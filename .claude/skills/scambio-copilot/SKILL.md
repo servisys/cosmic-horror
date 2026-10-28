@@ -62,7 +62,8 @@ Richiede il connettore Microsoft 365 nella sessione. Se non c'è, dirlo a Matteo
 - file letti da `da-copilot` e dove sono finiti su GitHub (branch, PR);
 - file copiati in `da-claude`;
 - anomalie o decisioni che servono a Matteo;
-- conferma esplicita: nessun merge, nulla modificato fuori da `da-claude`.
+- conferma esplicita: nessun merge, nulla modificato fuori da `da-claude`;
+- **la frase pronta da incollare a Copilot** per il passo successivo (in un blocco di citazione, con il percorso SharePoint dei file da leggere, il compito, le regole e i nomi dei file da salvare in `da-copilot`). Matteo la vuole sempre: se non c'è un passo successivo per Copilot, dirlo.
 
 ## Se qualcosa non torna
 

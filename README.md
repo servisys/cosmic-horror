@@ -1,18 +1,20 @@
 ---
-title: Cosmic Territory — Master Index
+title: Cosmic Horror — Master Index
 status: DRAFT
-version: 0.2.0
-owner: Team Cosmic Territory
+version: 0.2.1
+owner: Team Cosmic Horror
 last_reviewed: 2026-10-28
 repository_scope: GitHub
 implementation_target: Claude
 ---
 
-# Cosmic Territory — Master Index
+# Cosmic Horror — Master Index
 
-Questo documento è il punto di ingresso della documentazione di **Cosmic Territory**.
+Questo documento è il punto di ingresso della documentazione di **Cosmic Horror**.
 
-> **Principio operativo:** il Team Cosmic Territory definisce e approva visione, requisiti, vincoli e criteri di accettazione. Copilot supporta planning, consolidamento e verifica. Claude revisiona e implementa soltanto specifiche approvate.
+> **Nome del progetto:** il gioco si chiama **Cosmic Horror** (in precedenza "Cosmic Territory"). Il prefisso `CT_` dei documenti è una sigla storica, conservata per non rompere i riferimenti incrociati.
+
+> **Principio operativo:** il Team Cosmic Horror definisce e approva visione, requisiti, vincoli e criteri di accettazione. Copilot supporta planning, consolidamento e verifica. Claude revisiona e implementa soltanto specifiche approvate.
 
 ## 1. Istruzioni iniziali per Claude
 
@@ -199,7 +201,7 @@ L'ordine indica la dipendenza logica iniziale, non autorizza automaticamente la 
 title: Titolo
 status: DRAFT
 version: 0.1.0
-owner: Team Cosmic Territory
+owner: Team Cosmic Horror
 last_reviewed: YYYY-MM-DD
 related_documents: []
 ---
@@ -286,3 +288,4 @@ Claude deve produrre prima un pre-flight plan e, al termine, un Implementation R
 |---|---|---|
 | 0.1.0 | DRAFT | Prima struttura per SharePoint. |
 | 0.2.0 | DRAFT | Adattamento a repository GitHub unico con link relativi e separazione `docs/`, `reference/`, `game/`, `tools/`, `tests/`. |
+| 0.2.1 | DRAFT | Progetto rinominato in Cosmic Horror; il prefisso `CT_` dei documenti resta invariato. |

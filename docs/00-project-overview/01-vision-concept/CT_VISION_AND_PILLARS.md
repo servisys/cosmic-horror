@@ -1,19 +1,19 @@
 ---
-title: Cosmic Territory — Vision & Design Pillars
+title: Cosmic Horror — Vision & Design Pillars
 status: DRAFT
 version: 0.1.0
-owner: Team Cosmic Territory
+owner: Team Cosmic Horror
 last_reviewed: 2026-10-28
 implementation_target: Planning only — non implementabile da Claude in questa versione
 related_documents:
   - ../../../00_MASTER_INDEX.md
 ---
 
-# Cosmic Territory — Vision & Design Pillars
+# Cosmic Horror — Vision & Design Pillars
 
 ## 1. Funzione del documento
 
-Questo documento definisce la visione di prodotto e i pilastri di design di **Cosmic Territory**.
+Questo documento definisce la visione di prodotto e i pilastri di design di **Cosmic Horror**.
 
 Non è una specifica tecnica e non autorizza Claude a implementare funzionalità. Il suo scopo è stabilire una direzione condivisa entro cui verranno successivamente scritti i documenti di game design, lore, UX, architettura e sviluppo.
 
@@ -46,7 +46,7 @@ Le sezioni contrassegnate con `DA DECIDERE` non devono essere interpretate come 
 
 > **PROPOSTA**
 >
-> Cosmic Territory è un gioco strategico di carte e controllo territoriale ambientato in un cosmo oscuro e instabile, dove fazioni incompatibili competono per conquistare, corrompere o trasformare territori cosmici. Ogni partita rappresenta uno scontro per il dominio della realtà, nel quale il potere ottenuto espone progressivamente i contendenti a forze che non possono controllare completamente.
+> Cosmic Horror è un gioco strategico di carte e controllo territoriale ambientato in un cosmo oscuro e instabile, dove fazioni incompatibili competono per conquistare, corrompere o trasformare territori cosmici. Ogni partita rappresenta uno scontro per il dominio della realtà, nel quale il potere ottenuto espone progressivamente i contendenti a forze che non possono controllare completamente.
 
 Il gioco deve combinare tre idee centrali:
 
@@ -60,7 +60,7 @@ La componente cosmica e lovecraftiana deve sostenere il design, non essere solta
 
 ## 4. Promessa al giocatore
 
-Cosmic Territory deve offrire al giocatore la sensazione di:
+Cosmic Horror deve offrire al giocatore la sensazione di:
 
 - comandare una forza con identità riconoscibile;
 - contendersi una mappa viva, non una plancia passiva;
@@ -77,7 +77,7 @@ L'esperienza desiderata è **strategica, tesa e leggibile**. L'orrore deve emerg
 
 ### 5.1 Cosa deve essere
 
-Cosmic Territory deve essere:
+Cosmic Horror deve essere:
 
 - un gioco di strategia a carte con forte componente territoriale;
 - progettato digital-first;
@@ -89,7 +89,7 @@ Cosmic Territory deve essere:
 
 ### 5.2 Cosa non deve essere
 
-Cosmic Territory non deve diventare:
+Cosmic Horror non deve diventare:
 
 - una copia di Magic: The Gathering, Hearthstone, Marvel Snap o altri giochi esistenti con un tema differente;
 - un gioco nel quale il controllo territoriale è soltanto un contatore secondario;
@@ -253,7 +253,7 @@ Il tono deve essere:
 
 Il planning dovrà distinguere tre categorie:
 
-1. **Elementi originali di Cosmic Territory** — preferibili per identità e libertà creativa.
+1. **Elementi originali di Cosmic Horror** — preferibili per identità e libertà creativa.
 2. **Elementi lovecraftiani verificati come utilizzabili** — da registrare con provenienza e regole d'uso.
 3. **Elementi esclusi o dubbi** — da non inserire in specifiche destinate a Claude.
 
@@ -306,7 +306,7 @@ Ipotesi da validare:
 
 ### Posizionamento proposto
 
-Cosmic Territory dovrebbe differenziarsi attraverso la combinazione strutturale tra:
+Cosmic Horror dovrebbe differenziarsi attraverso la combinazione strutturale tra:
 
 - deckbuilding;
 - territorio conteso;

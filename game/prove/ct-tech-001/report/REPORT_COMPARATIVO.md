@@ -72,11 +72,13 @@ Screenshot: `report/screenshots/`.
 | Dimensione dell'artefatto | 1,03 MB (10 file) | 39,9 MB (wasm 39,5 MB); 10,4 MB con wasm compresso (gzip) |
 | Dipendenze/installazioni | Node 22; pacchetti npm (205 MB di node_modules) | binario 146 MB; template 1,28 GB (si usano 10 MB); nessun plugin |
 | Passaggi manuali o privilegi amministrativi | nessuno | nessuno privilegio; **checksum non verificabile** (SHA512-SUMS 403); GitHub releases 403; indice tuxfamily vuoto; funziona solo `downloads.godotengine.org` |
+| Pubblicazione per il telefono (pagina privata, Artifact di Claude) | pagina convertita in frammento (tolti i tag di documento): 1 passo manuale, 10 file, 1,03 MB | frammento della pagina + wasm compresso rinominato `.wasm` (l'host serve solo alcuni tipi di file: non `.pck` ne' `.gz`) + `.pck` incorporato nella pagina tramite lo shim: 3 passi manuali, 8 file, 10,1 MB. Provata in locale; **funzionamento sull'host da confermare sul telefono** |
 | Limite di hosting incontrato | nessuno | il wasm (39,5 MB) supera il limite per file degli Artifact (15 MB): serve la variante gzip con un piccolo shim in `index.html` (passaggio in piu') |
 
 ## 4. Problemi, dipendenze e lavoro manuale
 - Godot: fonte di download non ovvia (3 tentativi), template da 1,28 GB, copia manuale della fixture, shim per hosting, nessuna GPU (rendering software).
 - Web: nessun problema rilevante oltre ai tipi Node; la dimensione del bundle principale (~757 kB) e' da ottimizzare in un prodotto vero (non rilevante per la prova).
+- Pubblicazione per il telefono: le conversioni per l'host (frammento di pagina, rinomina del wasm, incorporamento del `.pck`) sono state fatte con uno script una tantum, non incluso nel repository: la pubblicazione non fa parte della fetta.
 - Nessun blocker.
 - Il tempo registrato e' di orologio di un agente software e non e' confrontabile con ore umane.
 

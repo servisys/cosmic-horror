@@ -10,12 +10,12 @@ export interface Carta {
 export interface EventoCosmico {
   id: string;
   al_round: number;
-  effetto: { imposta_stato: string };
+  effetto: { imposta_stato: string; imposta_stato2?: string };
 }
 
 export interface Fixture {
   carte: Carta[];
-  territorio: { id: string; stato_iniziale: string };
+  territorio: { id: string; stato_iniziale: string; stato2_iniziale: string };
   evento_cosmico: EventoCosmico;
 }
 
@@ -23,6 +23,7 @@ export interface Gioco {
   fixture: Fixture;
   round: number;
   stato: string;
+  stato2: string;
   carteGiocate: string[];
   eventiScattati: string[];
   log: string[];
@@ -33,6 +34,7 @@ export function creaGioco(fixture: Fixture): Gioco {
     fixture,
     round: 1,
     stato: fixture.territorio.stato_iniziale,
+    stato2: fixture.territorio.stato2_iniziale,
     carteGiocate: [],
     eventiScattati: [],
     log: ['Inizio partita di prova'],
@@ -77,6 +79,7 @@ export function fineTurno(g: Gioco): Gioco {
   if (n.round === ev.al_round && !n.eventiScattati.includes(ev.id)) {
     n.eventiScattati.push(ev.id);
     n.stato = ev.effetto.imposta_stato;
+    if (ev.effetto.imposta_stato2) n.stato2 = ev.effetto.imposta_stato2;
     n.log.push(`Evento cosmico ${ev.id}: stato = ${n.stato}`);
   }
   return n;

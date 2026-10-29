@@ -57,15 +57,18 @@ function disegna(): void {
   const stato = testo(`Stato: ${gioco.stato}`, verticale ? 24 : 40, terr.w - 32, colori.accento);
   stato.x = terr.x + 16;
   stato.y = terr.y + terr.h * 0.38;
+  const stato2 = testo(`Secondo stato: ${gioco.stato2}`, verticale ? 16 : 22, terr.w - 32);
+  stato2.x = terr.x + 16;
+  stato2.y = stato.y + stato.height + 8;
   const round = testo(`Round ${gioco.round}`, verticale ? 16 : 20);
   round.x = terr.x + 16;
   round.y = terr.y + terr.h - (verticale ? 34 : 44);
-  ui.addChild(titolo, stato, round);
+  ui.addChild(titolo, stato, stato2, round);
 
   if (gioco.eventiScattati.length > 0) {
     const ev = testo(`Evento cosmico: ${gioco.eventiScattati.join(', ')}`, verticale ? 14 : 20, terr.w - 32, colori.evento);
     ev.x = terr.x + 16;
-    ev.y = stato.y + stato.height + 12;
+    ev.y = stato2.y + stato2.height + 12;
     ui.addChild(ev);
   }
 
@@ -125,7 +128,7 @@ async function avvia(): Promise<void> {
   });
   // Interfaccia per i test automatici (non fa parte del gioco).
   (window as unknown as Record<string, unknown>).ct = {
-    stato: () => ({ stato: gioco.stato, round: gioco.round, eventi_scattati: gioco.eventiScattati }),
+    stato: () => ({ stato: gioco.stato, stato2: gioco.stato2, round: gioco.round, eventi_scattati: gioco.eventiScattati }),
     gioca: (id: string) => aggiorna(giocaCarta(gioco, id)),
     fineTurno: () => aggiorna(fineTurno(gioco)),
     reset: () => aggiorna(creaGioco(fixtureJson as unknown as Fixture)),

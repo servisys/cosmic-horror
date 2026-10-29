@@ -1,18 +1,71 @@
 {
   "_etichetta": "FIXTURE TECNICA NON DI DESIGN - valori finti per la prova CT-TECH-001. Non sono regole di gioco e non vanno nel Decision Log.",
-  "versione": 1,
-  "giocatori": ["persona", "avversario"],
-  "territorio": { "id": "T1", "stato_iniziale": "neutro" },
-  "carte": [
-    { "id": "C1", "proprietario": "persona", "effetto": { "imposta_stato": "stato-uno" } },
-    { "id": "C2", "proprietario": "avversario", "effetto": { "imposta_stato": "stato-due" } }
+  "versione": 2,
+  "giocatori": [
+    "persona",
+    "avversario"
   ],
-  "evento_cosmico": { "id": "E1", "al_round": 3, "effetto": { "imposta_stato": "stato-evento" } },
+  "territorio": {
+    "id": "T1",
+    "stato_iniziale": "neutro",
+    "stato2_iniziale": "neutro-2"
+  },
+  "carte": [
+    {
+      "id": "C1",
+      "proprietario": "persona",
+      "effetto": {
+        "imposta_stato": "stato-uno"
+      }
+    },
+    {
+      "id": "C2",
+      "proprietario": "avversario",
+      "effetto": {
+        "imposta_stato": "stato-due"
+      }
+    }
+  ],
+  "evento_cosmico": {
+    "id": "E1",
+    "al_round": 3,
+    "effetto": {
+      "imposta_stato": "stato-evento",
+      "imposta_stato2": "stato2-evento"
+    }
+  },
   "avversario_minimo": "Alla fine del turno della persona l'avversario gioca la propria carta se non e' gia' stata giocata, altrimenti passa. Nessuna strategia: e' uno script tecnico, non l'IA di gioco.",
   "convenzione_round": "Il round inizia a 1. fine_turno esegue il turno dell'avversario, poi incrementa il round; se il nuovo round e' uguale a evento_cosmico.al_round l'evento scatta subito.",
   "sequenza_di_prova": [
-    { "azione": "gioca", "carta": "C1", "atteso": { "stato": "stato-uno", "round": 1, "eventi_scattati": [] } },
-    { "azione": "fine_turno", "atteso": { "stato": "stato-due", "round": 2, "eventi_scattati": [] } },
-    { "azione": "fine_turno", "atteso": { "stato": "stato-evento", "round": 3, "eventi_scattati": ["E1"] } }
+    {
+      "azione": "gioca",
+      "carta": "C1",
+      "atteso": {
+        "stato": "stato-uno",
+        "round": 1,
+        "eventi_scattati": [],
+        "stato2": "neutro-2"
+      }
+    },
+    {
+      "azione": "fine_turno",
+      "atteso": {
+        "stato": "stato-due",
+        "round": 2,
+        "eventi_scattati": [],
+        "stato2": "neutro-2"
+      }
+    },
+    {
+      "azione": "fine_turno",
+      "atteso": {
+        "stato": "stato-evento",
+        "round": 3,
+        "eventi_scattati": [
+          "E1"
+        ],
+        "stato2": "stato2-evento"
+      }
+    }
   ]
 }

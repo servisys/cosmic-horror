@@ -41,7 +41,7 @@ describe('logica della fetta (senza interfaccia)', () => {
     let g = creaGioco(fixture);
     for (const passo of dati.sequenza_di_prova) {
       g = passo.azione === 'gioca' ? giocaCarta(g, passo.carta) : fineTurno(g);
-      expect({ stato: g.stato, round: g.round, eventi_scattati: g.eventiScattati }).toEqual(passo.atteso);
+      expect({ stato: g.stato, stato2: g.stato2, round: g.round, eventi_scattati: g.eventiScattati }).toEqual(passo.atteso);
     }
   });
 });

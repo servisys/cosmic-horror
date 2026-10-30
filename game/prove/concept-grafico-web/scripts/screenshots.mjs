@@ -31,6 +31,13 @@ for (const f of formati) {
   await page.evaluate(() => window.ct.fermaTilt(0.7, -0.3));
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${out}${f.nome}-3-inclinata-destra.png` });
+  // Confronto tra tutte le carte dell'elenco (se ce n'e' piu' di una).
+  if ((await page.evaluate(() => window.ct.carte())) > 1) {
+    await page.evaluate(() => window.ct.modo('confronto'));
+    await page.evaluate(() => window.ct.tempo(5));
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: `${out}${f.nome}-4-confronto.png` });
+  }
   console.log(`${f.nome}: ${errori.length ? 'ERRORI ' + errori.slice(0, 2) : 'nessun errore'}`);
   if (errori.length) ko++;
   await ctx.close();

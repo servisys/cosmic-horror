@@ -5,6 +5,37 @@ import * as THREE from 'three';
 const CW = 1024;
 const CH = 1434;
 
+export type TipoCarta = 'persona' | 'avversario' | 'territorio' | 'evento';
+export interface Dati {
+  nome: string;
+  tipoCarta: TipoCarta;
+  tipo: string;
+  testo: string;
+  flavor: string;
+  pt?: string;
+  costo: number[];
+  file?: string;
+  prompt?: string;
+  nota?: string;
+}
+// Cinque tonalita' del metallo della cornice per tipo di carta (stesso modello, colore diverso).
+const PALETTE: Record<TipoCarta, string[]> = {
+  persona: ['#d9b46a', '#6f5326', '#f0d89a', '#5a4220', '#c9a35a'],
+  avversario: ['#c98a7a', '#5a2420', '#f0b8a8', '#4a1a18', '#b8685a'],
+  territorio: ['#8cc7a8', '#2c5a48', '#c8f0d8', '#234a3a', '#7fb89a'],
+  evento: ['#b9a2e8', '#43307a', '#e0d4ff', '#352662', '#a58ad8'],
+};
+const DEFAULT_DATI: Dati = {
+  nome: "Custode dell'Abisso",
+  tipoCarta: 'avversario',
+  tipo: 'Entità — Abissale',
+  testo: 'Quando entra in gioco, ogni territorio vicino diventa Oscurato fino alla fine del turno.',
+  flavor: '«Non dorme. Aspetta che smettiamo di guardare.»',
+  pt: '4 / 5',
+  costo: [0, 1],
+  file: '../art.jpg',
+};
+
 // ---------- Texture della carta (disegnata con canvas 2D) ----------
 function rr(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
   c.beginPath();
@@ -116,7 +147,7 @@ function disegnaArtePlaceholder(c: CanvasRenderingContext2D, x: number, y: numbe
   c.restore();
 }
 
-function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null): void {
+function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null, d: Dati): void {
   const c = cv.getContext('2d') as CanvasRenderingContext2D;
   c.clearRect(0, 0, CW, CH);
   const rnd = rumore(3);
@@ -126,11 +157,8 @@ function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null): voi
   c.fillStyle = '#07070b';
   c.fill();
   const bronzo = c.createLinearGradient(0, 0, CW, CH);
-  bronzo.addColorStop(0, '#d9b46a');
-  bronzo.addColorStop(0.25, '#6f5326');
-  bronzo.addColorStop(0.5, '#f0d89a');
-  bronzo.addColorStop(0.75, '#5a4220');
-  bronzo.addColorStop(1, '#c9a35a');
+  const pal = PALETTE[d.tipoCarta];
+  [0, 0.25, 0.5, 0.75, 1].forEach((st, i) => bronzo.addColorStop(st, pal[i]));
   rr(c, 14, 14, CW - 28, CH - 28, 40);
   c.lineWidth = 14;
   c.strokeStyle = bronzo;
@@ -155,14 +183,15 @@ function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null): voi
   c.fillStyle = '#efe6d0';
   c.font = '700 54px Georgia, "Times New Roman", serif';
   c.textBaseline = 'middle';
-  c.fillText("Custode dell'Abisso", 96, 112);
+  c.fillText(d.nome, 96, 112);
 
   // Costo (sfere)
-  [0, 1].forEach((i) => {
-    const cx = CW - 158 + i * 64;
+  d.costo.forEach((tipoSfera, i) => {
+    const cx = CW - 94 - (d.costo.length - 1 - i) * 64;
+    const chiara = tipoSfera === 0;
     const g = c.createRadialGradient(cx - 8, 104, 4, cx, 112, 30);
-    g.addColorStop(0, i === 0 ? '#9ff0e0' : '#d0c4ff');
-    g.addColorStop(1, i === 0 ? '#0f5a66' : '#3a2a7a');
+    g.addColorStop(0, chiara ? '#9ff0e0' : '#d0c4ff');
+    g.addColorStop(1, chiara ? '#0f5a66' : '#3a2a7a');
     c.beginPath();
     c.arc(cx, 112, 28, 0, Math.PI * 2);
     c.fillStyle = g;
@@ -194,7 +223,7 @@ function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null): voi
   barra(812, 72);
   c.fillStyle = '#e4dcc6';
   c.font = '600 40px Georgia, serif';
-  c.fillText('Entità — Abissale', 96, 850);
+  c.fillText(d.tipo, 96, 850);
 
   // Riquadro del testo con pergamena scura
   const tx = 70;
@@ -224,30 +253,32 @@ function disegnaCarta(cv: HTMLCanvasElement, arte: HTMLImageElement | null): voi
   c.font = '500 38px Georgia, serif';
   c.textBaseline = 'alphabetic';
   let y = ty + 64;
-  for (const r of righe(c, 'Quando entra in gioco, ogni territorio vicino diventa Oscurato fino alla fine del turno.', tw - 60)) {
+  for (const r of righe(c, d.testo, tw - 60)) {
     c.fillText(r, tx + 30, y);
     y += 50;
   }
   y += 14;
   c.font = 'italic 34px Georgia, serif';
   c.fillStyle = '#3b3325';
-  for (const r of righe(c, '«Non dorme. Aspetta che smettiamo di guardare.»', tw - 60)) {
+  for (const r of righe(c, d.flavor, tw - 60)) {
     c.fillText(r, tx + 30, y);
     y += 44;
   }
 
-  // Piastra forza/resistenza e gemma rarità
-  rr(c, CW - 280, 1280, 210, 90, 18);
-  c.fillStyle = '#1c1828';
-  c.fill();
-  c.lineWidth = 4;
-  c.strokeStyle = bronzo;
-  c.stroke();
-  c.fillStyle = '#f2e9d2';
-  c.font = '700 58px Georgia, serif';
-  c.textAlign = 'center';
-  c.fillText('4 / 5', CW - 175, 1347);
-  c.textAlign = 'left';
+  // Piastra forza/resistenza (se presente) e gemma
+  if (d.pt) {
+    rr(c, CW - 280, 1280, 210, 90, 18);
+    c.fillStyle = '#1c1828';
+    c.fill();
+    c.lineWidth = 4;
+    c.strokeStyle = bronzo;
+    c.stroke();
+    c.fillStyle = '#f2e9d2';
+    c.font = '700 58px Georgia, serif';
+    c.textAlign = 'center';
+    c.fillText(d.pt, CW - 175, 1347);
+    c.textAlign = 'left';
+  }
   const gem = c.createRadialGradient(CW / 2 - 4, 1392, 2, CW / 2, 1396, 22);
   gem.addColorStop(0, '#ffe9a8');
   gem.addColorStop(1, '#a8741a');
@@ -273,15 +304,8 @@ document.body.appendChild(renderer.domElement);
 
 const scena = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-
-const cartaCanvas = document.createElement('canvas');
-cartaCanvas.width = CW;
-cartaCanvas.height = CH;
-disegnaCarta(cartaCanvas, null);
-const texture = new THREE.CanvasTexture(cartaCanvas);
-texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-texture.generateMipmaps = true;
-texture.minFilter = THREE.LinearMipmapLinearFilter;
+const tilt = new THREE.Vector2(0, 0); // condiviso da tutte le carte
+const tiltObiettivo = new THREE.Vector2(0, 0);
 
 const noiseGlsl = `
 float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
@@ -290,18 +314,8 @@ float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
 float fbm(vec2 p){ float v=0.0, a=0.5; for(int i=0;i<5;i++){ v+=a*vnoise(p); p*=2.0; a*=0.5; } return v; }
 `;
 
-const cartaMat = new THREE.ShaderMaterial({
-  transparent: true,
-  uniforms: {
-    uMap: { value: texture },
-    uTilt: { value: new THREE.Vector2(0, 0) },
-    uTime: { value: 0 },
-    uFoil: { value: 1 },
-    uFlash: { value: 0 },
-    uArt: { value: new THREE.Vector4(70 / CW, 1 - (176 + 620) / CH, (CW - 140) / CW, 620 / CH) },
-  },
-  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
-  fragmentShader: `
+const vertexBase = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`;
+const fragmentCarta = `
     varying vec2 vUv; uniform sampler2D uMap; uniform vec2 uTilt; uniform float uTime, uFoil, uFlash; uniform vec4 uArt;
     ${noiseGlsl}
     vec3 arcobaleno(float t){ return 0.5 + 0.5*cos(6.28318*(t + vec3(0.0, 0.33, 0.67))); }
@@ -333,36 +347,76 @@ const cartaMat = new THREE.ShaderMaterial({
       col += vec3(1.0,0.97,0.9) * g * (0.05 + 0.22*maschera + 0.06*inTesto) * uFoil;
       col += vec3(0.7,1.0,0.95) * uFlash * (0.6 - abs(vUv.y - 0.5));
       gl_FragColor = vec4(col, alfa);
-    }`,
-});
+    }`;
+
 const CARTA_W = 2.5;
 const CARTA_H = 3.5;
-const carta = new THREE.Mesh(new THREE.PlaneGeometry(CARTA_W, CARTA_H), cartaMat);
-const gruppo = new THREE.Group();
-gruppo.add(carta);
-scena.add(gruppo);
+const PASSO = 2.9; // distanza tra le carte in modalita' confronto
+const geoCarta = new THREE.PlaneGeometry(CARTA_W, CARTA_H);
+const geoOmbra = new THREE.PlaneGeometry(CARTA_W * 1.5, CARTA_H * 1.35);
+const matOmbra = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  vertexShader: vertexBase,
+  fragmentShader: `varying vec2 vUv; void main(){ vec2 q = (vUv-0.5)*vec2(2.0,2.0); float a = 1.0 - smoothstep(0.35, 1.0, length(q*vec2(1.0,0.95))); gl_FragColor = vec4(0.0,0.0,0.0,a*0.75); }`,
+});
 
-// Ombra morbida sotto la carta
-const ombra = new THREE.Mesh(
-  new THREE.PlaneGeometry(CARTA_W * 1.5, CARTA_H * 1.35),
-  new THREE.ShaderMaterial({
+interface Scheda {
+  dati: Dati;
+  canvas: HTMLCanvasElement;
+  texture: THREE.CanvasTexture;
+  mat: THREE.ShaderMaterial;
+  gruppo: THREE.Group;
+  x: number;
+  visibile: boolean;
+}
+const schede: Scheda[] = [];
+
+function creaScheda(d: Dati): Scheda {
+  const canvas = document.createElement('canvas');
+  canvas.width = CW;
+  canvas.height = CH;
+  disegnaCarta(canvas, null, d);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  const mat = new THREE.ShaderMaterial({
     transparent: true,
-    depthWrite: false,
-    uniforms: {},
-    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
-    fragmentShader: `varying vec2 vUv; void main(){ vec2 q = (vUv-0.5)*vec2(2.0,2.0); float a = 1.0 - smoothstep(0.35, 1.0, length(q*vec2(1.0,0.95))); gl_FragColor = vec4(0.0,0.0,0.0,a*0.75); }`,
-  }),
-);
-ombra.position.z = -0.15;
-gruppo.add(ombra);
+    uniforms: {
+      uMap: { value: texture },
+      uTilt: { value: tilt },
+      uTime: { value: 0 },
+      uFoil: { value: 1 },
+      uFlash: { value: 0 },
+      uArt: { value: new THREE.Vector4(70 / CW, 1 - (176 + 620) / CH, (CW - 140) / CW, 620 / CH) },
+    },
+    vertexShader: vertexBase,
+    fragmentShader: fragmentCarta,
+  });
+  const gruppo = new THREE.Group();
+  const ombra = new THREE.Mesh(geoOmbra, matOmbra);
+  ombra.position.z = -0.15;
+  gruppo.add(new THREE.Mesh(geoCarta, mat), ombra);
+  scena.add(gruppo);
+  const scheda: Scheda = { dati: d, canvas, texture, mat, gruppo, x: 0, visibile: true };
+  schede.push(scheda);
+  // Illustrazione vera, se il file esiste (percorso relativo alla cartella "arte/" accanto alla pagina).
+  if (d.file) {
+    const img = new Image();
+    img.onload = () => { disegnaCarta(canvas, img, d); texture.needsUpdate = true; };
+    img.src = new URL(d.file, new URL('arte/', location.href)).toString();
+  }
+  return scheda;
+}
 
 // Nebbia di fondo
 const nebbia = new THREE.Mesh(
-  new THREE.PlaneGeometry(30, 20),
+  new THREE.PlaneGeometry(40, 20),
   new THREE.ShaderMaterial({
     depthWrite: false,
     uniforms: { uTime: { value: 0 } },
-    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    vertexShader: vertexBase,
     fragmentShader: `varying vec2 vUv; uniform float uTime; ${noiseGlsl}
       void main(){
         float n = fbm(vUv*vec2(6.0,4.0) + vec2(uTime*0.02, -uTime*0.015));
@@ -383,7 +437,7 @@ const vel = new Float32Array(N);
 const dim = new Float32Array(N);
 const rnd = rumore(11);
 for (let i = 0; i < N; i++) {
-  pos[i * 3] = (rnd() - 0.5) * 7;
+  pos[i * 3] = (rnd() - 0.5) * 12;
   pos[i * 3 + 1] = (rnd() - 0.5) * 6;
   pos[i * 3 + 2] = -1 + rnd() * 2.5;
   vel[i] = 0.1 + rnd() * 0.35;
@@ -405,53 +459,76 @@ const particelle = new THREE.Points(
 );
 scena.add(particelle);
 
-// ---------- Interazione, animazione, ridimensionamento ----------
-const tilt = new THREE.Vector2(0, 0);
-const tiltObiettivo = new THREE.Vector2(0, 0);
+// ---------- Modalita', layout, interazione ----------
+let modo: 'singola' | 'confronto' = 'singola';
+let indice = 0;
 let trascino = false;
-let giroscopio = false;
 let inizio = performance.now();
 const durata = 1.5;
+const nota = document.getElementById('nota');
 
 function adatta(): void {
   const w = window.innerWidth;
   const h = window.innerHeight;
   renderer.setSize(w, h);
   camera.aspect = w / h;
+  const n = schede.filter((s) => s.visibile).length || 1;
+  const larghezzaTot = CARTA_W + (n - 1) * PASSO;
   const tanMezzo = Math.tan((camera.fov * Math.PI) / 360);
   const perAltezza = CARTA_H / 0.74 / (2 * tanMezzo);
-  const perLarghezza = CARTA_W / 0.9 / (2 * tanMezzo * camera.aspect);
+  const perLarghezza = larghezzaTot / 0.92 / (2 * tanMezzo * camera.aspect);
   camera.position.z = Math.max(perAltezza, perLarghezza);
   camera.updateProjectionMatrix();
 }
+
+function applicaLayout(): void {
+  const visibili: Scheda[] = [];
+  schede.forEach((s, i) => {
+    s.visibile = modo === 'confronto' || i === indice;
+    s.gruppo.visible = s.visibile;
+    if (s.visibile) visibili.push(s);
+  });
+  visibili.forEach((s, k) => { s.x = (k - (visibili.length - 1) / 2) * PASSO; });
+  adatta();
+  if (nota) {
+    nota.textContent = modo === 'confronto'
+      ? 'Confronto: tocca una carta per ingrandirla.'
+      : `${indice + 1}/${schede.length} - ${schede[indice].dati.nome}${schede[indice].dati.nota ? ' - ' + schede[indice].dati.nota : ''}. Trascina per inclinare.`;
+  }
+  inizio = performance.now();
+}
 window.addEventListener('resize', adatta);
-adatta();
 
 const rect = (): DOMRect => renderer.domElement.getBoundingClientRect();
 function puntatore(e: PointerEvent): void {
   const r = rect();
   tiltObiettivo.set(((e.clientX - r.left) / r.width - 0.5) * 2, -((e.clientY - r.top) / r.height - 0.5) * 2);
 }
-renderer.domElement.addEventListener('pointerdown', (e) => { trascino = true; puntatore(e); });
+let giu = { x: 0, y: 0 };
+renderer.domElement.addEventListener('pointerdown', (e) => { trascino = true; giu = { x: e.clientX, y: e.clientY }; puntatore(e); });
 renderer.domElement.addEventListener('pointermove', (e) => { if (trascino || e.pointerType === 'mouse') puntatore(e); });
-window.addEventListener('pointerup', () => { trascino = false; });
+window.addEventListener('pointerup', (e) => {
+  trascino = false;
+  // Tocco breve in modalita' confronto: ingrandisce la carta toccata.
+  if (modo === 'confronto' && Math.hypot(e.clientX - giu.x, e.clientY - giu.y) < 8) {
+    const r = rect();
+    const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(ndc, camera);
+    const meshes = schede.map((s) => s.gruppo.children[0]);
+    const hit = ray.intersectObjects(meshes, false)[0];
+    if (hit) { indice = meshes.indexOf(hit.object); modo = 'singola'; applicaLayout(); }
+  }
+});
 
+const vai = (d: number): void => { indice = (indice + d + schede.length) % schede.length; modo = 'singola'; applicaLayout(); };
+document.getElementById('b-prev')?.addEventListener('click', () => vai(-1));
+document.getElementById('b-next')?.addEventListener('click', () => vai(1));
+document.getElementById('b-conf')?.addEventListener('click', () => { modo = modo === 'confronto' ? 'singola' : 'confronto'; applicaLayout(); });
 document.getElementById('b-anim')?.addEventListener('click', () => { inizio = performance.now(); });
-document.getElementById('b-foil')?.addEventListener('click', () => { cartaMat.uniforms.uFoil.value = cartaMat.uniforms.uFoil.value > 0 ? 0 : 1; });
-document.getElementById('b-tilt')?.addEventListener('click', async () => {
-  const DOE = (window as unknown as { DeviceOrientationEvent?: { requestPermission?: () => Promise<string> } }).DeviceOrientationEvent;
-  try {
-    if (DOE?.requestPermission) {
-      const r = await DOE.requestPermission();
-      if (r !== 'granted') return;
-    }
-    giroscopio = true;
-    window.addEventListener('deviceorientation', (e) => {
-      const g = (e.gamma ?? 0) / 30;
-      const b = ((e.beta ?? 45) - 45) / 30;
-      tiltObiettivo.set(Math.max(-1, Math.min(1, g)), Math.max(-1, Math.min(1, -b)));
-    });
-  } catch { /* il giroscopio non e' disponibile: si resta con il tocco */ }
+document.getElementById('b-foil')?.addEventListener('click', () => {
+  const nuovo = schede[0].mat.uniforms.uFoil.value > 0 ? 0 : 1;
+  schede.forEach((s) => { s.mat.uniforms.uFoil.value = nuovo; });
 });
 
 const easeOutBack = (t: number): number => 1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2);
@@ -461,23 +538,28 @@ let frame = 0;
 function anima(): void {
   const dt = Math.min(orologio.getDelta(), 0.05);
   const tt = orologio.elapsedTime;
-  const p = Math.min(1, (performance.now() - inizio) / 1000 / durata);
-  const e = easeOutBack(p);
-  // Entrata: la carta arriva da sotto, ruotando, e si assesta
-  gruppo.position.y = (1 - e) * -3.2;
-  gruppo.position.z = (1 - e) * -2.5;
-  const rotEntrata = (1 - e) * Math.PI * 0.9;
-  cartaMat.uniforms.uFlash.value = Math.max(0, 1 - Math.abs(p - 0.82) * 6) * 0.5;
-  (particelle.material as THREE.ShaderMaterial).uniforms.uBoost.value = Math.max(0, 1 - p) * 2.5;
-
-  if (!trascino && !giroscopio && p >= 1) {
+  const trascorso = (performance.now() - inizio) / 1000;
+  const pPrima = Math.min(1, trascorso / durata);
+  const pUltima = Math.min(1, Math.max(0, trascorso - (schede.length - 1) * 0.12) / durata);
+  if (!trascino && pUltima >= 1) {
     tiltObiettivo.set(Math.sin(tt * 0.5) * 0.55, Math.cos(tt * 0.37) * 0.35); // oscillazione lenta a riposo
   }
   tilt.lerp(tiltObiettivo, 1 - Math.pow(0.001, dt));
-  gruppo.rotation.y = tilt.x * 0.42 + rotEntrata;
-  gruppo.rotation.x = -tilt.y * 0.32;
-  cartaMat.uniforms.uTilt.value.copy(tilt);
-  cartaMat.uniforms.uTime.value = tt;
+
+  let k = 0;
+  for (const s of schede) {
+    if (!s.visibile) continue;
+    // Entrata a cascata: ogni carta parte un po' dopo la precedente.
+    const p = Math.min(1, Math.max(0, trascorso - k * 0.12) / durata);
+    const e = easeOutBack(p);
+    s.gruppo.position.set(s.x, (1 - e) * -3.2, (1 - e) * -2.5);
+    s.gruppo.rotation.y = tilt.x * 0.42 + (1 - e) * Math.PI * 0.9;
+    s.gruppo.rotation.x = -tilt.y * 0.32;
+    s.mat.uniforms.uTime.value = tt;
+    s.mat.uniforms.uFlash.value = Math.max(0, 1 - Math.abs(p - 0.82) * 6) * 0.5;
+    k++;
+  }
+  (particelle.material as THREE.ShaderMaterial).uniforms.uBoost.value = Math.max(0, 1 - pPrima) * 2.5;
   (nebbia.material as THREE.ShaderMaterial).uniforms.uTime.value = tt;
 
   const a = geoP.getAttribute('position') as THREE.BufferAttribute;
@@ -492,18 +574,29 @@ function anima(): void {
   frame++;
   requestAnimationFrame(anima);
 }
-anima();
 
-// Illustrazione vera (opzionale): se accanto alla pagina c'e' "art.jpg" (immagine generata con ComfyUI), la usa.
-const arteImg = new Image();
-arteImg.onload = () => { disegnaCarta(cartaCanvas, arteImg); texture.needsUpdate = true; };
-const param = new URLSearchParams(location.search).get('art');
-arteImg.src = param ?? new URL('art.jpg', location.href).toString();
+// Elenco delle carte: "arte/manifest.json" se c'e', altrimenti la sola carta di esempio.
+async function avvia(): Promise<void> {
+  let elenco: Dati[] = [DEFAULT_DATI];
+  try {
+    const r = await fetch(new URL('arte/manifest.json', location.href).toString());
+    if (r.ok) {
+      const j = (await r.json()) as Dati[];
+      if (Array.isArray(j) && j.length > 0) elenco = j;
+    }
+  } catch { /* nessun manifest: resta la carta di esempio */ }
+  elenco.forEach(creaScheda);
+  applicaLayout();
+  anima();
+}
+void avvia();
 
 // Interfaccia per i test automatici (non fa parte del concept).
 (window as unknown as Record<string, unknown>).ct = {
   frame: () => frame,
-  replay: () => { inizio = performance.now(); },
+  carte: () => schede.length,
+  modo: (m: 'singola' | 'confronto') => { modo = m; applicaLayout(); },
+  indice: (i: number) => { indice = i; modo = 'singola'; applicaLayout(); },
   fermaTilt: (x: number, y: number) => { trascino = true; tiltObiettivo.set(x, y); },
   tempo: (s: number) => { inizio = performance.now() - s * 1000; },
 };

@@ -336,15 +336,6 @@ const fragmentCarta = `
       float t = vUv.x*1.4 + vUv.y*0.9 + uTilt.x*1.3 - uTilt.y*0.9 + fbm(vUv*5.0 + uTime*0.03)*0.35;
       vec3 foil = arcobaleno(t);
       col += foil * maschera * 0.24 * uFoil;
-      // scintille: poche, morbide, ognuna grande qualche pixel (una griglia fitta sul telefono sembra rumore)
-      vec2 griglia = vec2(70.0, 98.0);
-      vec2 cella = floor(vUv*griglia);
-      vec2 dentro = fract(vUv*griglia) - 0.5;
-      float s = hash(cella);
-      vec2 centro = (vec2(hash(cella+7.1), hash(cella+3.7)) - 0.5) * 0.5;
-      float punto = 1.0 - smoothstep(0.08, 0.34, length(dentro - centro));
-      float acceso = step(0.975, s) * punto * (0.5 + 0.5*sin(uTime*1.6 + s*60.0 + uTilt.x*6.0 + uTilt.y*5.0));
-      col += vec3(1.0,0.95,0.85) * acceso * maschera * uFoil * 0.9;
       // riflesso lucido: una fascia di luce che scorre con l'inclinazione
       float fascia = (vUv.x + vUv.y*0.6) - (0.5 + uTilt.x*0.9 - uTilt.y*0.5);
       float g = exp(-fascia*fascia*40.0);

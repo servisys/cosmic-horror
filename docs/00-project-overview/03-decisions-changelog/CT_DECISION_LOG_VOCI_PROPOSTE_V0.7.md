@@ -1,7 +1,8 @@
 ---
 title: Cosmic Horror - Voci tecniche unificate proposte Decision Log
 status: DRAFT
-version: 0.6.0
+version: 0.7.0
+prepared_by: Cowork
 owner: Team Cosmic Horror
 project_prefix: CT_
 last_reviewed: 2026-10-30
@@ -9,7 +10,7 @@ last_reviewed: 2026-10-30
 
 # Cosmic Horror - Voci tecniche unificate proposte Decision Log
 
-> **PROPOSTA DI COPILOT, DA CONFERMARE DA MATTEO**
+> **PROPOSTA DI COWORK (correzione dei riferimenti della V0.6 di Copilot), DA CONFERMARE DA MATTEO**
 >
 > Tutte le voci contenute in questo documento hanno `Stato: PROPOSTA`. Nessuna voce è registrata o approvata. `CT-DES-014` non compare perché dispone del documento separato predisposto per la registrazione.
 
@@ -93,6 +94,13 @@ last_reviewed: 2026-10-30
 ## Nota di unificazione
 
 - `CT-DES-011` compare una sola volta, nella formulazione aggiornata dal chiarimento «contro il computer».
-- `CT-DES-012` e `CT-DES-013` restano invariate rispetto a `CT_DECISION_LOG_VOCI_PROPOSTE_V0.4.md`.
-- `CT-DES-014` è stata rimossa da questo documento perché dispone del documento separato `CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.1.md` predisposto per il processo di registrazione.
+- `CT-DES-012` e `CT-DES-013` restano invariate rispetto alla precedente V0.4 (non più presente come file: il testo valido è quello di questo documento).
+- `CT-DES-014` è stata rimossa da questo documento perché dispone del documento separato `CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.12.md` predisposto per il processo di registrazione.
 - Il merge di questo documento non registra `CT-DES-011`, `CT-DES-012` o `CT-DES-013`, perché tutte riportano `Stato: PROPOSTA`.
+
+## Changelog
+
+| Versione | Stato | Modifica |
+|---|---|---|
+| 0.6.0 | DRAFT | Unificazione delle voci tecniche CT-DES-011, 012 e 013 (preparata da Copilot). |
+| 0.7.0 | DRAFT | Solo correzione di due riferimenti nella nota di unificazione: la V0.4 non è più citata come file, e il documento di CT-DES-014 è indicato col nome esistente `..._V0.12.md` (prima `..._V0.1.md`, inesistente). Intestazione e `prepared_by` aggiornati a Cowork. Nessuna voce modificata, nessuna decisione registrata o approvata. |

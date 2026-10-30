@@ -1,7 +1,7 @@
 // Cattura automatica del concept. Richiede l'anteprima su http://localhost:4174
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
-const require = createRequire('/home/user/cosmic-horror/game/prove/ct-tech-001/web/package.json');
+const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 const url = process.env.CT_URL ?? 'http://localhost:4174/';
 const out = new URL('../report/screenshots/', import.meta.url).pathname;

@@ -1,17 +1,17 @@
 ---
 title: Cosmic Horror - Aggiornamento CT-DES-014
 status: DRAFT
-version: 0.1.0
+version: 0.13.0
 owner: Matteo
+prepared_by: Cowork
+supersedes: CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.12.md
 project_prefix: CT_
-last_reviewed: 2026-10-30
+last_reviewed: 2026-10-31
 ---
 
 # Cosmic Horror - Aggiornamento CT-DES-014
 
-> **PROPOSTA DI COPILOT, DA CONFERMARE DA MATTEO**
->
-> Documento predisposto per il processo di registrazione. Non viene effettuato alcun merge da questo documento.
+> **CORREZIONE DI COWORK, DA CONFERMARE DA MATTEO.** Questa versione corregge solo lo stato del documento (banner, sezione di registrazione, versione). **Il testo della decisione è identico a quello della V0.12.**
 
 ## CT-DES-014 - Motore e percorso tecnologico
 
@@ -51,8 +51,18 @@ last_reviewed: 2026-10-30
 
 **Sostituisce:** la precedente formulazione di `CT-DES-014`, che dichiarava il motore non ancora scelto. L'ID viene mantenuto perché il presente documento aggiorna direttamente la decisione tecnica già identificata come `CT-DES-014`.
 
-## Condizione di efficacia
+## Stato di registrazione
 
-Secondo la proposta `CT_DECISION_LOG_REGOLE_V0.2.md`, il merge in `main` registra soltanto le voci che nel documento hanno `Stato: REGISTRATA`.
+Secondo `CT_DECISION_LOG_REGOLE_V0.2.md` (regola 4), il merge in `main` registra soltanto le voci che nel documento hanno `Stato: REGISTRATA`.
 
-Questa voce è predisposta con `Stato: REGISTRATA`, ma il presente file non effettua alcun merge. Prima del merge, resta un aggiornamento proposto e non ancora registrato nel repository autorevole.
+La V0.12 di questo documento è stata fusa in `main` con la PR #28 (commit di merge `129cfdb`): **CT-DES-014 è registrata.** Conferma di Matteo in chat il 2026-10-30: «ok approvato usiamo il web».
+
+La registrazione riguarda il percorso web. Non approva librerie, wrapper di packaging o architettura definitiva (vedi sopra).
+
+## Changelog
+
+| Versione | Stato | Modifica |
+|---|---|---|
+| 0.1.0 (file V0.11) | DRAFT | Prima predisposizione della registrazione di CT-DES-014 (Copilot). Sostituita dalla V0.12. |
+| 0.1.0 (file V0.12) | DRAFT | Aggiornamento del testo (Copilot). Il numero di versione nel front matter non coincideva con il nome del file. |
+| 0.13.0 | DRAFT | Solo stato del documento: tolto il banner «proposta di Copilot, da confermare» e la sezione «Condizione di efficacia» (superata dal merge), aggiunta la sezione «Stato di registrazione», allineati nome file e versione. Testo della decisione invariato. |

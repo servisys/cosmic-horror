@@ -8,3 +8,15 @@ Due screenshot inviati da Matteo, schermo orizzontale, stato iniziale (Round 1).
 | godot-iphone16promax-orizzontale-iniziale.png | Godot (versione browser) | "troppo piccolo" (parere su uno dei due, vedi sopra) | Si apre e gira sull'host privato (lo shim funziona). Testi e solido 3D molto piccoli, grandi aree vuote, bande nere ai lati. |
 
 Nota: la prova automatica copriva PC e telefono in verticale (390x844, 440x956), non il telefono in orizzontale. Nessuno dei due layout e' stato adattato a questa orientazione.
+
+## Seconda serie: dopo la sequenza (carta C1, fine turno, fine turno)
+
+Screenshot finali di Matteo, stesso iPhone, orizzontale. Nota: in questa serie il primo screenshot inviato e' Godot e il secondo web (ordine invertito rispetto alla prima serie; riconosciuti dall'aspetto).
+
+| File | Percorso | Esito |
+|---|---|---|
+| web-iphone16promax-orizzontale-finale.png | TypeScript web | Sequenza completata: Round 3, stato "stato-evento", secondo stato "stato2-evento", evento cosmico E1 visibile, log completo, "Nessuna carta in mano". Tutti gli elementi leggibili. |
+| godot-iphone16promax-orizzontale-finale.png | Godot (versione browser) | Stessa sequenza e stessi valori e stesso log. Elementi leggibili ma piccoli; solido 3D minuscolo. |
+
+Interazione: i tap sui bottoni funzionano in entrambi (stato e log identici ai valori attesi della fixture). Non e' stato riferito alcun tap mancato; non e' una misura sistematica.
+Scala: invariata rispetto alla prima serie (web molto grande, Godot piccolo): nessuno dei due layout e' stato adattato all'orientamento orizzontale.

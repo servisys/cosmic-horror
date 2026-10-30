@@ -35,4 +35,4 @@ Nota: il prefisso del tentativo 2 e' stato aggiunto davanti al prompt; il campo 
 - Licenza del modello non controllata.
 
 ## Tempi di orologio
-Dalle 15:41 alle 15:5x circa: generazioni 2,5 min di macchina; il resto e' lettura delle immagini, ritaglio, build e verifica.
+Dalle 15:41 alle 15:46 circa: 5 minuti totali. Generazioni 2,5 min di macchina; il resto e' lettura delle immagini, ritaglio, build e verifica.

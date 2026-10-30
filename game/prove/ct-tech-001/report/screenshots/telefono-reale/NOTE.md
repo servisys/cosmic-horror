@@ -20,3 +20,9 @@ Screenshot finali di Matteo, stesso iPhone, orizzontale. Nota: in questa serie i
 
 Interazione: i tap sui bottoni funzionano in entrambi (stato e log identici ai valori attesi della fixture). Non e' stato riferito alcun tap mancato; non e' una misura sistematica.
 Scala: invariata rispetto alla prima serie (web molto grande, Godot piccolo): nessuno dei due layout e' stato adattato all'orientamento orizzontale.
+
+## Terza serie: dopo la correzione di sola scala (da provare sul telefono)
+Correzione richiesta da Matteo e suggerita dalla revisione di Copilot (PR #24/#25). Verifica automatica in orizzontale a 956x440 (le misure CSS di un iPhone 16 Pro Max in orizzontale), come emulazione, **non** sul dispositivo reale: aspettiamo gli screenshot di Matteo.
+- Web: 0 min 31 s, file toccati 2 (UI e script di cattura), 1 tentativo.
+- Godot: 0 min 48 s, file toccato 1 (`project.godot`), 1 tentativo; causa = base verticale con scalatura "expand".
+- Screenshot: `report/screenshots/web-telefono-orizzontale-956x440-*.png`, `godot-telefono-orizzontale-956x440-*.png`.

@@ -12,6 +12,7 @@ const formati = [
   { nome: 'pc-1280x800', viewport: { width: 1280, height: 800 }, mobile: false, dsf: 1 },
   { nome: 'telefono-390x844', viewport: { width: 390, height: 844 }, mobile: true, dsf: 3 },
   { nome: 'telefono-440x956', viewport: { width: 440, height: 956 }, mobile: true, dsf: 3 },
+  { nome: 'telefono-orizzontale-956x440', viewport: { width: 956, height: 440 }, mobile: true, dsf: 3 },
 ];
 
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

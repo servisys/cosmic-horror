@@ -15,3 +15,9 @@ Il percorso Godot e' stato eseguito **dopo** il percorso web: ha riusato la fixt
 **Totale cumulativo registrato: 6 min 58 s** (2:15 + 1:50 + 1:51 + 0:50 + 0:12; esclusa la pausa), limite: 4 ore.
 
 Nota: sono tempi di orologio di un agente software, non ore di lavoro umano. Il percorso Godot ha richiesto piu' passi di preparazione (fonte di download, template), parte dei quali e' attesa esterna.
+
+## Correzione di sola scala (orizzontale su telefono) - richiesta di Matteo dopo la prova sull'iPhone
+| Sessione | Durata | Attivita' | File toccati |
+|---|---|---|---|
+| G4 | 0 min 48 s | Causa: dimensione base verticale 390x844 con scalatura "expand": in orizzontale tutto si riduceva a meta'. Base portata a 400x400 (la scala segue il lato corto); test, 4 formati di screenshot nativi, re-import, export web, variante gzip, ripubblicazione della pagina privata | `godot/project.godot` (due valori; nessuna modifica a logica, fixture, contenuti) |
+Tentativi: 1. Errori: 0. Regressioni: 0 (8 asserzioni su 8; PC e verticale verificati con screenshot). Passaggi manuali extra per la pubblicazione: incorporare il nuovo `.pck` nella pagina (lo stesso adattamento dell'host gia' descritto). Il tempo non include la prova sul telefono reale.

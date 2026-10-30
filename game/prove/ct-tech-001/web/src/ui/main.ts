@@ -36,6 +36,9 @@ function disegna(): void {
   const w = app.screen.width;
   const h = app.screen.height;
   const verticale = w < 700;
+  // Scala solo per schermi bassi in orizzontale (telefono): i testi non scendono sotto 11 px.
+  const k = verticale ? 1 : Math.min(1, h / 800);
+  const fs = (n: number): number => (verticale ? n : Math.max(11, Math.round(n * k)));
   ui?.destroy({ children: true });
   ui = new Container();
   app.stage.addChild(ui);
@@ -51,22 +54,22 @@ function disegna(): void {
   rects.territorio = terr;
 
   ui.addChild(new Graphics().roundRect(terr.x, terr.y, terr.w, terr.h, 14).fill(colori.pannello).stroke({ color: colori.bordo, width: 2 }));
-  const titolo = testo('Territorio T1', verticale ? 18 : 26);
+  const titolo = testo('Territorio T1', verticale ? 18 : fs(26));
   titolo.x = terr.x + 16;
   titolo.y = terr.y + 12;
-  const stato = testo(`Stato: ${gioco.stato}`, verticale ? 24 : 40, terr.w - 32, colori.accento);
+  const stato = testo(`Stato: ${gioco.stato}`, verticale ? 24 : fs(40), terr.w - 32, colori.accento);
   stato.x = terr.x + 16;
   stato.y = terr.y + terr.h * 0.38;
-  const stato2 = testo(`Secondo stato: ${gioco.stato2}`, verticale ? 16 : 22, terr.w - 32);
+  const stato2 = testo(`Secondo stato: ${gioco.stato2}`, verticale ? 16 : fs(22), terr.w - 32);
   stato2.x = terr.x + 16;
   stato2.y = stato.y + stato.height + 8;
-  const round = testo(`Round ${gioco.round}`, verticale ? 16 : 20);
+  const round = testo(`Round ${gioco.round}`, verticale ? 16 : fs(20));
   round.x = terr.x + 16;
-  round.y = terr.y + terr.h - (verticale ? 34 : 44);
+  round.y = terr.y + terr.h - (verticale ? 34 : Math.round(44 * Math.max(k, 0.6)));
   ui.addChild(titolo, stato, stato2, round);
 
   if (gioco.eventiScattati.length > 0) {
-    const ev = testo(`Evento cosmico: ${gioco.eventiScattati.join(', ')}`, verticale ? 14 : 20, terr.w - 32, colori.evento);
+    const ev = testo(`Evento cosmico: ${gioco.eventiScattati.join(', ')}`, verticale ? 14 : fs(20), terr.w - 32, colori.evento);
     ev.x = terr.x + 16;
     ev.y = stato2.y + stato2.height + 12;
     ui.addChild(ev);
@@ -84,12 +87,12 @@ function disegna(): void {
 
   ui.addChild(new Graphics().roundRect(reg.x, reg.y, reg.w, reg.h, 10).fill(0x10101c).stroke({ color: colori.bordo, width: 1 }));
   const ultime = gioco.log.slice(-6).join('\n');
-  const log = testo(ultime, verticale ? 12 : 14, reg.w - 20);
+  const log = testo(ultime, verticale ? 12 : fs(14), reg.w - 20);
   log.x = reg.x + 10;
   log.y = reg.y + 8;
   ui.addChild(log);
 
-  posizionaTre(terr, verticale);
+  posizionaTre(terr, verticale, k);
 }
 
 // Un solo elemento 3D minimo, dentro la scheda del territorio.
@@ -102,8 +105,8 @@ scena.add(oggetto);
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 contenitoreTre.appendChild(renderer.domElement);
 
-function posizionaTre(terr: { x: number; y: number; w: number; h: number }, verticale: boolean): void {
-  const lato = verticale ? 80 : 140;
+function posizionaTre(terr: { x: number; y: number; w: number; h: number }, verticale: boolean, k: number): void {
+  const lato = verticale ? 80 : Math.max(80, Math.round(140 * k));
   contenitoreTre.style.left = `${terr.x + terr.w - lato - 14}px`;
   contenitoreTre.style.top = `${terr.y + 14}px`;
   renderer.setSize(lato, lato);

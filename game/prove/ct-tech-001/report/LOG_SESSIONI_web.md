@@ -12,3 +12,9 @@ Tempi in UTC, ISO 8601, misurati con l'orologio del sistema (`date -u`) durante 
 Pause: nessuna.
 
 Nota: sono tempi di orologio di un agente software, non ore di lavoro umano; non sono confrontabili con stime di tempo umano.
+
+## Correzione di sola scala (orizzontale su telefono) - richiesta di Matteo dopo la prova sull'iPhone
+| Sessione | Durata | Attivita' | File toccati |
+|---|---|---|---|
+| W4 | 0 min 31 s | Scala dei testi e dell'elemento 3D in base all'altezza dello schermo (solo orizzontale, minimo 11 px); formato 956x440 aggiunto agli screenshot automatici; test, build, screenshot, ripubblicazione della pagina privata | `web/src/ui/main.ts`, `web/scripts/screenshots.mjs` (nessuna modifica a logica, fixture, contenuti) |
+Tentativi: 1. Errori: 0. Regressioni: 0 (5 test su 5; screenshot PC e verticale invariati e verificati dalla cattura automatica). Il tempo include la sola cattura automatica, non la prova sul telefono reale.

@@ -26,3 +26,14 @@ Correzione richiesta da Matteo e suggerita dalla revisione di Copilot (PR #24/#2
 - Web: 0 min 31 s, file toccati 2 (UI e script di cattura), 1 tentativo.
 - Godot: 0 min 48 s, file toccato 1 (`project.godot`), 1 tentativo; causa = base verticale con scalatura "expand".
 - Screenshot: `report/screenshots/web-telefono-orizzontale-956x440-*.png`, `godot-telefono-orizzontale-956x440-*.png`.
+
+## Quarta serie: telefono reale dopo la correzione di scala
+Screenshot finali di Matteo (stesso iPhone, orizzontale, dopo la sequenza carta, fine turno, fine turno). Giudizio di Matteo: "meglio". Il primo screenshot inviato e' Godot, il secondo web (riconosciuti dall'aspetto).
+
+| File | Percorso | Esito |
+|---|---|---|
+| web-iphone16promax-orizzontale-corretto-finale.png | TypeScript web | Round 3, stato "stato-evento", secondo stato, evento E1, log completo. Testi e solido 3D in proporzione allo schermo; la scheda e i bottoni sono comodi. Il titolo "Territorio T1" e' ora piccolo rispetto allo stato. |
+| godot-iphone16promax-orizzontale-corretto-finale.png | Godot (versione browser) | Stessi valori e stesso log. Testi leggibili e di taglia simile al web. Il solido 3D e' ancora una sfera piccola e pixelata (non e' un problema di scala). La pagina mostra bande nere sopra e ai lati. |
+
+Interazione: i tap funzionano in entrambi; stato e log coincidono con i valori attesi.
+Scala: ora comparabile tra i due percorsi (testi di taglia simile, tutti gli elementi leggibili). Correzione: 1 tentativo, 0 errori, per entrambi (vedi i log di sessione).

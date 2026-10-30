@@ -30,7 +30,7 @@ Nota: 1200x896 e' 4:3 quasi esatto (multipli di 16 richiesti dal modello), non 1
 Per la build `art.jpg` va copiato in `dist/` (l'ho fatto a mano per il test): se si vuole che finisca nel build in automatico, basta metterlo in `public/` (modifica non fatta).
 
 ## Tempi di orologio
-Dall'inizio (14:35) a fine misure, generazione e screenshot: circa 25 minuti, di cui circa 5 min di tempo macchina (install+build 4 s, misure FPS ~6 min complessivi con le prove scartate, generazioni 30 s) e il resto di messa a punto/attesa della risposta di Matteo.
+Dalle 14:35 alle 15:20 circa: 45 minuti totali, di cui buona parte in attesa della risposta di Matteo sulla scelta del modello. Tempo macchina: install+build 4 s, misure FPS pochi minuti (comprese due prove scartate), generazioni 18 s + 12 s.
 
 ## Non verificato
 - Prestazioni su telefono reale, su GPU integrate/deboli, o con Chrome non headless (finestra reale, compositing del desktop).

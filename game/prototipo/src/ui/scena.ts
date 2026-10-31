@@ -1,9 +1,10 @@
 // Disegno della scena con PixiJS (grafica essenziale: riquadri puliti, numeri grandi). Nessuna regola qui:
 // tutto cio' che si mostra viene dalla vista del giocatore, tutto cio' che si puo' fare viene dal controller (che chiede al motore).
-import { Container, Graphics, Text, type Application } from 'pixi.js';
+import { Container, Graphics, Sprite, Text, type Application } from 'pixi.js';
 import { carta } from '../motore/catalogo.js';
 import type { Vista, VistaPresenza } from '../motore/vista.js';
 import type { Controller } from './controller.js';
+import { idImmagine, texturaDi } from './immagini.js';
 
 export interface Area {
   x: number;
@@ -20,6 +21,8 @@ export interface ZoomInfo {
 export interface UiStato {
   zoom: ZoomInfo | null;
   zoomTerr: number | null;
+  /** Vista grande (tocco su una carta o su un territorio). */
+  grande: { tipo: 'carta'; id: string; trasformata: boolean } | { tipo: 'terr'; i: number } | null;
   regole: boolean;
   ordine: number[];
   copiato: string;
@@ -29,6 +32,7 @@ export interface Azioni {
   rerender(): void;
   zoom(z: ZoomInfo | null): void;
   zoomTerritorio(t: number | null): void;
+  grande(g: UiStato['grande']): void;
   copia(): void;
   nuova(): void;
   regole(aperte: boolean): void;
@@ -55,6 +59,25 @@ function colori(id: string): { chiaro: number; scuro: number } {
 }
 
 class Disegno {
+  /** Immagine di una carta dentro il riquadro (x,y,w,h); se manca, non disegna nulla e ritorna false. */
+  immagine(idImg: string, x: number, y: number, w: number, h: number, alpha = 1): boolean {
+    const t = texturaDi(idImg);
+    if (!t) return false;
+    const sp = new Sprite(t);
+    // riempie il riquadro mantenendo le proporzioni (taglia l'eccesso)
+    const k = Math.max(w / t.width, h / t.height);
+    sp.scale.set(k);
+    sp.alpha = alpha;
+    const mask = new Graphics();
+    mask.roundRect(x, y, w, h, 4 * this.u).fill(0xffffff);
+    sp.x = x + (w - t.width * k) / 2;
+    sp.y = y + (h - t.height * k) / 2;
+    sp.mask = mask;
+    this.s.addChild(mask);
+    this.s.addChild(sp);
+    return true;
+  }
+
   aree: Record<string, Area> = {};
   constructor(readonly s: Container, readonly u: number) {}
 
@@ -63,6 +86,7 @@ class Disegno {
     g.roundRect(x, y, w, h, opz.r ?? 6 * this.u).fill({ color: fill, alpha: opz.alpha ?? 1 });
     if (opz.stroke !== undefined) g.stroke({ width: (opz.sw ?? 1.5) * Math.max(1, this.u * 0.8), color: opz.stroke });
     if (opz.tap || opz.over) {
+      if (opz.over) g.label = 'zoomable';
       g.eventMode = 'static';
       g.cursor = 'pointer';
       if (opz.tap) g.on('pointertap', opz.tap);
@@ -176,7 +200,9 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     const px = x + 6 * u;
     const pw = tw - 12 * u;
     let y = yMid + 4 * u;
+    d.immagine(c.cat.dati.territori[i].id, x + 1, yMid + 1, tw - 2, hMid - 2, 0.16);
     d.adatta(tNomi[i].nome, px, y, pw, 18 * u, 13, 9, COL.testo, true, 'left');
+    d.rett(px, y - 2 * u, pw, 20 * u, 0xffffff, { alpha: 0.001, id: `terrnome:${i}`, tap: () => az.grande({ tipo: 'terr', i }) });
     y += 17 * u;
     // instabilita': 5 caselle
     const cas = 12 * u;
@@ -203,7 +229,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
         const bersaglio = opz.pres.includes(p.uid);
         d.rett(px1, yy, w1, hP, col.scuro, {
           stroke: bersaglio ? COL.valido : col.chiaro, sw: bersaglio ? 3.5 : 1.2, id: `pres:${p.uid}`,
-          tap: () => { if (bersaglio) { c.scegliPresenza(p.uid); az.rerender(); } },
+          tap: () => { if (bersaglio) { c.scegliPresenza(p.uid); az.rerender(); } else az.grande({ tipo: 'carta', id: p.id, trasformata: p.trasformata }); },
           over: () => az.zoom({ id: p.id, trasformata: p.trasformata }), out: () => az.zoom(null),
         });
         d.adatta(p.nome, px1 + 2 * u, yy + 2 * u, w1 - 4 * u, hP - 16 * u, 10.5, 8.5, COL.testo, false, 'center');
@@ -257,13 +283,26 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
       tap: () => { c.scegliCarta(cd.uid); az.rerender(); },
       over: () => az.zoom({ id: cd.id, trasformata: cd.trasformata }), out: () => az.zoom(null),
     });
-    d.rett(x + 3 * u, y + 3 * u, 20 * u, 20 * u, 0x0d1015, { stroke: COL.oro, r: 10 * u });
+    // illustrazione, poi nome, poi tipo e forza
+    const aw = cw - 6 * u;
+    const ah = Math.min(aw * 0.75, chH * 0.5);
+    const conImg = d.immagine(idImmagine(cd.id, cd.trasformata), x + 3 * u, y + 3 * u, aw, ah, giocabile ? 1 : 0.5);
+    if (!conImg) d.rett(x + 3 * u, y + 3 * u, aw, ah, col.chiaro, { alpha: 0.18, r: 3 * u });
+    d.rett(x + 3 * u, y + 3 * u, 20 * u, 20 * u, 0x0d1015, { stroke: COL.oro, r: 10 * u, alpha: 0.9 });
     d.testo(String(cd.costo), x + 13 * u, y + 5 * u, 13, COL.oro, { bold: true, anchorX: 0.5 });
-    if (cd.potente) d.testo('⚡' + (cd.potente > 1 ? cd.potente : ''), x + cw - 4 * u, y + 5 * u, 11, 0xff9a5a, { anchorX: 1 });
-    d.adatta(cd.nome, x + 3 * u, y + 26 * u, cw - 6 * u, chH - 56 * u, 11.5, 8.5, giocabile ? COL.testo : 0x7c8596, true, 'center');
-    d.testo(cd.tipo === 'presenza' ? 'Presenza' : 'Azione', x + 4 * u, y + chH - 17 * u, 9.5, giocabile ? COL.tenue : 0x59627a);
-    if (cd.tipo === 'presenza') d.testo(String(cd.forza), x + cw - 5 * u, y + chH - 21 * u, 16, COL.oro, { bold: true, anchorX: 1 });
-    if (cd.trasformata) d.testo('✦', x + cw - 5 * u, y + 24 * u, 10, 0xd08cff, { anchorX: 1 });
+    if (cd.potente) d.testo('⚡' + (cd.potente > 1 ? cd.potente : ''), x + cw - 5 * u, y + 5 * u, 11, 0xffb070, { anchorX: 1, bold: true });
+    if (cd.trasformata) d.testo('✦', x + cw - 5 * u, y + ah - 12 * u, 10, 0xd08cff, { anchorX: 1 });
+    d.adatta(cd.nome, x + 3 * u, y + ah + 5 * u, cw - 6 * u, chH - ah - 26 * u, 11, 8, giocabile ? COL.testo : 0x7c8596, true, 'center');
+    d.testo(cd.tipo === 'presenza' ? 'Presenza' : 'Azione', x + 4 * u, y + chH - 16 * u, 9.5, giocabile ? COL.tenue : 0x59627a);
+    if (cd.tipo === 'presenza') d.testo(String(cd.forza), x + cw - 5 * u, y + chH - 20 * u, 15, COL.oro, { bold: true, anchorX: 1 });
+    // lente: apre la carta ingrandita senza giocarla
+    const lx = x + cw - 24 * u;
+    const ly = y + ah - 22 * u;
+    d.rett(lx, ly, 22 * u, 22 * u, 0x0d1015, { stroke: 0xcfd8ea, sw: 1.2, r: 11 * u, alpha: 0.85, id: `lente:${cd.uid}`, tap: () => az.grande({ tipo: 'carta', id: cd.id, trasformata: cd.trasformata }) });
+    const lente = new Graphics();
+    lente.circle(lx + 10 * u, ly + 10 * u, 4.5 * u).stroke({ width: 1.6, color: 0xcfd8ea });
+    lente.moveTo(lx + 13.5 * u, ly + 13.5 * u).lineTo(lx + 17 * u, ly + 17 * u).stroke({ width: 1.8, color: 0xcfd8ea });
+    d.s.addChild(lente);
   });
 
   // pannello di controllo a destra
@@ -288,12 +327,13 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   d.bottone('btn:copia', ui.copiato || 'Copia il registro', cxp + 4 * u, by, bw, bh, true, () => az.copia(), 0x2d3b55, 11);
 
   // ---------- sovrapposizioni ----------
-  const modale = opz.cerca.length > 0 || !!c.decisione || !!c.evento || ui.regole || c.finita;
+  const modale = opz.cerca.length > 0 || !!c.decisione || !!c.evento || ui.regole || c.finita || !!ui.grande;
   if (ui.zoom && !modale) zoomCarta(d, c, ui.zoom, W, yMid);
   if (ui.zoomTerr !== null && !ui.zoom && !modale) zoomTerritorio(d, c, ui.zoomTerr, W, yMid);
   if (opz.cerca.length) sceltaCerca(d, c, opz.cerca, W, H, az);
   const dec = c.decisione;
   if (dec) riordinoBiblioteca(d, c, dec.uids, ui, W, H, az);
+  if (ui.grande && !c.evento) vistaGrande(d, c, ui.grande, W, H, az);
   if (c.evento) eventoCosmico(d, c, W, H, az);
   if (ui.regole) pannelloRegole(d, W, H, az);
   if (c.finita) fineAPartita(d, c, W, H, az);
@@ -403,22 +443,61 @@ function misura(d: Disegno, t: string, size: number, w: number): number {
   return h;
 }
 
-function eventoCosmico(d: Disegno, c: Controller, W: number, H: number, az: Azioni): void {
+/** Scheda grande: illustrazione a sinistra, testi a destra. Un tocco ovunque la chiude. */
+function schedaGrande(d: Disegno, W: number, H: number, bordo: number, sopra: string, titolo: string, riga: string, effetto: string, cit: { testo: string; fonte: string; originale?: string }, idImg: string, chiudi: () => void, id: string, nota = ''): void {
   const u = d.u;
+  d.rett(0, 0, W, H, 0x000000, { r: 0, alpha: 0.7, id: 'velo', tap: chiudi });
+  const bw = Math.min(W - 12 * u, 920 * u);
+  const bh = Math.min(H - 12 * u, 420 * u);
+  const x = (W - bw) / 2;
+  const y = (H - bh) / 2;
+  d.rett(x, y, bw, bh, 0x161b26, { stroke: bordo, sw: 3, id, tap: chiudi });
+  const aw = Math.min(bw * 0.46, (bh - 24 * u) * (4 / 3));
+  const ah = aw * 0.75;
+  const ay = y + (bh - ah) / 2;
+  if (!d.immagine(idImg, x + 10 * u, ay, aw, ah)) d.rett(x + 10 * u, ay, aw, ah, bordo, { alpha: 0.2 });
+  d.rett(x + 10 * u, ay, aw, ah, 0xffffff, { alpha: 0.0, stroke: bordo, sw: 2, r: 4 * u });
+  const tx = x + aw + 24 * u;
+  const tw = bw - aw - 36 * u;
+  let ty = y + 10 * u;
+  if (sopra) { d.testo(sopra, tx, ty, 11, bordo, { bold: true }); ty += 18 * u; }
+  const t = d.testo(titolo, tx, ty, 20, 0xffffff, { bold: true, w: tw });
+  ty += t.height + 4 * u;
+  const r1 = d.testo(riga, tx, ty, 12, COL.oro, { w: tw });
+  ty += r1.height + 8 * u;
+  const ef = d.testo(effetto || '(nessun effetto)', tx, ty, 14, COL.testo, { w: tw });
+  ty += ef.height + 12 * u;
+  const ci = d.testo('«' + cit.testo + '»', tx, ty, 13, 0xd8c690, { w: tw });
+  ty += ci.height + 3 * u;
+  const fo = d.testo('— ' + cit.fonte, tx, ty, 11, COL.tenue, { w: tw });
+  ty += fo.height + 4 * u;
+  if (cit.originale) {
+    const o = d.testo(cit.originale, tx, ty, 9.5, 0x6f7a8e, { w: tw });
+    ty += o.height + 4 * u;
+  }
+  if (nota) d.testo(nota, tx, ty + 4 * u, 10.5, COL.oro, { w: tw });
+  d.testo('Tocca per chiudere', x + bw - 10 * u, y + bh - 16 * u, 10, COL.tenue, { anchorX: 1 });
+}
+
+function vistaGrande(d: Disegno, c: Controller, g: NonNullable<UiStato['grande']>, W: number, H: number, az: Azioni): void {
+  const chiudi = () => az.grande(null);
+  if (g.tipo === 'carta') {
+    const e = carta(c.cat, g.id, g.trasformata);
+    const col = colori(g.id);
+    const def = c.cat.carte.get(g.id)!;
+    const riga = `${e.tipo === 'presenza' ? 'Presenza' : 'Azione'} · costo ${e.costo}` + (e.tipo === 'presenza' ? ` · forza ${e.forza}` : '') + (e.potente ? ` · potente (+${e.potente} esposizione)` : '') + (g.trasformata ? ' · versione cosmica ✦' : '');
+    const cosm = !g.trasformata && def.versione_cosmica ? `Versione cosmica: ${def.versione_cosmica.nome}` : '';
+    schedaGrande(d, W, H, col.chiaro, '', e.nome, riga, e.effetto, e.citazione, idImmagine(g.id, g.trasformata), chiudi, 'grande:chiudi', cosm);
+  } else {
+    const t = c.cat.dati.territori[g.i];
+    const r = t.riserva[0];
+    schedaGrande(d, W, H, 0x8aa0c8, 'TERRITORIO', t.nome, `Carta della riserva: ${r.nome} (${r.copie} copie)`, t.effetto, t.citazione, t.id, chiudi, 'grande:chiudi', `Riserva: ${r.effetto}`);
+  }
+}
+
+function eventoCosmico(d: Disegno, c: Controller, W: number, H: number, az: Azioni): void {
   const e = c.evento!;
-  const w = Math.min(520 * u, W * 0.9);
-  const hEf = misura(d, e.effetto, 13, w - 28 * u);
-  const hCi = misura(d, '«' + e.citazione.testo + '»', 12, w - 28 * u);
-  const hFo = misura(d, '— ' + e.citazione.fonte, 10.5, w - 28 * u);
-  const h = Math.min(H - 12 * u, 96 * u + hEf + hCi + hFo);
-  const r = riquadroCentrale(d, W, H, w, h, 0xb06cff);
-  d.rett(r.x, r.y, w, h, 0x1a1226, { stroke: 0xb06cff, sw: 3, id: 'evento:chiudi', tap: () => az.chiudiEvento() });
-  d.testo('EVENTO COSMICO', r.x + w / 2, r.y + 8 * u, 12, 0xb06cff, { bold: true, anchorX: 0.5 });
-  d.adatta(e.nome, r.x + 10 * u, r.y + 26 * u, w - 20 * u, 26 * u, 22, 12, 0xffffff, true, 'center');
-  d.testo(e.effetto, r.x + 14 * u, r.y + 62 * u, 13, COL.testo, { w: w - 28 * u });
-  d.testo('«' + e.citazione.testo + '»', r.x + 14 * u, r.y + 70 * u + hEf, 12, 0xc8b88a, { w: w - 28 * u });
-  d.testo('— ' + e.citazione.fonte, r.x + 14 * u, r.y + 74 * u + hEf + hCi, 10.5, COL.tenue, { w: w - 28 * u });
-  d.testo('Tocca per continuare', r.x + w / 2, r.y + h - 18 * u, 11, COL.tenue, { anchorX: 0.5 });
+  schedaGrande(d, W, H, 0xb06cff, 'EVENTO COSMICO', e.nome, e.tipo === '?' ? 'evento improvviso' : `tipo: ${NOME_TIPO_EVENTO[e.tipo] ?? e.tipo}`, e.effetto, c.cat.eventi.get(e.id)!.citazione, e.id, () => az.chiudiEvento(), 'evento:chiudi');
 }
 
 function pannelloRegole(d: Disegno, W: number, H: number, az: Azioni): void {

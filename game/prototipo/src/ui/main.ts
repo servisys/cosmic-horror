@@ -4,6 +4,7 @@ import type { FazioneId } from '../dati/tipi.js';
 import { sceglieMossa } from '../computer/computer.js';
 import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
+import { caricaImmagini } from './immagini.js';
 import { disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
@@ -11,13 +12,24 @@ const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del c
 const PAUSA_EVENTO = Number(parametri.get('pausaEvento') ?? 4500); // l'evento si chiude da solo dopo questo tempo
 
 const ctrl = new Controller(datiDelBuild());
-const ui: UiStato = { zoom: null, zoomTerr: null, regole: false, ordine: [], copiato: '' };
+const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '' };
 let app: Application;
 let aree: Record<string, Area> = {};
 let ridisegnoInCoda = false;
 let ciclo = false;
 let mosseComputer = 0; // mosse del computer giocate (per i test)
 let timerEvento: number | undefined;
+let ultimoPuntatore: { x: number; y: number } | null = null;
+
+function controllaIngrandimento(): void {
+  if ((!ui.zoom && ui.zoomTerr === null) || !ultimoPuntatore) return;
+  const sotto = app.renderer.events.rootBoundary.hitTest(ultimoPuntatore.x, ultimoPuntatore.y);
+  if (!sotto || sotto.label !== 'zoomable') {
+    ui.zoom = null;
+    ui.zoomTerr = null;
+    ridisegna();
+  }
+}
 
 function ridisegna(): void {
   if (!app || ridisegnoInCoda) return;
@@ -26,6 +38,7 @@ function ridisegna(): void {
     ridisegnoInCoda = false;
     aree = disegnaScena(app, ctrl, ui, azioni);
     void avviaCicloSeServe();
+    setTimeout(controllaIngrandimento, 40);
   }, 0);
 }
 
@@ -58,6 +71,12 @@ const azioni: Azioni = {
   rerender: ridisegna,
   zoom(z: ZoomInfo | null) {
     ui.zoom = z;
+    ridisegna();
+  },
+  grande(g) {
+    ui.grande = g;
+    ui.zoom = null;
+    ui.zoomTerr = null;
     ridisegna();
   },
   zoomTerritorio(t) {
@@ -121,6 +140,7 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.zoom = null;
   ui.zoomTerr = null;
   ui.regole = false;
+  ui.grande = null;
   ui.ordine = [];
   ctrl.nuova(fazione, seme);
   ridisegna();
@@ -133,7 +153,11 @@ async function avvia(): Promise<void> {
     resolution: Math.max(1, window.devicePixelRatio || 1), autoDensity: true,
   });
   document.getElementById('gioco')!.appendChild(app.canvas);
+  await caricaImmagini();
   window.addEventListener('resize', ridisegna);
+  // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
+  // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
+  app.canvas.addEventListener('pointermove', (e) => { ultimoPuntatore = { x: e.offsetX, y: e.offsetY }; });
   document.querySelectorAll<HTMLButtonElement>('#inizio button[data-fazione]').forEach((b) =>
     b.addEventListener('click', () => {
       const raw = (document.getElementById('seme') as HTMLInputElement).value.trim();
@@ -147,6 +171,7 @@ async function avvia(): Promise<void> {
     ctrl,
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
+    zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)

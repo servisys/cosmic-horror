@@ -112,7 +112,7 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Illustrazioni:** 71 file WebP (lato lungo 800 px, circa 2,5 MB in tutto) in `game/prototipo/src/assets/illustrazioni/`, nome = id della carta (le versioni cosmiche hanno id con «c», i territori T1-T3, le riserve T1r-T3r, gli eventi E01-E20). Sono scelte da Matteo; `scripts/converti-illustrazioni.py` le converte dalle scelte (richiede pillow). Un test controlla che ogni carta, versione cosmica, evento e territorio abbia la sua immagine e che il peso resti sotto i limiti.
 - **Caricamento:** `src/ui/immagini.ts` include i file nella build e li carica prima del primo disegno; una immagine mancante lascia il riquadro con il nome.
 - **Carta ingrandita:** un tocco sulla lente di una carta in mano, su una carta in campo o sul nome di un territorio apre la scheda grande (illustrazione, nome, costo, forza, testo, citazione in italiano con fonte e originale inglese in piccolo); l'evento cosmico usa la stessa scheda. Si chiude toccando. Il passaggio del mouse mostra ancora la scheda piccola.
-- **PROPOSTA:** E12 (Il Richiamo di Dagon) usa ancora un segnaposto del quarto giro finche' Matteo non sceglie la nuova immagine: basta sostituire `E12.webp`.
+- E12 (Il Richiamo di Dagon) usa l'immagine scelta da Matteo nel quinto giro (`illustrazioni_v7/E12_v3`). Per cambiare un'immagine basta rifare la conversione con il nuovo percorso nel file delle scelte.
 
 ## 10. Elenco delle ambiguità
 

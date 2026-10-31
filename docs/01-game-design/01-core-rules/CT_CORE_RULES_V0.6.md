@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.5.0
+version: 0.6.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -13,7 +13,7 @@ related_documents:
 
 # Cosmic Horror - Regole base (Core Rules)
 
-> **BOZZA IN COSTRUZIONE, PREPARATA DA COWORK.** Le scelte marcate «DECISIONE DI MATTEO» sono registrate nel Decision Log. Tutto il resto è **DA DECIDERE** e non autorizza implementazione. I numeri, quando ci sono, sono **provvisori** e vanno tarati nei playtest. Questo documento resta `DRAFT` finché tutte le sezioni non sono decise.
+> **BOZZA COMPLETA, PREPARATA DA COWORK.** Tutte le sezioni hanno le scelte di fondo di Matteo, registrate nel Decision Log (CT-DES-021…054). I numeri sono **provvisori** e vanno tarati nei playtest (CT-DES-030). Il documento resta `DRAFT`: passarlo in `REVIEW` o `APPROVED` è una decisione di Matteo.
 
 ## 0. Riferimenti già decisi
 
@@ -55,7 +55,11 @@ Ogni territorio ha:
 
 Gli effetti dei territori del prototipo sono in §10 (CT-DES-046).
 
-**DA DECIDERE:** quante presenze possono stare su un territorio; cosa succede in caso di parità di forza; se i territori cambiano da una partita all'altra.
+**DECISIONE DI MATTEO (CT-DES-049, REGISTRATA):** in caso di parità di forza su un territorio **nessuno lo controlla**, finché la parità non si rompe.
+
+**DECISIONE DI MATTEO (CT-DES-050, REGISTRATA):** ogni giocatore può avere **al massimo 4 presenze** su un territorio.
+
+**DECISIONE DI MATTEO (CT-DES-052, REGISTRATA):** nel prototipo i territori sono **sempre gli stessi 3** (§10).
 
 ## 3. Il mazzo
 
@@ -77,7 +81,7 @@ Gli effetti dei territori del prototipo sono in §10 (CT-DES-046).
 
 **DECISIONE DI MATTEO (CT-DES-029, REGISTRATA):** nel prototipo **non si risponde** durante il turno dell'avversario. L'unica finestra di reazione è il turno di avviso prima della vittoria (CT-DES-015).
 
-Fasi del turno (proposta di struttura, **DA CONFERMARE** con le sezioni successive):
+**DECISIONE DI MATTEO (CT-DES-053, REGISTRATA):** il turno ha tre fasi:
 1. **Inizio:** si riceve l'energia e si pesca.
 2. **Azioni:** si giocano carte e si attivano effetti finché c'è energia.
 3. **Fine:** si controllano gli obiettivi e il segnale di vittoria imminente.
@@ -121,7 +125,19 @@ Fasi del turno (proposta di struttura, **DA CONFERMARE** con le sezioni successi
 
 Cosa fa salire l'instabilità di un territorio: gli eventi cosmici, le carte potenti giocate lì e il passare del tempo (§11).
 
-**DA DECIDERE:** cosa succede esattamente alle soglie di instabilità di ciascun territorio; come sono fatte le versioni cosmiche delle carte (più forti, con un effetto collaterale?).
+**DECISIONE DI MATTEO (CT-DES-051, REGISTRATA):** soglie di instabilità:
+- a **4**, le presenze su quel territorio hanno **−1 forza**;
+- a **5**, si scatena l'**effetto cosmico** del territorio, alla fine di ogni giro finché resta a 5:
+
+| Territorio | Effetto cosmico a instabilità 5 |
+|---|---|
+| Il Faro Spento | chi lo controlla prende +1 esposizione |
+| La Biblioteca Sommersa | chi lo controlla scarta 1 carta a caso |
+| Il Cratere Stellare | vengono eliminate tutte le presenze con forza 1 o meno |
+
+La soglia 3, usata dai riti dei Risvegliati, non ha penalità.
+
+Le versioni cosmiche delle carte sono descritte nella lista delle carte (CT-DES-047): in genere più forti, spesso con un costo in esposizione o un effetto collaterale.
 
 ## 7. Forza cosmica
 
@@ -133,7 +149,7 @@ Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla 
 
 Tipi di evento: **territorio**, **giocatore**, **campo** (tutti i territori), **carte**. Gli eventi improvvisi mostrano «?».
 
-Prima lista degli eventi: `docs/03-cards-content/01-card-database/CT_EVENTI_COSMICI_PROTOTIPO_V0.1.yaml`. È una **PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO**: non è una decisione registrata.
+**DECISIONE DI MATTEO (CT-DES-054, REGISTRATA):** la prima lista dei 20 eventi (`docs/03-cards-content/01-card-database/CT_EVENTI_COSMICI_PROTOTIPO_V0.1.yaml`) è approvata come **lista di partenza**, da provare nelle partite. Valori provvisori.
 
 ## 8. Vittoria, segnale e turno di avviso
 
@@ -242,6 +258,7 @@ Già deciso, nessuna scelta nuova:
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.6.0 | DRAFT | Regole base complete nelle scelte di fondo: parità, limite di presenze, soglie di instabilità, territori fissi, fasi del turno, eventi di partenza (CT-DES-049…054). |
 | 0.5.0 | DRAFT | Tappe che si possono togliere (CT-DES-048); tipi di evento e prima lista degli eventi (proposta); glossario. |
 | 0.4.0 | DRAFT | §10 completata: obiettivi, priorità del computer, territori, prima lista delle carte (CT-DES-043…047). |
 | 0.3.0 | DRAFT | Sezioni 9, 10 (stile delle fazioni) e 11; mazzo esaurito e presenze immobili. Scelte di Matteo del 2026-10-31 (CT-DES-039…042). |

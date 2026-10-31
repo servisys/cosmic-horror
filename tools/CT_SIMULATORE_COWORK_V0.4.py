@@ -1,12 +1,12 @@
-# Cosmic Horror - Simulatore di partite di Cowork (V0.3, 2026-10-31)
+# Cosmic Horror - Simulatore di partite di Cowork (V0.4, 2026-10-31)
 # Strumento di analisi, NON il prototipo (CT-DES-020). Giocatore simulato semplice: i numeri indicano squilibri, non il bilanciamento fine.
 # Uso: python3 CT_SIMULATORE_COWORK_V0.2.py [numero_partite] ; parametri modificabili con variabili d'ambiente (vedi PR).
 # I valori predefiniti corrispondono alle regole base V0.8 (CT-DES-055...058).
-# V0.3: legge carte ed eventi V0.3 (nomi lovecraftiani, CT-DES-060); internamente usa i nomi di lavoro della V0.2, tradotti per id.
+# V0.4: legge carte ed eventi V0.4 (con citazioni). V0.3: legge carte ed eventi V0.3 (nomi lovecraftiani, CT-DES-060); internamente usa i nomi di lavoro della V0.2, tradotti per id.
 import yaml, random, sys, collections
 import os
 D=os.environ.get('CT_DATI',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','docs','03-cards-content','01-card-database'))+os.sep
-C=yaml.safe_load(open(D+'CT_CARTE_PROTOTIPO_V0.3.yaml',encoding='utf-8'))
+C=yaml.safe_load(open(D+'CT_CARTE_PROTOTIPO_V0.4.yaml',encoding='utf-8'))
 _N={'CU01': 'Sentinella del Faro', 'CU02': 'Archivista Vigile', 'CU03': 'Guardiano di Pietra', 'CU04': "Custode dell'Abisso", 'CU05': 'Cerchio di Veglia', 'CU06': 'Lanterna Benedetta', 'CU07': 'Vecchio Bibliotecario', 'CU08': 'Muro di Sale', 'CU09': 'Sigillo Antico', 'CU10': 'Quiete', 'CU11': 'Respiro Profondo', 'CU12': 'Rinforzi', 'CU13': 'Esorcismo', 'CU14': 'Preparare il Sigillo', 'CU15': 'Cacciata', 'CU16': 'Studio delle Stelle', 'CU17': 'Rito di Contenimento', 'CU18': 'Fiamma Sacra', 'RI01': 'Accolito', 'RI02': "Cultista dell'Abisso", 'RI03': 'Profeta Febbricitante', 'RI04': 'Bruto Marchiato', 'RI05': 'Seminatore di Crepe', 'RI06': 'Sacerdotessa del Varco', 'RI07': 'Ombra Strisciante', 'RI08': "Araldo dell'Oltre", 'RI09': 'Marchio', 'RI10': 'Sussurro', 'RI11': 'Offerta di Sangue', 'RI12': 'Profanazione', 'RI13': 'Visioni', 'RI14': 'Corruzione', 'RI15': 'Preparare il Rito', 'RI16': 'Abbraccio del Vuoto', 'RI17': 'Squarcio nel Cielo', 'RI18': "Richiamo dell'Abisso"}
 _NC={'CU02': 'Archivista Sussurrante', 'CU03': 'Guardiano Incrinato', 'CU06': 'Lanterna Nera', 'RI01': 'Accolito Divorato', 'RI02': 'Cultista Trasfigurato', 'RI03': 'Profeta Cieco', 'RI04': 'Bruto Deforme', 'RI07': 'Ombra Vorace', 'RI10': 'Urlo'}
 _R={'T1': 'Lampo del Faro', 'T2': 'Pagina Perduta', 'T3': 'Frammento Stellare'}
@@ -15,7 +15,7 @@ for _f in C['fazioni']:
         _c['nome']=_N[_c['id']]
         if _c.get('versione_cosmica'): _c['versione_cosmica']['nome']=_NC[_c['id']]
 for _t in C['territori']: _t['riserva'][0]['nome']=_R[_t['id']]
-E=yaml.safe_load(open(D+'CT_EVENTI_COSMICI_PROTOTIPO_V0.3.yaml',encoding='utf-8'))['eventi']
+E=yaml.safe_load(open(D+'CT_EVENTI_COSMICI_PROTOTIPO_V0.4.yaml',encoding='utf-8'))['eventi']
 TN=['Faro','Biblioteca','Cratere']
 import os
 PR={k:int(os.environ.get(k,v)) for k,v in dict(SIG_MAX=3,RITO_MIN=3,SIG_COST=2,RITO_COST=2,PROF_MIN=3,LATE=1,FRAMM=1,RITO_CTRL=2,SIG_LOCK=0,SECOND_EN=1,CAP=0,PERM=1,FP_EN=-1,REMCOST=0,LATEDISC=0,FRAMM2=1,PROF2=1,BIBLIO2=1).items()}

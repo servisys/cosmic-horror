@@ -1,0 +1,23 @@
+// Testi degli effetti degli eventi con cui e' scritto il codice di src/motore/eventi.ts (il controllo dei dati li confronta con i file).
+export const TESTI_EVENTO: Record<string, string> = {
+  E01: "Il territorio piu' instabile: instabilita' +1.",
+  E02: "Sul territorio con piu' presenze, tutte le presenze hanno -1 forza fino alla fine del giro successivo a quello in cui si risolve l'evento.",
+  E03: "Il piu' esposto scarta 1 carta a caso dalla mano.",
+  E04: "Ogni territorio con instabilita' 0 sale a 1.",
+  E05: "La Landa Maledetta: instabilita' +1.",
+  E06: "Ogni giocatore pesca 1 carta.",
+  E07: "Il territorio piu' instabile: instabilita' +2.",
+  E08: "Il piu' esposto elimina la propria presenza con forza piu' bassa.",
+  E09: "Tutti i territori: instabilita' +1.",
+  E10: "Chi controlla Innsmouth e la Scogliera del Diavolo: esposizione +1.",
+  E11: "Il piu' esposto scarta 2 carte a caso dalla mano.",
+  E12: "Il piu' esposto: una carta casuale del suo mazzo si trasforma nella versione cosmica.",
+  E13: "Il territorio piu' instabile: instabilita' +2; le presenze li' hanno -1 forza fino a fine partita.",
+  E14: "Il piu' esposto: esposizione +2.",
+  E15: "Tutti i territori: instabilita' +1; ogni presenza con forza 1 o meno viene eliminata.",
+  E16: "Sul territorio piu' instabile viene eliminata la presenza con forza piu' alta (in parita', sorteggio).",
+  E17: "Tutti i territori: instabilita' +1; ogni giocatore con esposizione 6 o piu' scarta 1 carta a caso.",
+  E18: "Entrambi i giocatori: esposizione +1; il piu' esposto +1 in piu'.",
+  E19: "Tutti i territori: instabilita' -1.",
+  E20: "Il piu' esposto: due carte casuali del suo mazzo si trasformano nella versione cosmica.",
+};

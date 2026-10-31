@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.2.0
+version: 0.3.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -65,7 +65,7 @@ Ogni territorio ha:
 
 **Numeri provvisori (§5):** mano iniziale, pesca, trasformazioni e carte guadagnate dai territori.
 
-**DA DECIDERE:** cosa succede se il mazzo finisce.
+**DECISIONE DI MATTEO (CT-DES-042, REGISTRATA):** se il mazzo finisce, si rimescolano gli scarti per formare un nuovo mazzo e l'esposizione del giocatore sale di 1.
 
 ## 4. Il turno
 
@@ -82,7 +82,7 @@ Fasi del turno (proposta di struttura, **DA CONFERMARE** con le sezioni successi
 
 **Numeri provvisori (§5):** valori dell'energia; l'energia non spesa non si conserva.
 
-**DA DECIDERE:** se le presenze possono spostarsi tra territori.
+**DECISIONE DI MATTEO (CT-DES-040, REGISTRATA):** nel prototipo le presenze restano sul territorio dove vengono giocate e non si spostano.
 
 ## 5. Numeri di partenza (provvisori)
 
@@ -139,9 +139,33 @@ Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla 
 
 **DA DECIDERE:** l'obiettivo e le tappe di ciascuna fazione (§10); se il segnale può «spegnersi» quando l'avversario fa perdere una tappa.
 
-## 9. Informazione visibile e nascosta - DA DECIDERE
-## 10. Le due fazioni del prototipo e le priorità dell'avversario - DA DECIDERE
-## 11. Durata e instabilità crescente - DA DECIDERE
+## 9. Informazione visibile e nascosta
+
+**DECISIONE DI MATTEO (CT-DES-039, REGISTRATA):** all'avversario sono nascosti solo **la mano** e **l'ordine del mazzo**. Sono visibili a tutti: le carte in campo, gli indicatori di esposizione e instabilità, gli obiettivi e le loro tappe, il tipo del prossimo evento cosmico, il numero di carte in mano e nel mazzo, gli scarti.
+
+Il computer (CT-DES-016) vede esattamente le stesse informazioni del giocatore umano.
+
+## 10. Le due fazioni del prototipo e le priorità dell'avversario
+
+**DECISIONE DI MATTEO (CT-DES-041, REGISTRATA):** le due fazioni del prototipo hanno stili opposti. I nomi sono **provvisori**.
+
+| | **I Custodi** | **I Risvegliati** |
+|---|---|---|
+| Idea | difendono e stabilizzano i territori | corrompono i territori e cercano il potere cosmico |
+| Rapporto con il rischio | si espongono poco; possono ridurre l'instabilità | si espongono molto; puntano sulle trasformazioni |
+| Punto di forza | presenze solide, difesa, controllo duraturo | colpi forti, carte cosmiche, crescita rapida |
+| Punto debole | più lenti a chiudere la partita | più colpiti dalla forza cosmica |
+
+**DA DECIDERE:** l'obiettivo fisso e le tappe di ciascuna fazione (CT-DES-037, CT-DES-038); le priorità del computer per ciascuna fazione (CT-DES-016); le 40 carte di ciascun mazzo; gli effetti dei 3 territori e le loro riserve di carte.
+
+## 11. Durata e instabilità crescente
+
+Già deciso, nessuna scelta nuova:
+- durata normale 10-15 minuti (CT-DES-009);
+- la pressione verso la fine viene soprattutto dagli obiettivi territoriali (CT-DES-009);
+- la forza cosmica cresce per fasi (CT-DES-036);
+- dal giro 7 tutti i territori guadagnano instabilità alla fine di ogni giro (numero provvisorio, §5);
+- un eventuale limite massimo di giri si decide dopo i playtest (CT-DES-009).
 ## 12. Glossario - DA DECIDERE
 
 ## Changelog
@@ -149,4 +173,5 @@ Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla 
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.3.0 | DRAFT | Sezioni 9, 10 (stile delle fazioni) e 11; mazzo esaurito e presenze immobili. Scelte di Matteo del 2026-10-31 (CT-DES-039…042). |
 | 0.2.0 | DRAFT | Sezioni 5-8 con le scelte di Matteo del 2026-10-31 (CT-DES-030…038) e la tabella dei numeri provvisori proposti da Cowork. |

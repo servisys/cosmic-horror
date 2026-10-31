@@ -1,0 +1,59 @@
+[
+  {
+    "nome": "Custode dell'Abisso",
+    "tipoCarta": "avversario",
+    "tipo": "Entità — Abissale",
+    "testo": "Quando entra in gioco, ogni territorio vicino diventa Oscurato fino alla fine del turno.",
+    "flavor": "«Non dorme. Aspetta che smettiamo di guardare.»",
+    "pt": "4 / 5",
+    "costo": [0, 1],
+    "file": "../art.jpg",
+    "nota": "prima prova, z_image_turbo seed 777"
+  },
+  {
+    "nome": "Archivista di Arkham",
+    "tipoCarta": "persona",
+    "tipo": "Persona — Studiosa",
+    "testo": "Gioca questa carta su un territorio: il suo stato diventa Vigilato. Pesca una carta.",
+    "flavor": "«Ho letto troppo per poter tornare indietro.»",
+    "pt": "2 / 3",
+    "costo": [1],
+    "file": "01-archivista.jpg",
+    "nota": "z_image_turbo, seed 1001, tentativo 1 di 3; ritagliato il bordo disegnato dal modello",
+    "prompt": "gothic horror painting of a young woman archivist in a dark university library at night, holding a glowing book, eerie teal and amber candlelight, shelves vanishing into darkness, subtle tentacle shadows on the wall, dramatic lighting, detailed oil painting, trading card game illustration, full bleed, no frame, no border, no text"
+  },
+  {
+    "nome": "Faro di Innsmouth",
+    "tipoCarta": "territorio",
+    "tipo": "Territorio — Costa",
+    "testo": "Il territorio è Neutro finché non viene occupato. Chi lo controlla vede le carte avversarie giocate qui.",
+    "flavor": "«La luce non guida le navi. Le chiama.»",
+    "costo": [],
+    "file": "02-faro.jpg",
+    "nota": "z_image_turbo, seed 2002, tentativo 2 di 3 con prefisso anti-bordo aggiunto al prompt (tentativo 2); ritagliato il bordo disegnato dal modello",
+    "prompt": "gothic horror painting of a decaying lighthouse on a rocky coast at night, stormy sea, sickly green light beam cutting through fog, strange shapes moving in the black water, ruined fishing village below, cosmic horror atmosphere, detailed oil painting, trading card game illustration, full bleed, no frame, no border, no text"
+  },
+  {
+    "nome": "Le Stelle Sono Giuste",
+    "tipoCarta": "evento",
+    "tipo": "Evento Cosmico",
+    "testo": "Al round 3, ogni territorio passa allo stato Evento.",
+    "flavor": "«Non c'era nulla da fare. Non c'è mai stato.»",
+    "costo": [0, 0, 1],
+    "file": "03-stelle.jpg",
+    "nota": "z_image_turbo, seed 3002, tentativo 2 di 3 con prefisso anti-bordo aggiunto al prompt (tentativo 2); ritagliato il bordo disegnato dal modello",
+    "prompt": "cosmic horror painting of an impossible starry sky, constellations rearranging into a vast watching eye, violet and teal nebula, tiny silhouettes of a town far below looking up, sense of dread and awe, detailed digital painting, trading card game illustration, full bleed, no frame, no border, no text"
+  },
+  {
+    "nome": "Cultista del Nulla",
+    "tipoCarta": "avversario",
+    "tipo": "Persona ostile — Adepto",
+    "testo": "Quando passa, il territorio che controlla diventa Oscurato.",
+    "flavor": "«Il silenzio ha un nome. Presto lo saprai.»",
+    "pt": "3 / 2",
+    "costo": [1, 1],
+    "file": "04-cultista.jpg",
+    "nota": "z_image_turbo, seed 4002, tentativo 2 di 3 con prefisso anti-bordo aggiunto al prompt (tentativo 2); ritagliato il bordo disegnato dal modello",
+    "prompt": "gothic horror painting of a hooded cultist in tattered dark robes holding a lantern that emits black light, ritual chamber with strange glyphs on stone walls, ominous red and violet glow, face hidden in shadow, detailed oil painting, trading card game illustration, full bleed, no frame, no border, no text"
+  }
+]

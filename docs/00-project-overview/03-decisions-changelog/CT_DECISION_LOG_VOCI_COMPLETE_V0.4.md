@@ -1,7 +1,9 @@
 ---
 title: Cosmic Horror - Voci Complete Decision Log
 status: DRAFT
-version: 0.3.0
+version: 0.4.0
+prepared_by: Cowork
+last_reviewed: 2026-10-31
 owner: Team Cosmic Horror
 source_decisions: CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md
 source_answers: CT_DECISIONI_V0.3_ESITO_CHIARO.md
@@ -10,13 +12,13 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 # Cosmic Horror - Voci Complete Decision Log
 
-> Tutte le voci sono **PROPOSTA**. Nessuna voce è registrata o approvata.
+> **Tutte le voci sono REGISTRATE.** Matteo le ha confermate in chat il 2026-10-31 rispondendo «Tutte c» all'elenco CT-DES-001…013 preparato da Cowork. Secondo le Regole V0.2 (regola 4) la registrazione è effettiva con il merge di questo documento in `main`.
 >
 > Il campo **Decisione** riproduce invariato il testo di `CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md`.
 
 ## CT-DES-001 - Deckbuilding ibrido
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Il giocatore prepara un mazzo quasi completo; durante la partita possono coesistere più fonti di adattamento e una parte importante del mazzo può trasformarsi. Quantità, fonti, tempi e limiti restano da decidere.
 
@@ -24,7 +26,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuro `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Costruzione pre-partita**; **B - Deckbuilding durante la partita**; **C - Modello ibrido**.
@@ -40,7 +42,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-002 - Vittoria e territorio
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Ogni vittoria richiede interazione significativa con i territori; gli obiettivi possono dipendere dalla fazione senza un modello comune. L'avversario deve poter vedere chiaramente il pericolo e intervenire prima del completamento; se l'obiettivo viene comunque completato, la vittoria è immediata senza ulteriori risposte. Definizione dell'interazione significativa e della finestra precedente restano da decidere.
 
@@ -48,7 +50,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuro `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Vittoria esclusivamente territoriale**; **B - Territorio come fonte primaria di punti o avanzamento**; **C - Vie di vittoria multiple, tutte vincolate al territorio**; **D - Danno diretto indipendente dal territorio**.
@@ -64,7 +66,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-003 - Potere e conseguenze
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Le conseguenze si manifestano soprattutto sul territorio. Esposizione, costi e instabilità fanno parte di un unico rischio cosmico; sia le azioni dei giocatori sia la forza cosmica contribuiscono al rischio. Il primo prototipo deve mostrare tutte e tre le componenti. Misure e funzionamento concreto restano da decidere.
 
@@ -72,7 +74,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Tracciato individuale**; **B - Alterazione dei territori**; **C - Contaminazione del mazzo**; **D - Instabilità condivisa**; **E - Costi concessi all'avversario**; **F - Sistema composito con veicolo primario e conseguenze secondarie**.
@@ -88,22 +90,22 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-004 - Modalità iniziale
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** La prima modalità da costruire bene è 1vs1 con elemento cosmico. Altre modalità possono essere evoluzioni future; scope e ordine restano da decidere.
 
-**Motivazione:** Matteo ha risposto «tutti» rispetto alle esperienze desiderate e ha scelto «1vs1 con elemento cosmico» come prima modalità da costruire bene. **[da chat, da confermare da Matteo]** Fonti: `CT_DECISIONI_V0.2_ESITO.md`, sezione 4.
+**Motivazione:** Matteo ha risposto «tutti» rispetto alle esperienze desiderate e ha scelto «1vs1 con elemento cosmico» come prima modalità da costruire bene. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]** Fonti: `CT_DECISIONI_V0.2_ESITO.md`, sezione 4.
 
 **Data:** 2026-10-28
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuro `CT_PROTOTYPE_SCOPE.md` e `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_PROTOTYPE_SCOPE.md` e `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - **A - Duello 1v1 competitivo**.
 - **B - 1v1 con forza cosmica ambientale**.
 - **C - PvE o campagna**.
 - **D - Multiplayer 3-4 giocatori**.
-- Nell'intervista sono inoltre state considerate come esperienze: duello PvP; PvP con cosmo come terza presenza; giocatori contro gioco/ambientazione; più giocatori sulla stessa mappa. **[da chat, da confermare da Matteo]**
+- Nell'intervista sono inoltre state considerate come esperienze: duello PvP; PvP con cosmo come terza presenza; giocatori contro gioco/ambientazione; più giocatori sulla stessa mappa. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** scope del prototipo; struttura del match; requisiti del sistema cosmico; futuro PvE/cooperativo/multiplayer; architettura tecnica successiva, senza implicarne oggi l'implementazione.
 
@@ -113,7 +115,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-005 - Informazione e casualità
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Il rischio cosmico è visibile solo quando aumenta o sta per succedere qualcosa; il giocatore conosce il tipo generale di problema; normalmente può prepararsi, ma alcuni eventi possono arrivare senza preavviso. Il giocatore conosce le regole ma deve dedurre cosa prepara l'avversario. Categorie e segnali restano da decidere.
 
@@ -121,7 +123,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri `CT_CORE_RULES.md` e `CT_USER_FLOWS.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e `CT_USER_FLOWS.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Regole ed effetti completamente trasparenti**; **B - Regole trasparenti, intenzioni nascoste**; **C - Casualità controllata e distribuzioni note**; **D - Informazione e casualità come costo acquistabile**.
@@ -137,22 +139,22 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-006 - Contrappeso allo snowball
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Il contrappeso combina esposizione, costi e instabilità senza bonus artificiali per chi è indietro. Il vantaggio deve restare consolidabile gestendo il rischio. Misurazione e relazione tra le componenti restano da decidere.
 
-**Motivazione:** Matteo ha indicato «Combinazione di esposizione, costi e instabilità», ha risposto «Sì» alla domanda «Vuoi evitare meccaniche esplicite tipo “sei indietro, quindi ricevi un bonus”, preferendo che la possibilità di rimonta emerga naturalmente dai sistemi del gioco?» **[da chat, da confermare da Matteo]** e «Il vantaggio deve restare consolidabile gestendo il rischio». Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 6.
+**Motivazione:** Matteo ha indicato «Combinazione di esposizione, costi e instabilità», ha risposto «Sì» alla domanda «Vuoi evitare meccaniche esplicite tipo “sei indietro, quindi ricevi un bonus”, preferendo che la possibilità di rimonta emerga naturalmente dai sistemi del gioco?» **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]** e «Il vantaggio deve restare consolidabile gestendo il rischio». Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 6.
 
 **Data:** 2026-10-28
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
 
 **Alternative considerate:**
 - **A - Maggiore dominio, maggiore esposizione**.
 - **B - Costo di mantenimento territoriale**.
 - **C - Territori instabili o trasformabili**.
 - **D - Catch-up esplicito**.
-- Nell'intervista di dettaglio: esposizione/vulnerabilità; costi crescenti; territori più instabili; combinazione delle tre idee. **[da chat, da confermare da Matteo]**
+- Nell'intervista di dettaglio: esposizione/vulnerabilità; costi crescenti; territori più instabili; combinazione delle tre idee. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** economia dei costi; rischio cosmico; stabilità territoriale; capacità di consolidamento; metriche di balance e playtest; forte dipendenza da CT-DES-003.
 
@@ -162,21 +164,21 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-007 - Governance delle decisioni
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
-**Decisione:** Le decisioni devono essere visibili direttamente nei documenti, avere ID univoci e mantenere lo storico nel Decision Log. ID e stato sono separati dal testo. Le modifiche minori mantengono l'ID; le modifiche sostanziali generano un nuovo ID che sostituisce la decisione precedente. La decisione diventa registrata al merge del documento in `main`.
+**Decisione:** Le decisioni devono essere visibili direttamente nei documenti, avere ID univoci e mantenere lo storico nel Decision Log. ID e stato sono separati dal testo. Le modifiche minori mantengono l'ID; le modifiche sostanziali generano un nuovo ID che sostituisce la decisione precedente. Una decisione diventa registrata solo quando la voce riporta `Stato: REGISTRATA` e il documento viene fuso in `main` (Regole V0.2, regola 4).
 
-**Motivazione:** Matteo ha risposto «direttamente li», «si» e «mantenere il Decision Log». Nell'intervista di governance ha scelto «Scelgo C» per ID e stato separati dal testo, ha delegato a Copilot la scelta dei campi («scegli tu»), ha scelto «C» per la supersessione condizionale e «A» per merge in `main` come momento di registrazione. **[da chat, da confermare da Matteo]** Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 7; intervista Decision Log successiva.
+**Motivazione:** Matteo ha risposto «direttamente li», «si» e «mantenere il Decision Log». Nell'intervista di governance ha scelto «Scelgo C» per ID e stato separati dal testo, ha delegato a Copilot la scelta dei campi («scegli tu»), ha scelto «C» per la supersessione condizionale e «A» per merge in `main` come momento di registrazione. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]** Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 7; intervista Decision Log successiva. Le Regole V0.2 hanno poi precisato che il merge registra solo le voci con `Stato: REGISTRATA`; il 2026-10-31 Matteo ha confermato la formulazione allineata a quella regola (correzione della proposta prima della registrazione, stesso ID).
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_DECISION_LOG_REGOLE_V0.1.md`; tutti i documenti che contengono decisioni `CT-DES-###`.
+**Documento interessato:** `CT_DECISION_LOG_REGOLE_V0.2.md`; tutti i documenti che contengono decisioni `CT-DES-###`.
 
 **Alternative considerate:**
-- Marcatore: **A** `DECISIONE REGISTRATA (CT-DES-001)`; **B** `CT-DES-001 — REGISTRATA`; **C** ID e Stato su righe separate; **D** sintassi diversa. **[da chat, da confermare da Matteo]**
-- Campi Decision Log: **A - Essenziale**; **B - Tracciabile**; **C - Completo**. Matteo ha delegato la scelta e Copilot ha proposto **C - Completo**. **[da chat, da confermare da Matteo]**
-- Supersessione: **A** stesso ID sempre; **B** nuovo ID sempre; **C** stesso ID per correzioni minori, nuovo ID per cambiamenti sostanziali. **[da chat, da confermare da Matteo]**
-- Registrazione: **A** merge in `main`; **B** conferma esplicita di Matteo nel Decision Log; **C** conferma esplicita più merge. **[da chat, da confermare da Matteo]**
+- Marcatore: **A** `DECISIONE REGISTRATA (CT-DES-001)`; **B** `CT-DES-001 — REGISTRATA`; **C** ID e Stato su righe separate; **D** sintassi diversa. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Campi Decision Log: **A - Essenziale**; **B - Tracciabile**; **C - Completo**. Matteo ha delegato la scelta e Copilot ha proposto **C - Completo**. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Supersessione: **A** stesso ID sempre; **B** nuovo ID sempre; **C** stesso ID per correzioni minori, nuovo ID per cambiamenti sostanziali. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Registrazione: **A** merge in `main`; **B** conferma esplicita di Matteo nel Decision Log; **C** conferma esplicita più merge. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** formato delle decisioni nei documenti; audit trail; gestione dello storico; workflow GitHub; criteri per distinguere proposta e decisione registrata; Decision Log.
 
@@ -186,15 +188,15 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-008 - Fazioni
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Forte asimmetria già nel prototipo. Struttura del turno e gestione di carte/mazzo restano comuni; una fazione può avere meccaniche che le altre non hanno e imparare progressivamente le altre fazioni può essere parte della difficoltà. Il prototipo prevede almeno due fazioni volutamente molto diverse e 40 carte per ogni fazione; l'eventuale terza fazione si decide dopo i primi playtest.
 
-**Motivazione:** Matteo ha scelto il livello «3», ha risposto «si» alla domanda «Vuoi che le fazioni possano rapportarsi al territorio in modi sostanzialmente diversi, per esempio senza essere tutte obbligate a cercare lo stesso tipo di controllo?» **[da chat, da confermare da Matteo]** e «già con forte identità». Ha poi scelto: nucleo comune su struttura del turno più gestione carte/mazzo («B»), meccaniche esclusive ammesse («A»), apprendimento progressivo delle altre fazioni («C»), «b» cioè 40 carte per fazione, fazioni volutamente molto diverse («a») e decisione sulla terza fazione dopo i primi playtest («c»). Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 8; `CT_DECISIONI_V0.3_ESITO_CHIARO.md`, sezioni 7 e 8.
+**Motivazione:** Matteo ha scelto il livello «3», ha risposto «si» alla domanda «Vuoi che le fazioni possano rapportarsi al territorio in modi sostanzialmente diversi, per esempio senza essere tutte obbligate a cercare lo stesso tipo di controllo?» **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]** e «già con forte identità». Ha poi scelto: nucleo comune su struttura del turno più gestione carte/mazzo («B»), meccaniche esclusive ammesse («A»), apprendimento progressivo delle altre fazioni («C»), «b» cioè 40 carte per fazione, fazioni volutamente molto diverse («a») e decisione sulla terza fazione dopo i primi playtest («c»). Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 8; `CT_DECISIONI_V0.3_ESITO_CHIARO.md`, sezioni 7 e 8.
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri documenti Factions, `CT_CORE_RULES.md` e `CT_PROTOTYPE_SCOPE.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri documenti Factions, `CT_CORE_RULES.md` e `CT_PROTOTYPE_SCOPE.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Asimmetria di contenuto**; **B - Asimmetria moderata**; **C - Asimmetria di regole completa**.
@@ -213,21 +215,21 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-009 - Durata e pressione di chiusura
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Durata normale 10-15 minuti; alcune partite possono finire prima e quelle combattute durare di più. Gli obiettivi territoriali costituiscono la principale pressione verso la conclusione; nelle partite prolungate i territori diventano progressivamente più instabili. L'eventuale limite massimo si decide dopo i playtest.
 
-**Motivazione:** Matteo ha indicato «10-15 minuti», «che finiscano anche prima» e «si può durare di più». Ha poi scelto gli obiettivi territoriali come pressione principale («b»), territori progressivamente più instabili nelle partite prolungate («c») e rinvio della decisione sul limite assoluto ai playtest («c»). **[da chat, da confermare da Matteo]** Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 9; `CT_DECISIONI_V0.3_ESITO_CHIARO.md`, sezione 9.
+**Motivazione:** Matteo ha indicato «10-15 minuti», «che finiscano anche prima» e «si può durare di più». Ha poi scelto gli obiettivi territoriali come pressione principale («b»), territori progressivamente più instabili nelle partite prolungate («c») e rinvio della decisione sul limite assoluto ai playtest («c»). **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]** Fonti: `CT_DECISIONI_V0.2_ESITO_PARTE2.md`, sezione 9; `CT_DECISIONI_V0.3_ESITO_CHIARO.md`, sezione 9.
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e documenti di Balance.
 
 **Alternative considerate:**
 - Fascia di durata: **A - breve**; **B - media**; **C - lunga**; **D - diversa per modalità**. Nell'intervista: 10-15; 20-30; 30-45; 45-60+ minuti.
-- Pressione naturale: **A** forza cosmica crescente; **B** obiettivi territoriali; **C** esaurimento di risorse/opportunità; **D** combinazione. **[da chat, da confermare da Matteo]**
-- Se la partita si prolunga: **A** continua; **B** aumenta pressione cosmica; **C** territori più instabili; **D** altra escalation. **[da chat, da confermare da Matteo]**
-- Limite massimo: **A** nessun limite; **B** limite assoluto; **C** decisione dopo dati di playtest. **[da chat, da confermare da Matteo]**
+- Pressione naturale: **A** forza cosmica crescente; **B** obiettivi territoriali; **C** esaurimento di risorse/opportunità; **D** combinazione. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Se la partita si prolunga: **A** continua; **B** aumenta pressione cosmica; **C** territori più instabili; **D** altra escalation. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Limite massimo: **A** nessun limite; **B** limite assoluto; **C** decisione dopo dati di playtest. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** ritmo delle Core Rules; dimensione della curva di escalation; progettazione degli obiettivi; instabilità territoriale; metriche di playtest; eventuale limite massimo futuro.
 
@@ -237,7 +239,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## CT-DES-010 - Forza cosmica
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** La forza cosmica agisce autonomamente e in modo imprevedibile. I singoli eventi producono soprattutto pressione e cambiamenti graduali; l'impatto può dipendere dall'esposizione dei giocatori; nel prototipo gli eventi possono influenzare territori e giocatori/mazzi. Rischio e possibilità di preparazione seguono CT-DES-005. Categorie, intensità e limiti restano da decidere.
 
@@ -245,7 +247,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.7_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e `CT_USER_FLOWS.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e `CT_USER_FLOWS.md`.
 
 **Alternative considerate:**
 - Natura della forza cosmica: agisce solo in risposta ai giocatori; agisce autonomamente in modo prevedibile; agisce autonomamente in modo imprevedibile.
@@ -275,4 +277,11 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 ## Nota
 
-Le motivazioni riportano esclusivamente elementi esplicitamente espressi da Matteo nelle risposte disponibili. Le conseguenze derivano dalle schede decisionali e dalle osservazioni progettuali già documentate; non costituiscono nuove decisioni. Tutte le voci restano `PROPOSTA` fino al processo di registrazione previsto da CT-DES-007.
+Le motivazioni riportano esclusivamente elementi esplicitamente espressi da Matteo nelle risposte disponibili. Le conseguenze derivano dalle schede decisionali e dalle osservazioni progettuali già documentate; non costituiscono nuove decisioni. Tutte le voci sono `REGISTRATA` dal merge in `main` della V0.4, su conferma di Matteo del 2026-10-31.
+
+## Changelog
+
+| Versione | Stato | Modifica |
+|---|---|---|
+| 0.3.0 | DRAFT | Voci complete CT-DES-001…010, tutte `PROPOSTA`. |
+| 0.4.0 | DRAFT | Preparata da Cowork. Tutte le voci passano a `Stato: REGISTRATA` su conferma di Matteo in chat il 2026-10-31 («Tutte c»). CT-DES-007: ultima frase allineata alle Regole V0.2 e riferimento alle Regole V0.2 invece della V0.1, confermati da Matteo. Marcatori «da confermare» sostituiti con la conferma. «Documento interessato»: Vision V0.10 invece della V0.7. Nessun altro testo di decisione cambiato. |

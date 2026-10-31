@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.1.0
+version: 0.2.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -38,7 +38,7 @@ related_documents:
    **DECISIONE DI MATTEO (CT-DES-021, REGISTRATA):** la forza cosmica agisce alla fine di ogni giro.
 4. **Fine:** la partita termina quando un giocatore completa il proprio obiettivo, dopo il turno di avviso (§8).
 
-**DA DECIDERE:** chi gioca per primo e se il secondo giocatore riceve un compenso.
+**Numero provvisorio (§5):** si sorteggia chi gioca per primo; il secondo giocatore pesca 1 carta in più nella mano iniziale.
 
 ## 2. Il campo
 
@@ -63,7 +63,9 @@ Ogni territorio ha:
 - alcune carte si **trasformano** in una versione cosmica quando il rischio del giocatore sale;
 - **controllare un territorio** fa guadagnare carte nuove.
 
-**DA DECIDERE:** mano iniziale e pesca per turno; quante carte possono trasformarsi; quando e come si guadagnano carte dai territori; cosa succede se il mazzo finisce.
+**Numeri provvisori (§5):** mano iniziale, pesca, trasformazioni e carte guadagnate dai territori.
+
+**DA DECIDERE:** cosa succede se il mazzo finisce.
 
 ## 4. Il turno
 
@@ -78,12 +80,65 @@ Fasi del turno (proposta di struttura, **DA CONFERMARE** con le sezioni successi
 2. **Azioni:** si giocano carte e si attivano effetti finché c'è energia.
 3. **Fine:** si controllano gli obiettivi e il segnale di vittoria imminente.
 
-**DA DECIDERE:** i valori dell'energia; se l'energia non spesa si conserva; se le presenze possono spostarsi tra territori.
+**Numeri provvisori (§5):** valori dell'energia; l'energia non spesa non si conserva.
 
-## 5. Risorse nel dettaglio - DA DECIDERE
-## 6. Rischio cosmico (esposizione, costi, instabilità) - DA DECIDERE
-## 7. Forza cosmica - DA DECIDERE
-## 8. Vittoria, segnale e turno di avviso - DA DECIDERE
+**DA DECIDERE:** se le presenze possono spostarsi tra territori.
+
+## 5. Numeri di partenza (provvisori)
+
+**DECISIONE DI MATTEO (CT-DES-030, REGISTRATA):** i numeri di partenza li propone Cowork, ragionando su una partita da 10-15 minuti, e si tarano nei playtest. **Nessuno di questi numeri è definitivo.**
+
+| Elemento | Valore provvisorio |
+|---|---|
+| Primo giocatore | sorteggio; il secondo pesca 1 carta in più |
+| Mano iniziale | 5 carte |
+| Pesca | 1 carta all'inizio di ogni proprio turno |
+| Energia base | 2 al primo turno, +1 ogni turno successivo, fino a un massimo di 8 |
+| Extra dai territori | +1 energia se all'inizio del turno controlli almeno 2 territori |
+| Energia non spesa | non si conserva |
+| Carte guadagnate dai territori | quando prendi il controllo di un territorio che prima non controllavi, aggiungi alla mano 1 carta della sua piccola riserva (3 carte per territorio) |
+| Esposizione | da 0 a 10 per giocatore, parte da 0 |
+| Carte potenti | oltre all'energia fanno salire l'esposizione di 1 o 2 (indicato sulla carta) |
+| Trasformazioni | a esposizione 3, 6 e 9: una carta casuale del tuo mazzo si trasforma nella sua versione cosmica |
+| Ridurre l'esposizione | una volta per turno: spendi 2 energia, esposizione -1 |
+| Instabilità | da 0 a 5 per territorio, parte da 0 |
+| Fasi cosmiche | fase I giri 1-3; fase II giri 4-6; fase III dal giro 7 |
+| Instabilità crescente | dal giro 7, alla fine di ogni giro tutti i territori +1 instabilità |
+| Eventi senza preavviso | 2 nel mazzo degli eventi |
+| Tappe degli obiettivi | 3 tappe; il segnale scatta quando ne manca 1 |
+
+## 6. Rischio cosmico
+
+**DECISIONE DI MATTEO (CT-DES-031, REGISTRATA):** ogni giocatore ha un indicatore di **esposizione** e ogni territorio un indicatore di **instabilità**. I **costi** sono le carte potenti che, oltre all'energia, fanno salire l'esposizione.
+
+**DECISIONE DI MATTEO (CT-DES-032, REGISTRATA):** con l'esposizione alta la forza cosmica colpisce più forte chi è più esposto e le carte del giocatore si trasformano nella loro versione cosmica.
+
+**DECISIONE DI MATTEO (CT-DES-033, REGISTRATA):** l'esposizione si può far scendere, ma costa: si rinuncia a energia o a una giocata.
+
+**DECISIONE DI MATTEO (CT-DES-034, REGISTRATA):** con l'instabilità alta il territorio cambia comportamento, per esempio le presenze perdono forza o si attiva un suo effetto cosmico.
+
+Cosa fa salire l'instabilità di un territorio: gli eventi cosmici, le carte potenti giocate lì e il passare del tempo (§11).
+
+**DA DECIDERE:** cosa succede esattamente alle soglie di instabilità di ciascun territorio; come sono fatte le versioni cosmiche delle carte (più forti, con un effetto collaterale?).
+
+## 7. Forza cosmica
+
+**DECISIONE DI MATTEO (CT-DES-035, REGISTRATA):** si vede sempre il **tipo** del prossimo evento (per esempio «colpirà un territorio»), non i dettagli. Pochi eventi rari arrivano senza preavviso.
+
+**DECISIONE DI MATTEO (CT-DES-036, REGISTRATA):** gli eventi sono divisi in **fasi** e diventano più forti man mano che la partita va avanti.
+
+Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla fine di ogni giro si risolve l'evento in cima e si scopre il tipo del successivo. Quando un evento colpisce «un giocatore», colpisce il più esposto; in caso di parità, entrambi.
+
+**DA DECIDERE:** l'elenco dei tipi di evento e degli eventi del prototipo.
+
+## 8. Vittoria, segnale e turno di avviso
+
+**DECISIONE DI MATTEO (CT-DES-037, REGISTRATA):** nel prototipo ogni fazione ha **un obiettivo fisso**.
+
+**DECISIONE DI MATTEO (CT-DES-038, REGISTRATA):** ogni obiettivo è fatto di **tappe visibili**. Quando manca solo l'ultima tappa scatta il segnale e l'avversario ha il suo turno di avviso (CT-DES-015). Se dopo quel turno l'ultima tappa viene completata, la vittoria è immediata.
+
+**DA DECIDERE:** l'obiettivo e le tappe di ciascuna fazione (§10); se il segnale può «spegnersi» quando l'avversario fa perdere una tappa.
+
 ## 9. Informazione visibile e nascosta - DA DECIDERE
 ## 10. Le due fazioni del prototipo e le priorità dell'avversario - DA DECIDERE
 ## 11. Durata e instabilità crescente - DA DECIDERE
@@ -94,3 +149,4 @@ Fasi del turno (proposta di struttura, **DA CONFERMARE** con le sezioni successi
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.2.0 | DRAFT | Sezioni 5-8 con le scelte di Matteo del 2026-10-31 (CT-DES-030…038) e la tabella dei numeri provvisori proposti da Cowork. |

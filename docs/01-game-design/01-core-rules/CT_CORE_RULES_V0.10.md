@@ -1,6 +1,6 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
-status: APPROVED
+status: DEPRECATED
 version: 0.10.0
 owner: Matteo
 prepared_by: Cowork
@@ -12,6 +12,8 @@ related_documents:
 ---
 
 # Cosmic Horror - Regole base (Core Rules)
+
+> **DEPRECATED.** Superata da `CT_CORE_RULES_V0.11.md` (CT-DES-067: cambia solo la priorità 3 dei Risvegliati nel §10). Il testo sotto resta com'era, solo per la storia.
 
 > **APPROVATE DA MATTEO il 2026-10-31 come base del prototipo (CT-DES-059). Tema: mondo di Lovecraft e Grandi Antichi (CT-DES-060).** Preparate da Cowork; tutte le scelte sono registrate nel Decision Log (CT-DES-021…058, 064, 065, 066). I numeri restano **provvisori** e vanno tarati nei playtest (CT-DES-030). Ogni modifica futura passa da una nuova decisione e da una nuova versione del documento.
 

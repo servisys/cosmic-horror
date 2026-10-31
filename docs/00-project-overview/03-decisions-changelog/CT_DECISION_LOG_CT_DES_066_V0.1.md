@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Decision Log CT-DES-066 (i Risvegliati contendono i territori dal primo turno)
 status: DRAFT
-version: 0.1.0
+version: 0.1.1
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -14,7 +14,7 @@ last_reviewed: 2026-10-31
 
 ## CT-DES-066 - I Risvegliati contendono i territori dal primo turno
 
-**Stato:** REGISTRATA
+**Stato:** SUPERATA (da CT-DES-067, 2026-10-31)
 
 **Decisione:** Nella tabella delle priorità del computer (regole base, §10) la priorità 3 dei Risvegliati non richiede più instabilità 3 o più. Diventa: **gioca presenze su un territorio senza rito dove la sua forza è minore o uguale a quella dell'avversario; tra più territori sceglie quello con l'instabilità più alta**. Le altre priorità restano uguali.
 
@@ -40,3 +40,4 @@ last_reviewed: 2026-10-31
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Cowork con la scelta di Matteo del 2026-10-31. |
+| 0.1.1 | DRAFT | CT-DES-066 segnata `SUPERATA` da CT-DES-067. Testo invariato. |

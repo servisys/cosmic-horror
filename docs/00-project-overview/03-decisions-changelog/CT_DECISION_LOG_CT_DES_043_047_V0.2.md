@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Decision Log CT-DES-043…047 (fazioni del prototipo)
 status: DRAFT
-version: 0.1.0
+version: 0.2.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -14,7 +14,7 @@ last_reviewed: 2026-10-31
 
 ## CT-DES-043 - Obiettivo dei Custodi: i tre Sigilli
 
-**Stato:** REGISTRATA
+**Stato:** SUPERATA (da CT-DES-055, 2026-10-31)
 
 **Decisione:** Su un territorio che controlli e con instabilità 2 o meno puoi porre un Sigillo, al massimo uno per territorio. Ogni Sigillo è una tappa; con tre Sigilli vinci.
 
@@ -36,7 +36,7 @@ last_reviewed: 2026-10-31
 
 ## CT-DES-044 - Obiettivo dei Risvegliati: il Rituale
 
-**Stato:** REGISTRATA
+**Stato:** SUPERATA (da CT-DES-055, 2026-10-31)
 
 **Decisione:** Su un territorio dove hai una presenza e l'instabilità è 3 o più puoi completare un rito, al massimo uno per territorio. Ogni rito è una tappa; con tre riti su tre territori diversi vinci.
 
@@ -127,3 +127,4 @@ last_reviewed: 2026-10-31
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Cowork con le scelte di Matteo del 2026-10-31. |
+| 0.2.0 | DRAFT | CT-DES-043 e CT-DES-044 segnate `SUPERATA` da CT-DES-055 (Regole V0.2, regola 3). Testo delle voci invariato. |

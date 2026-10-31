@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Decision Log CT-DES-048 (tappe che si possono togliere)
 status: DRAFT
-version: 0.1.0
+version: 0.2.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -14,7 +14,7 @@ last_reviewed: 2026-10-31
 
 ## CT-DES-048 - Tappe che si possono togliere
 
-**Stato:** REGISTRATA
+**Stato:** SUPERATA (da CT-DES-056, 2026-10-31)
 
 **Decisione:** Una tappa già ottenuta (un Sigillo dei Custodi, un rito dei Risvegliati) può essere tolta dall'avversario con carte apposite. Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne. Quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso (CT-DES-015).
 
@@ -39,3 +39,4 @@ last_reviewed: 2026-10-31
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Cowork con la scelta di Matteo del 2026-10-31. |
+| 0.2.0 | DRAFT | CT-DES-048 segnata `SUPERATA` da CT-DES-056 (Regole V0.2, regola 3). Testo della voce invariato. |

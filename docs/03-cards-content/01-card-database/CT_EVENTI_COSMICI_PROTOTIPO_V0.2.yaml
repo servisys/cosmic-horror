@@ -1,7 +1,7 @@
 # Cosmic Horror - Eventi cosmici del prototipo (prima lista)
-# status: DRAFT | version: 0.1.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+# status: DRAFT | version: 0.2.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
 #
-# PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO. Non e' una decisione registrata.
+# Lista di partenza approvata da Matteo (CT-DES-054); valori provvisori.
 # Formato provvisorio (YAML), come le carte (CT-DES-018). Tutti i valori sono provvisori (CT-DES-030).
 #
 # Come si usa (regole base §7, CT-DES-021, 035, 036, 010):
@@ -13,12 +13,14 @@
 #   - «Il territorio piu' instabile»: in parita', sorteggio con il seme della partita.
 #   - Se un mazzetto finisce, si rimescola.
 #
+# V0.2 (2026-10-31, CT-DES-058): chiarita la durata di Ombre Lunghe. Approvati come lista di partenza (CT-DES-054).
+#
 # Tipi: territorio | giocatore | campo (tutti i territori) | carte
 
 eventi:
   fase_I:
     - {id: E01, nome: Bisbiglio dal Vuoto, tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +1."}
-    - {id: E02, nome: Ombre Lunghe, tipo: territorio, effetto: "Sul territorio con piu' presenze, tutte le presenze hanno -1 forza fino alla fine del prossimo giro."}
+    - {id: E02, nome: Ombre Lunghe, tipo: territorio, effetto: "Sul territorio con piu' presenze, tutte le presenze hanno -1 forza fino alla fine del giro successivo a quello in cui si risolve l'evento."}
     - {id: E03, nome: Sogni Inquieti, tipo: giocatore, effetto: "Il piu' esposto scarta 1 carta a caso dalla mano."}
     - {id: E04, nome: Marea Lenta, tipo: campo, effetto: "Ogni territorio con instabilita' 0 sale a 1."}
     - {id: E05, nome: Stella Cadente, tipo: territorio, effetto: "Il Cratere Stellare: instabilita' +1."}

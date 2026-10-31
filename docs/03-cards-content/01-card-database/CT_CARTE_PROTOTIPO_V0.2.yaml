@@ -1,5 +1,5 @@
 # Cosmic Horror - Carte del prototipo (prima lista)
-# status: DRAFT | version: 0.1.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+# status: DRAFT | version: 0.2.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
 #
 # PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO (CT-DES-047).
 # Formato provvisorio (YAML): il formato definitivo dei dati si decide nell'architettura tecnica (CT-DES-018).
@@ -14,9 +14,12 @@
 #   versione_cosmica: la carta in cui si trasforma (CT-DES-026, CT-DES-032), se esiste
 #
 # Azioni base sempre disponibili (provvisorie, regole base §10):
-#   Porre un Sigillo (Custodi): 3 energia; su un territorio che controlli con instabilita' 2 o meno; uno per territorio.
-#   Completare un rito (Risvegliati): 3 energia; su un territorio con una tua presenza e instabilita' 3 o piu'; uno per territorio.
+#   Porre un Sigillo (Custodi): 2 energia; su un territorio che controlli con instabilita' 3 o meno; uno per territorio (CT-DES-055).
+#   Completare un rito (Risvegliati): 2 energia; su un territorio dove hai una presenza, almeno tanta forza quanto l'avversario e instabilita' 3 o piu'; uno per territorio (CT-DES-055).
 #   Ridurre l'esposizione (tutti): 2 energia, esposizione -1, una volta per turno.
+#
+# V0.2 (2026-10-31, CT-DES-055 e CT-DES-058): costi e condizioni delle azioni base; Profanazione con le condizioni del rito;
+#   Frammento Stellare senza instabilita'; Biblioteca Sommersa con 1 carta pescata. Esorcismo e Profanazione: tappe togliibili solo finche' non sono consolidate (CT-DES-056).
 
 fazioni:
   - id: custodi
@@ -37,7 +40,7 @@ fazioni:
       - {id: CU10, nome: Quiete, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Instabilita' di un territorio -1."}
       - {id: CU11, nome: Respiro Profondo, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "La tua esposizione -1."}
       - {id: CU12, nome: Rinforzi, tipo: azione, costo: 2, potente: 0, copie: 3, effetto: "Una tua presenza ha +2 forza fino a fine partita."}
-      - {id: CU13, nome: Esorcismo, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un rito avversario da un territorio che controlli. (Toglie una tappa: DA CONFERMARE.)"}
+      - {id: CU13, nome: Esorcismo, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un rito avversario non ancora consolidato da un territorio che controlli."}
       - {id: CU14, nome: Preparare il Sigillo, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "Il prossimo Sigillo che poni in questo turno costa 1 energia in meno."}
       - {id: CU15, nome: Cacciata, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Elimina una presenza avversaria con forza 3 o meno."}
       - {id: CU16, nome: Studio delle Stelle, tipo: azione, costo: 2, potente: 0, copie: 2, effetto: "Peschi 2 carte."}
@@ -64,7 +67,7 @@ fazioni:
       - {id: RI10, nome: Sussurro, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Instabilita' di un territorio +1.",
          versione_cosmica: {nome: Urlo, costo: 1, potente: 0, effetto: "Instabilita' di un territorio +2."}}
       - {id: RI11, nome: Offerta di Sangue, tipo: azione, costo: 0, potente: 1, copie: 2, effetto: "+2 energia in questo turno."}
-      - {id: RI12, nome: Profanazione, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un Sigillo avversario da un territorio con instabilita' 3 o piu'. (Toglie una tappa: DA CONFERMARE.)"}
+      - {id: RI12, nome: Profanazione, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un Sigillo avversario non ancora consolidato da un territorio con instabilita' 3 o piu', dove hai una presenza e almeno tanta forza quanto l'avversario."}
       - {id: RI13, nome: Visioni, tipo: azione, costo: 2, potente: 1, copie: 2, effetto: "Peschi 2 carte."}
       - {id: RI14, nome: Corruzione, tipo: azione, costo: 2, potente: 0, copie: 3, effetto: "Una presenza avversaria -2 forza fino a fine partita."}
       - {id: RI15, nome: Preparare il Rito, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "Il prossimo rito che completi in questo turno costa 1 energia in meno."}
@@ -75,7 +78,7 @@ fazioni:
 territori:
   - {id: T1, nome: Il Faro Spento, effetto: "Chi lo controlla pesca 1 carta in piu' all'inizio del proprio turno.",
      riserva: [{nome: Lampo del Faro, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Peschi 1 carta e vedi il tipo dei prossimi 2 eventi cosmici."}]}
-  - {id: T2, nome: La Biblioteca Sommersa, effetto: "Chi ne prende il controllo guarda le prime 3 carte del proprio mazzo e le rimette nell'ordine che vuole.",
+  - {id: T2, nome: La Biblioteca Sommersa, effetto: "Chi ne prende il controllo pesca 1 carta, poi guarda le prime 3 carte del proprio mazzo e le rimette nell'ordine che vuole.",
      riserva: [{nome: Pagina Perduta, tipo: azione, costo: 1, potente: 1, copie: 3, effetto: "Cerca nel tuo mazzo una carta azione e mettila in mano."}]}
   - {id: T3, nome: Il Cratere Stellare, effetto: "Ogni carta potente giocata qui fa salire l'instabilita' di questo territorio di 1 in piu'.",
-     riserva: [{nome: Frammento Stellare, tipo: azione, costo: 0, potente: 0, copie: 3, effetto: "+1 energia in questo turno; instabilita' di questo territorio +1."}]}
+     riserva: [{nome: Frammento Stellare, tipo: azione, costo: 0, potente: 0, copie: 3, effetto: "+1 energia in questo turno."}]}

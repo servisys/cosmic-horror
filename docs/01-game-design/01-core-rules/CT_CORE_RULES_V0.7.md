@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.6.0
+version: 0.7.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -13,7 +13,7 @@ related_documents:
 
 # Cosmic Horror - Regole base (Core Rules)
 
-> **BOZZA COMPLETA, PREPARATA DA COWORK.** Tutte le sezioni hanno le scelte di fondo di Matteo, registrate nel Decision Log (CT-DES-021…054). I numeri sono **provvisori** e vanno tarati nei playtest (CT-DES-030). Il documento resta `DRAFT`: passarlo in `REVIEW` o `APPROVED` è una decisione di Matteo.
+> **BOZZA COMPLETA, PREPARATA DA COWORK.** Tutte le sezioni hanno le scelte di fondo di Matteo, registrate nel Decision Log (CT-DES-021…058). I numeri sono **provvisori** e vanno tarati nei playtest (CT-DES-030). Il documento resta `DRAFT`: passarlo in `REVIEW` o `APPROVED` è una decisione di Matteo.
 
 ## 0. Riferimenti già decisi
 
@@ -99,7 +99,7 @@ Gli effetti dei territori del prototipo sono in §10 (CT-DES-046).
 | Primo giocatore | sorteggio; il secondo pesca 1 carta in più |
 | Mano iniziale | 5 carte |
 | Pesca | 1 carta all'inizio di ogni proprio turno |
-| Energia base | 2 al primo turno, +1 ogni turno successivo, fino a un massimo di 8 |
+| Energia base | 2 al primo turno, +1 ogni turno successivo, fino a un massimo di 8; **eccezione per il primo turno della partita (CT-DES-057): chi gioca per primo ha 1 energia, chi gioca per secondo 3** |
 | Extra dai territori | +1 energia se all'inizio del turno controlli almeno 2 territori |
 | Energia non spesa | non si conserva |
 | Carte guadagnate dai territori | quando prendi il controllo di un territorio che prima non controllavi, aggiungi alla mano 1 carta della sua piccola riserva (3 carte per territorio) |
@@ -123,7 +123,9 @@ Gli effetti dei territori del prototipo sono in §10 (CT-DES-046).
 
 **DECISIONE DI MATTEO (CT-DES-034, REGISTRATA):** con l'instabilità alta il territorio cambia comportamento, per esempio le presenze perdono forza o si attiva un suo effetto cosmico.
 
-Cosa fa salire l'instabilità di un territorio: gli eventi cosmici, le carte potenti giocate lì e il passare del tempo (§11).
+Cosa fa salire l'instabilità di un territorio: gli eventi cosmici, le carte potenti giocate lì e il passare del tempo (§11). Una carta potente giocata senza un territorio (per esempio un'azione che non bersaglia un territorio) alza solo l'esposizione (CT-DES-058).
+
+Nella trasformazione, «mazzo» indica le carte ancora da pescare (CT-DES-058).
 
 **DECISIONE DI MATTEO (CT-DES-051, REGISTRATA):** soglie di instabilità:
 - a **4**, le presenze su quel territorio hanno **−1 forza**;
@@ -149,7 +151,7 @@ Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla 
 
 Tipi di evento: **territorio**, **giocatore**, **campo** (tutti i territori), **carte**. Gli eventi improvvisi mostrano «?».
 
-**DECISIONE DI MATTEO (CT-DES-054, REGISTRATA):** la prima lista dei 20 eventi (`docs/03-cards-content/01-card-database/CT_EVENTI_COSMICI_PROTOTIPO_V0.1.yaml`) è approvata come **lista di partenza**, da provare nelle partite. Valori provvisori.
+**DECISIONE DI MATTEO (CT-DES-054, REGISTRATA):** la prima lista dei 20 eventi (`docs/03-cards-content/01-card-database/`, versione più alta del file `CT_EVENTI_COSMICI_PROTOTIPO_V0.x.yaml`) è approvata come **lista di partenza**, da provare nelle partite. Valori provvisori.
 
 ## 8. Vittoria, segnale e turno di avviso
 
@@ -157,9 +159,9 @@ Tipi di evento: **territorio**, **giocatore**, **campo** (tutti i territori), **
 
 **DECISIONE DI MATTEO (CT-DES-038, REGISTRATA):** ogni obiettivo è fatto di **tappe visibili**. Quando manca solo l'ultima tappa scatta il segnale e l'avversario ha il suo turno di avviso (CT-DES-015). Se dopo quel turno l'ultima tappa viene completata, la vittoria è immediata.
 
-Obiettivi e tappe di ciascuna fazione: §10 (CT-DES-043, CT-DES-044).
+Obiettivi e tappe di ciascuna fazione: §10 (CT-DES-055).
 
-**DECISIONE DI MATTEO (CT-DES-048, REGISTRATA):** una tappa già ottenuta **può essere tolta** dall'avversario con carte apposite (nella prima lista: «Esorcismo» per i Custodi, «Profanazione» per i Risvegliati). Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne. Quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso.
+**DECISIONE DI MATTEO (CT-DES-056, REGISTRATA; sostituisce CT-DES-048):** una tappa già ottenuta può essere tolta dall'avversario con carte apposite (nella prima lista: «Esorcismo» per i Custodi, «Profanazione» per i Risvegliati), ma **solo fino alla fine del turno successivo dell'avversario**: dopo, la tappa è **consolidata** e definitiva. Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne; quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso.
 
 ## 9. Informazione visibile e nascosta
 
@@ -180,15 +182,16 @@ Il computer (CT-DES-016) vede esattamente le stesse informazioni del giocatore u
 
 ### Obiettivi (3 tappe ciascuno)
 
-**DECISIONE DI MATTEO (CT-DES-043, REGISTRATA):** obiettivo dei Custodi, **«I tre Sigilli»**. Su un territorio che controlli e che ha instabilità 2 o meno puoi porre un Sigillo, al massimo uno per territorio. Ogni Sigillo è una tappa: con tre Sigilli vinci.
+**DECISIONE DI MATTEO (CT-DES-055, REGISTRATA; sostituisce CT-DES-043 e CT-DES-044):**
 
-**DECISIONE DI MATTEO (CT-DES-044, REGISTRATA):** obiettivo dei Risvegliati, **«Il Rituale»**. Su un territorio dove hai una presenza e l'instabilità è 3 o più puoi completare un rito, al massimo uno per territorio. Ogni rito è una tappa: con tre riti, su tre territori diversi, vinci.
+- **Custodi, «I tre Sigilli»:** su un territorio che controlli e che ha instabilità **3 o meno** puoi porre un Sigillo, al massimo uno per territorio. Ogni Sigillo è una tappa: con tre Sigilli vinci.
+- **Risvegliati, «Il Rituale»:** su un territorio dove hai una presenza, **almeno tanta forza quanto l'avversario** e instabilità 3 o più puoi completare un rito, al massimo uno per territorio. Ogni rito è una tappa: con tre riti, su tre territori diversi, vinci.
 
-Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Risvegliati alta.
+Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Risvegliati alta. Alla soglia 3 entrambe le tappe sono possibili.
 
-**Numeri provvisori:** porre un Sigillo o completare un rito costa 3 energia.
+**Numeri provvisori:** porre un Sigillo o completare un rito costa **2 energia** (CT-DES-055).
 
-Le tappe possono essere tolte dall'avversario: §8 (CT-DES-048).
+Le tappe possono essere tolte dall'avversario finché non sono consolidate: §8 (CT-DES-056). *Profanazione* richiede le stesse condizioni del rito; *Esorcismo* richiede il controllo del territorio (CT-DES-058).
 
 ### Priorità del computer
 
@@ -208,12 +211,12 @@ Le tappe possono essere tolte dall'avversario: §8 (CT-DES-048).
 | Territorio | Effetto |
 |---|---|
 | Il Faro Spento | chi lo controlla pesca 1 carta in più a ogni turno |
-| La Biblioteca Sommersa | chi ne prende il controllo guarda le prime 3 carte del proprio mazzo e le riordina |
+| La Biblioteca Sommersa | chi ne prende il controllo pesca 1 carta, poi guarda le prime 3 carte del proprio mazzo e le riordina (CT-DES-058) |
 | Il Cratere Stellare | ogni carta potente giocata qui fa salire l'instabilità di 1 in più |
 
 ### Carte
 
-**DECISIONE DI MATTEO (CT-DES-047, REGISTRATA):** la prima lista delle 80 carte (40 per fazione), con le riserve dei territori, la prepara Cowork in un file di dati di testo e Matteo la rivede. File: `docs/03-cards-content/01-card-database/CT_CARTE_PROTOTIPO_V0.1.yaml`. Tutti i valori sono provvisori.
+**DECISIONE DI MATTEO (CT-DES-047, REGISTRATA):** la prima lista delle 80 carte (40 per fazione), con le riserve dei territori, la prepara Cowork in un file di dati di testo e Matteo la rivede. File: `docs/03-cards-content/01-card-database/` (versione più alta del file `CT_CARTE_PROTOTIPO_V0.x.yaml`). Tutti i valori sono provvisori.
 
 Eventi cosmici: prima lista proposta in §7.
 
@@ -246,6 +249,7 @@ Già deciso, nessuna scelta nuova:
 | **Evento improvviso** | evento il cui tipo non si vede in anticipo |
 | **Fase cosmica** | periodo della partita (I, II, III) con eventi via via più forti |
 | **Tappa** | passo verso l'obiettivo di vittoria (3 per obiettivo) |
+| **Tappa consolidata** | tappa che l'avversario non può più togliere (dopo il suo turno successivo) |
 | **Segnale** | avviso che un giocatore è a una sola tappa dalla vittoria |
 | **Turno di avviso** | il turno garantito all'avversario dopo il segnale |
 | **Sigillo** | tappa dei Custodi |
@@ -258,6 +262,7 @@ Già deciso, nessuna scelta nuova:
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.7.0 | DRAFT | Correzioni dopo la simulazione di Cowork: condizioni e costi di Sigillo e rito (CT-DES-055), tappe consolidate (CT-DES-056), primo turno 1/3 energia (CT-DES-057), chiarimenti (CT-DES-058). |
 | 0.6.0 | DRAFT | Regole base complete nelle scelte di fondo: parità, limite di presenze, soglie di instabilità, territori fissi, fasi del turno, eventi di partenza (CT-DES-049…054). |
 | 0.5.0 | DRAFT | Tappe che si possono togliere (CT-DES-048); tipi di evento e prima lista degli eventi (proposta); glossario. |
 | 0.4.0 | DRAFT | §10 completata: obiettivi, priorità del computer, territori, prima lista delle carte (CT-DES-043…047). |

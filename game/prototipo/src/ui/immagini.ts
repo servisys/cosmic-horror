@@ -17,7 +17,10 @@ export function idsImmagini(): string[] {
 }
 
 export async function caricaImmagini(): Promise<void> {
-  await Promise.all(
+  // PixiJS carica le texture con un web worker da un URL blob: una pagina ospite con una Content-Security-Policy che lo vieta
+  // (worker-src) lo blocca e le immagini non arrivano mai. Senza worker le immagini si caricano dal thread principale.
+  Assets.setPreferences({ preferWorkers: false });
+  const tutte = Promise.all(
     [...perId.entries()].map(async ([id, url]) => {
       try {
         texture.set(id, await Assets.load<Texture>(url));
@@ -26,8 +29,15 @@ export async function caricaImmagini(): Promise<void> {
       }
     }),
   );
+  // se per qualche motivo il caricamento si blocca, il gioco parte lo stesso (senza le immagini non arrivate)
+  await Promise.race([tutte, new Promise<void>((r) => setTimeout(r, 10000))]);
 }
 
 export function texturaDi(id: string): Texture | undefined {
   return texture.get(id);
+}
+
+/** Quante texture sono state caricate (serve ai test automatici). */
+export function numeroTexture(): number {
+  return texture.size;
 }

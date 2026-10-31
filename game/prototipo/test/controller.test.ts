@@ -40,6 +40,12 @@ function partita(fazione: FazioneId, seme: number): Controller {
 }
 
 describe('controller dell interfaccia', () => {
+  it('prima di scegliere la fazione non c e una partita attiva (il ridisegno non deve toccare lo stato)', () => {
+    const c = new Controller(cat.dati);
+    expect(c.attiva).toBe(false);
+    c.nuova('custodi', 1);
+    expect(c.attiva).toBe(true);
+  });
   for (const f of ['custodi', 'risvegliati'] as const) {
     it(`partita completa dei ${f} usando solo le funzioni dell interfaccia`, () => {
       for (const seme of [1, 2, 3, 4, 5]) {

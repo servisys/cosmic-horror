@@ -58,6 +58,11 @@ function colori(id: string): { chiaro: number; scuro: number } {
   return { chiaro: COL.riserva, scuro: COL.riservaScuro };
 }
 
+/** Dispositivo con il solo tocco (niente passaggio del mouse) o evento di tocco. */
+function soloTocco(tipoPuntatore: string): boolean {
+  return tipoPuntatore === 'touch' || tipoPuntatore === 'pen' || (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches);
+}
+
 class Disegno {
   /** Immagine di una carta dentro il riquadro (x,y,w,h); se manca, non disegna nulla e ritorna false. */
   immagine(idImg: string, x: number, y: number, w: number, h: number, alpha = 1): boolean {
@@ -90,8 +95,10 @@ class Disegno {
       g.eventMode = 'static';
       g.cursor = 'pointer';
       if (opz.tap) g.on('pointertap', opz.tap);
-      if (opz.over) g.on('pointerover', opz.over);
-      if (opz.out) g.on('pointerout', opz.out);
+      // L'anteprima al passaggio e' solo per il mouse: sul telefono il tocco farebbe aprire l'anteprima (che resterebbe sopra il campo
+      // e intercetterebbe i tocchi) e il ridisegno farebbe perdere il tocco stesso. La scheda si apre solo con la lente o toccando.
+      if (opz.over) g.on('pointerover', (e) => { if (!soloTocco(e.pointerType)) opz.over!(); });
+      if (opz.out) g.on('pointerout', (e) => { if (!soloTocco(e.pointerType)) opz.out!(); });
     }
     if (opz.id) this.aree[opz.id] = { x, y, w, h };
     this.s.addChild(g);

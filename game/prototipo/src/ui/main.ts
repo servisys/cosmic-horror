@@ -4,7 +4,7 @@ import type { FazioneId } from '../dati/tipi.js';
 import { sceglieMossa } from '../computer/computer.js';
 import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
-import { caricaImmagini } from './immagini.js';
+import { caricaImmagini, numeroTexture } from './immagini.js';
 import { disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
@@ -32,7 +32,7 @@ function controllaIngrandimento(): void {
 }
 
 function ridisegna(): void {
-  if (!app || ridisegnoInCoda) return;
+  if (!app || !ctrl.attiva || ridisegnoInCoda) return;
   ridisegnoInCoda = true;
   setTimeout(() => {
     ridisegnoInCoda = false;
@@ -175,6 +175,7 @@ async function avvia(): Promise<void> {
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
     zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,
+    immagini: () => numeroTexture(),
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)

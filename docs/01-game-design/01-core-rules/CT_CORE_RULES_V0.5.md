@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.4.0
+version: 0.5.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -53,7 +53,9 @@ Ogni territorio ha:
 - un livello di **instabilità** (§6);
 - eventuali stati di fazione (CT-DES-002: più stati possono coesistere).
 
-**DA DECIDERE:** gli effetti dei territori; quante presenze possono stare su un territorio; cosa succede in caso di parità di forza; se i territori cambiano da una partita all'altra.
+Gli effetti dei territori del prototipo sono in §10 (CT-DES-046).
+
+**DA DECIDERE:** quante presenze possono stare su un territorio; cosa succede in caso di parità di forza; se i territori cambiano da una partita all'altra.
 
 ## 3. Il mazzo
 
@@ -129,7 +131,9 @@ Cosa fa salire l'instabilità di un territorio: gli eventi cosmici, le carte pot
 
 Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla fine di ogni giro si risolve l'evento in cima e si scopre il tipo del successivo. Quando un evento colpisce «un giocatore», colpisce il più esposto; in caso di parità, entrambi.
 
-**DA DECIDERE:** l'elenco dei tipi di evento e degli eventi del prototipo.
+Tipi di evento: **territorio**, **giocatore**, **campo** (tutti i territori), **carte**. Gli eventi improvvisi mostrano «?».
+
+Prima lista degli eventi: `docs/03-cards-content/01-card-database/CT_EVENTI_COSMICI_PROTOTIPO_V0.1.yaml`. È una **PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO**: non è una decisione registrata.
 
 ## 8. Vittoria, segnale e turno di avviso
 
@@ -137,7 +141,9 @@ Come funziona (struttura proposta): un mazzo di eventi diviso in tre fasi; alla 
 
 **DECISIONE DI MATTEO (CT-DES-038, REGISTRATA):** ogni obiettivo è fatto di **tappe visibili**. Quando manca solo l'ultima tappa scatta il segnale e l'avversario ha il suo turno di avviso (CT-DES-015). Se dopo quel turno l'ultima tappa viene completata, la vittoria è immediata.
 
-**DA DECIDERE:** l'obiettivo e le tappe di ciascuna fazione (§10); se il segnale può «spegnersi» quando l'avversario fa perdere una tappa.
+Obiettivi e tappe di ciascuna fazione: §10 (CT-DES-043, CT-DES-044).
+
+**DECISIONE DI MATTEO (CT-DES-048, REGISTRATA):** una tappa già ottenuta **può essere tolta** dall'avversario con carte apposite (nella prima lista: «Esorcismo» per i Custodi, «Profanazione» per i Risvegliati). Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne. Quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso.
 
 ## 9. Informazione visibile e nascosta
 
@@ -166,7 +172,7 @@ Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Ri
 
 **Numeri provvisori:** porre un Sigillo o completare un rito costa 3 energia.
 
-**DA DECIDERE:** se una tappa già ottenuta può essere tolta dall'avversario. La prima lista di carte include due carte di prova che lo fanno, «Esorcismo» e «Profanazione», ma la regola va confermata.
+Le tappe possono essere tolte dall'avversario: §8 (CT-DES-048).
 
 ### Priorità del computer
 
@@ -193,7 +199,7 @@ Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Ri
 
 **DECISIONE DI MATTEO (CT-DES-047, REGISTRATA):** la prima lista delle 80 carte (40 per fazione), con le riserve dei territori, la prepara Cowork in un file di dati di testo e Matteo la rivede. File: `docs/03-cards-content/01-card-database/CT_CARTE_PROTOTIPO_V0.1.yaml`. Tutti i valori sono provvisori.
 
-**DA DECIDERE:** il mazzo degli eventi cosmici (§7).
+Eventi cosmici: prima lista proposta in §7.
 
 ## 11. Durata e instabilità crescente
 
@@ -203,13 +209,40 @@ Già deciso, nessuna scelta nuova:
 - la forza cosmica cresce per fasi (CT-DES-036);
 - dal giro 7 tutti i territori guadagnano instabilità alla fine di ogni giro (numero provvisorio, §5);
 - un eventuale limite massimo di giri si decide dopo i playtest (CT-DES-009).
-## 12. Glossario - DA DECIDERE
+## 12. Glossario
+
+| Termine | Significato |
+|---|---|
+| **Giro** | un turno di ciascun giocatore, seguito dall'azione della forza cosmica |
+| **Turno** | la parte del giro in cui gioca un solo giocatore |
+| **Territorio** | una delle zone del campo (3 nel prototipo) |
+| **Controllo** | ha il controllo di un territorio chi vi ha più forza |
+| **Presenza** | carta che resta sul territorio finché non viene eliminata |
+| **Azione** | carta che fa il suo effetto e va negli scarti |
+| **Forza** | valore di una presenza; conta per il controllo |
+| **Energia** | ciò che si spende per giocare carte e azioni base |
+| **Esposizione** | rischio cosmico del giocatore, da 0 a 10 |
+| **Instabilità** | rischio cosmico del territorio, da 0 a 5 |
+| **Carta potente** | carta che oltre all'energia fa salire l'esposizione |
+| **Versione cosmica** | forma in cui una carta si trasforma quando l'esposizione sale |
+| **Forza cosmica** | presenza autonoma che agisce alla fine di ogni giro con un evento |
+| **Evento cosmico** | carta del mazzo della forza cosmica; il suo tipo si vede in anticipo |
+| **Evento improvviso** | evento il cui tipo non si vede in anticipo |
+| **Fase cosmica** | periodo della partita (I, II, III) con eventi via via più forti |
+| **Tappa** | passo verso l'obiettivo di vittoria (3 per obiettivo) |
+| **Segnale** | avviso che un giocatore è a una sola tappa dalla vittoria |
+| **Turno di avviso** | il turno garantito all'avversario dopo il segnale |
+| **Sigillo** | tappa dei Custodi |
+| **Rito** | tappa dei Risvegliati |
+| **Riserva** | piccole carte di un territorio, guadagnate prendendone il controllo |
+| **Seme** | numero che rende ripetibile la casualità di una partita |
 
 ## Changelog
 
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.5.0 | DRAFT | Tappe che si possono togliere (CT-DES-048); tipi di evento e prima lista degli eventi (proposta); glossario. |
 | 0.4.0 | DRAFT | §10 completata: obiettivi, priorità del computer, territori, prima lista delle carte (CT-DES-043…047). |
 | 0.3.0 | DRAFT | Sezioni 9, 10 (stile delle fazioni) e 11; mazzo esaurito e presenze immobili. Scelte di Matteo del 2026-10-31 (CT-DES-039…042). |
 | 0.2.0 | DRAFT | Sezioni 5-8 con le scelte di Matteo del 2026-10-31 (CT-DES-030…038) e la tabella dei numeri provvisori proposti da Cowork. |

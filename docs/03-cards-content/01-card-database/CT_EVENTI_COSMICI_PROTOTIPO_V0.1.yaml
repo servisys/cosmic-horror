@@ -1,0 +1,42 @@
+# Cosmic Horror - Eventi cosmici del prototipo (prima lista)
+# status: DRAFT | version: 0.1.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+#
+# PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO. Non e' una decisione registrata.
+# Formato provvisorio (YAML), come le carte (CT-DES-018). Tutti i valori sono provvisori (CT-DES-030).
+#
+# Come si usa (regole base §7, CT-DES-021, 035, 036, 010):
+#   - Tre mazzetti, uno per fase: fase I (giri 1-3), fase II (giri 4-6), fase III (dal giro 7).
+#   - Ogni mazzetto si mescola con il seme della partita (CT-DES-019). Un evento improvviso va nella fase II e uno nella fase III.
+#   - Alla fine di ogni giro si risolve l'evento in cima al mazzetto della fase in corso e si mostra il TIPO del successivo.
+#   - Gli eventi improvvisi mostrano «?» al posto del tipo (CT-DES-035).
+#   - «Il piu' esposto»: il giocatore con esposizione piu' alta; in parita', entrambi (regole base §7).
+#   - «Il territorio piu' instabile»: in parita', sorteggio con il seme della partita.
+#   - Se un mazzetto finisce, si rimescola.
+#
+# Tipi: territorio | giocatore | campo (tutti i territori) | carte
+
+eventi:
+  fase_I:
+    - {id: E01, nome: Bisbiglio dal Vuoto, tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +1."}
+    - {id: E02, nome: Ombre Lunghe, tipo: territorio, effetto: "Sul territorio con piu' presenze, tutte le presenze hanno -1 forza fino alla fine del prossimo giro."}
+    - {id: E03, nome: Sogni Inquieti, tipo: giocatore, effetto: "Il piu' esposto scarta 1 carta a caso dalla mano."}
+    - {id: E04, nome: Marea Lenta, tipo: campo, effetto: "Ogni territorio con instabilita' 0 sale a 1."}
+    - {id: E05, nome: Stella Cadente, tipo: territorio, effetto: "Il Cratere Stellare: instabilita' +1."}
+    - {id: E06, nome: Eco Antica, tipo: carte, effetto: "Ogni giocatore pesca 1 carta."}
+  fase_II:
+    - {id: E07, nome: Crepa nella Realta', tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +2."}
+    - {id: E08, nome: Fame dell'Abisso, tipo: giocatore, effetto: "Il piu' esposto elimina la propria presenza con forza piu' bassa."}
+    - {id: E09, nome: Nebbia Cosmica, tipo: campo, effetto: "Tutti i territori: instabilita' +1."}
+    - {id: E10, nome: Il Faro si Accende, tipo: territorio, effetto: "Chi controlla il Faro Spento: esposizione +1."}
+    - {id: E11, nome: Pagine Bruciate, tipo: carte, effetto: "Il piu' esposto scarta 2 carte a caso dalla mano."}
+    - {id: E12, nome: Richiamo, tipo: giocatore, effetto: "Il piu' esposto: una carta casuale del suo mazzo si trasforma nella versione cosmica."}
+  fase_III:
+    - {id: E13, nome: Squarcio, tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +2; le presenze li' hanno -1 forza fino a fine partita."}
+    - {id: E14, nome: Il Grande Occhio, tipo: giocatore, effetto: "Il piu' esposto: esposizione +2."}
+    - {id: E15, nome: Tempesta di Stelle, tipo: campo, effetto: "Tutti i territori: instabilita' +1; ogni presenza con forza 1 o meno viene eliminata."}
+    - {id: E16, nome: Divoratore, tipo: territorio, effetto: "Sul territorio piu' instabile viene eliminata la presenza con forza piu' alta (in parita', sorteggio)."}
+    - {id: E17, nome: Convergenza, tipo: campo, effetto: "Tutti i territori: instabilita' +1; ogni giocatore con esposizione 6 o piu' scarta 1 carta a caso."}
+    - {id: E18, nome: Allineamento, tipo: giocatore, effetto: "Entrambi i giocatori: esposizione +1; il piu' esposto +1 in piu'."}
+  improvvisi:
+    - {id: E19, nome: Silenzio Improvviso, tipo: "?", fase: II, effetto: "Tutti i territori: instabilita' -1."}
+    - {id: E20, nome: Risveglio, tipo: "?", fase: III, effetto: "Il piu' esposto: due carte casuali del suo mazzo si trasformano nella versione cosmica."}

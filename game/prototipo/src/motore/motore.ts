@@ -1,6 +1,6 @@
 // Motore delle regole: crea una partita, elenca le mosse legali, applica una mossa. Nessuna grafica (CT-DES-020).
 import type { FazioneId } from '../dati/tipi.js';
-import { idRiserva, type Catalogo } from './catalogo.js';
+import type { Catalogo } from './catalogo.js';
 import { effettoAzione, effettoIngresso, parametriPossibili, territorioPerPotente, type Param } from './effetti.js';
 import {
   assicuraMazzetto, creaMazzettiEventi, effettiCosmiciTerritori, instabilitaCrescente, risolviEvento, scadenze,
@@ -53,7 +53,7 @@ export function creaPartita(cat: Catalogo, opz: OpzioniPartita): Partita {
   })) as [Giocatore, Giocatore];
   s.territori = cat.dati.territori.map((t): TerritorioStato => ({
     inst: 0, presenze: [[], []], controllo: null, malus: 0, malusFinoAlGiro: 0,
-    riserva: t.riserva.flatMap((r) => Array.from({ length: r.copie }, () => nuovaCarta(s, idRiserva(t.id)))),
+    riserva: t.riserva.flatMap((r) => Array.from({ length: r.copie }, () => nuovaCarta(s, r.id))),
   })) as [TerritorioStato, TerritorioStato, TerritorioStato];
   // mano iniziale: 5 carte, il secondo giocatore ne pesca 1 in piu'
   for (let p = 0; p < 2; p++) pesca(g, p, REGOLE.manoIniziale + p);

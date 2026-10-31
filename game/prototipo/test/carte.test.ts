@@ -87,13 +87,21 @@ describe('carte dei Custodi', () => {
     giroIntero(g);
     expect(g.s.territori[2].inst).toBe(2);
   });
-  it('CU08 Fattoria Barricata: non puo essere eliminata da azioni che costano 2 o meno', () => {
+  it('CU08 Fattoria Barricata: non puo essere eliminata da azioni che costano 4 o meno (CT-DES-064)', () => {
     const g = partita(C);
     const p = presenza(g, 0, 0, 'CU08');
     eliminaDaAzione(g, 0, 0, p, 2);
+    eliminaDaAzione(g, 0, 0, p, 4);
     expect(totPresenze(g, 0, 0)).toBe(1);
-    eliminaDaAzione(g, 0, 0, p, 3);
+    eliminaDaAzione(g, 0, 0, p, 5);
     expect(totPresenze(g, 0, 0)).toBe(0);
+  });
+  it('CU08: resiste a Polvere di Ibn Ghazi (costo 3), che pure la sceglie come bersaglio', () => {
+    const g = partita(C);
+    const f = presenza(g, 1, 0, 'CU08'); // forza 3: bersaglio valido per forza 3 o meno
+    mano(g, 0, 'CU15');
+    gioca(g, 0, 'CU15', { pres: f.uid });
+    expect(totPresenze(g, 0, 1)).toBe(1);
   });
   it('CU09 Pietra Stellata di Mnar: entra, se puoi porre un Sigillo lo poni gratis', () => {
     const g = partita(C);
@@ -260,6 +268,8 @@ describe('carte dei Risvegliati', () => {
     gioca(g, 0, 'RI07', { terr: 0, pres: v.uid });
     expect(forzaPresenza(g, 0, 1, v)).toBe(3);
     gioca(g, 0, 'RI07*', { terr: 0, pres: v.uid });
+    expect(forzaPresenza(g, 0, 1, v)).toBe(1);
+    giroIntero(g); // il malus dura fino a fine partita
     expect(forzaPresenza(g, 0, 1, v)).toBe(1);
   });
   it('RI08 Shoggoth: forza 6, potente 1', () => {

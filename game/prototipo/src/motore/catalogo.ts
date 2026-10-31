@@ -20,11 +20,6 @@ export interface Catalogo {
   eventi: Map<string, EventoDef>;
 }
 
-/** Le riserve dei territori nei file dati non hanno `id`: si ricava "<id territorio>r" (es. T1r). */
-export function idRiserva(idTerritorio: string): string {
-  return idTerritorio + 'r';
-}
-
 export function creaCatalogo(dati: Dati): Catalogo {
   const carte = new Map<string, CartaDef>();
   const fazioneDi = new Map<string, FazioneId | 'riserva'>();
@@ -32,10 +27,9 @@ export function creaCatalogo(dati: Dati): Catalogo {
   for (const f of dati.fazioni) for (const c of f.carte) { carte.set(c.id, c); fazioneDi.set(c.id, f.id); }
   dati.territori.forEach((t, i) => {
     for (const r of t.riserva) {
-      const id = idRiserva(t.id);
-      carte.set(id, { ...r, id });
-      fazioneDi.set(id, 'riserva');
-      territorioDiRiserva.set(id, i);
+      carte.set(r.id, r);
+      fazioneDi.set(r.id, 'riserva');
+      territorioDiRiserva.set(r.id, i);
     }
   });
   const eventi = new Map<string, EventoDef>();

@@ -68,12 +68,13 @@ describe('priorita dei Custodi', () => {
     presenza(g, 0, 0, 'CU03');
     expect(sceglieMossa(creaVista(g, 0), cat)).toEqual({ t: 'tappa', terr: 0 });
   });
-  it('1: se l avversario e a un passo dalla vittoria usa l Esorcismo di Armitage', () => {
+  it('fuori tabella: se l avversario e a un passo e non ha di meglio usa l Esorcismo di Armitage', () => {
     const g = partita('custodi');
     presenza(g, 0, 0, 'CU03');
+    g.s.giocatori[0].tappe[0] = g.s.turniCompletati - 5; // niente Sigillo da porre qui
     g.s.giocatori[1].tappe[0] = g.s.turniCompletati;
     g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
-    mano(g, 0, 'CU13', 'CU01');
+    mano(g, 0, 'CU13');
     const v = creaVista(g, 0);
     expect(idCarta(v, sceglieMossa(v, cat))).toBe('CU13');
   });
@@ -152,6 +153,55 @@ describe('priorita dei Risvegliati', () => {
     energia(g, 0, 1);
     const m = sceglieMossa(creaVista(g, 0), cat);
     expect(m.t === 'gioca' && m.terr).toBe(1);
+  });
+});
+
+describe('priorita CT-DES-065 (tabella aggiornata)', () => {
+  it('Custodi 1: a un passo dalla sconfitta gioca presenze dove l avversario puo completare l ultima tappa, per superarne la forza', () => {
+    const g = partita('custodi');
+    g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
+    g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
+    presenza(g, 1, 2, 'RI04');
+    presenza(g, 0, 2, 'CU01');
+    mano(g, 0, 'CU01', 'CU04');
+    const v = creaVista(g, 0);
+    const m = sceglieMossa(v, cat);
+    expect(m.t === 'gioca' && m.terr).toBe(2);
+    expect(idCarta(v, m)).toBe('CU04'); // la presenza piu' forte
+  });
+  it('Risvegliati 3: gioca presenze su un territorio con instabilita 3 o piu, senza rito, dove la sua forza e minore o uguale', () => {
+    const g = partita('risvegliati');
+    inst(g, 1, 3);
+    presenza(g, 1, 1, 'CU03'); // 4 contro 0
+    inst(g, 0, 1);
+    mano(g, 0, 'RI01', 'RI04');
+    energia(g, 0, 20);
+    const v = creaVista(g, 0);
+    const m = sceglieMossa(v, cat);
+    expect(m.t === 'gioca' && m.terr).toBe(1);
+    expect(idCarta(v, m)).toBe('RI04');
+  });
+  it('Risvegliati 3: non gioca li se ha gia la forza maggiore o c e gia il suo rito', () => {
+    const g = partita('risvegliati');
+    inst(g, 1, 3);
+    presenza(g, 0, 1, 'RI08'); // 6 contro 0
+    g.s.giocatori[0].tappe[1] = 0;
+    mano(g, 0, 'RI04');
+    const v = creaVista(g, 0);
+    const m = sceglieMossa(v, cat);
+    expect(m.t === 'gioca' && m.terr).not.toBe(1);
+  });
+  it('Risvegliati 1: a un passo dalla sconfitta alza l instabilita sopra 3 dove i Custodi possono porre l ultimo Sigillo', () => {
+    const g = partita('risvegliati');
+    g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
+    g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
+    presenza(g, 1, 2, 'CU03');
+    inst(g, 2, 3);
+    mano(g, 0, 'RI10', 'RI04');
+    const v = creaVista(g, 0);
+    const m = sceglieMossa(v, cat);
+    expect(idCarta(v, m)).toBe('RI10');
+    expect(m.t === 'gioca' && m.terr).toBe(2);
   });
 });
 

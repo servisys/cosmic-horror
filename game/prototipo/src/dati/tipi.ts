@@ -64,6 +64,4 @@ export interface Dati {
   fazioni: FazioneDef[];
   territori: TerritorioDef[];
   eventi: Record<FaseEvento, EventoDef[]> & { improvvisi: EventoDef[] };
-  /** Quante righe di continuazione non valide in YAML rigoroso sono state riunite (vedi caricamento.ts). */
-  acapoNormalizzati: { carte: number; eventi: number };
 }

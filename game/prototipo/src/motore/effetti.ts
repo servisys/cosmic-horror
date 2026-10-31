@@ -18,7 +18,7 @@ export const TESTI_EFFETTO: Record<string, [string, string?]> = {
   CU05: ["Finche' e' qui, l'instabilita' di questo territorio non puo' superare 3."],
   CU06: ['Quando entra: peschi 1 carta.', 'Quando entra: peschi 2 carte.'],
   CU07: ["All'inizio del tuo turno: instabilita' di questo territorio -1."],
-  CU08: ["Non puo' essere eliminata da azioni che costano 2 o meno."],
+  CU08: ["Non puo' essere eliminata da azioni che costano 4 o meno."],
   CU09: ['Quando entra: se qui puoi porre un Sigillo, lo poni senza pagare energia.'],
   CU10: ["Instabilita' di un territorio -1."],
   CU11: ['La tua esposizione -1.'],
@@ -35,7 +35,7 @@ export const TESTI_EFFETTO: Record<string, [string, string?]> = {
   RI04: [''],
   RI05: ["All'inizio del tuo turno: instabilita' di questo territorio +1."],
   RI06: ['I riti su questo territorio costano 1 energia in meno.'],
-  RI07: ['Quando entra: una presenza avversaria su questo territorio -1 forza.', 'Quando entra: una presenza avversaria su questo territorio -2 forza.'],
+  RI07: ['Quando entra: una presenza avversaria su questo territorio -1 forza fino a fine partita.', 'Quando entra: una presenza avversaria su questo territorio -2 forza fino a fine partita.'],
   RI08: [''],
   RI09: ['Conta come tua presenza per i riti, non per il controllo.'],
   RI10: ["Instabilita' di un territorio +1.", "Instabilita' di un territorio +2."],
@@ -117,8 +117,8 @@ export function territorioPerPotente(g: Partita, m: Extract<Mossa, { t: 'gioca' 
 }
 
 export function eliminaDaAzione(g: Partita, t: number, pi: number, p: Presenza, costoCarta: number): void {
-  // Fattoria Barricata (CU08): non puo' essere eliminata da azioni che costano 2 o meno.
-  if (p.carta.id === 'CU08' && costoCarta <= 2) {
+  // Fattoria Barricata (CU08): non puo' essere eliminata da azioni che costano 4 o meno (CT-DES-064).
+  if (p.carta.id === 'CU08' && costoCarta <= 4) {
     log(g, `${eff(g, p.carta).nome} resiste (azione da ${costoCarta})`);
     return;
   }

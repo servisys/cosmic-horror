@@ -61,12 +61,6 @@ export function controllaDati(d: Dati): EsitoControllo {
     if (ids.has(id)) e.push(`${dove}: id duplicato ${id}`);
     ids.add(id);
   };
-  if (d.acapoNormalizzati.carte || d.acapoNormalizzati.eventi) {
-    w.push(
-      `I file YAML non sono validi per un lettore YAML 1.2 rigoroso: ${d.acapoNormalizzati.carte} righe di continuazione nelle carte e ` +
-      `${d.acapoNormalizzati.eventi} negli eventi (barra rovesciata a fine riga, riga seguente meno indentata). Il caricamento le riunisce senza toccare i file.`,
-    );
-  }
   // fazioni
   if (!Array.isArray(d.fazioni) || d.fazioni.length !== 2) e.push('Servono esattamente 2 fazioni');
   for (const f of d.fazioni ?? []) {
@@ -91,12 +85,10 @@ export function controllaDati(d: Dati): EsitoControllo {
     controllaCitazione(t.citazione, dove, e);
     if (!Array.isArray(t.riserva) || t.riserva.length !== 1) e.push(`${dove}: serve una sola carta di riserva`);
     for (const r of t.riserva ?? []) {
-      const id = t.id + 'r';
-      unico(id, `${dove}/riserva`);
-      controllaCarta({ ...r, id }, `${dove}/riserva`, e, w);
-      controllaTesto(id, { ...r, id }, e);
+      unico(r.id, `${dove}/riserva`);
+      controllaCarta(r, `${dove}/riserva`, e, w);
+      controllaTesto(r.id, r, e);
       if (r.copie !== 3) e.push(`${dove}/riserva: servono 3 copie (Core Rules §5), nel file ${String(r.copie)}`);
-      if (!('id' in (r as object))) w.push(`${dove}/riserva: la carta non ha id nel file; si usa "${id}"`);
     }
   }
   // eventi

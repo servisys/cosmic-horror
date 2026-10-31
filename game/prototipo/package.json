@@ -11,12 +11,15 @@
     "simula": "tsx src/simulazione/simula.ts"
   },
   "dependencies": {
+    "pixi.js": "8.6.6",
     "yaml": "2.8.1"
   },
   "devDependencies": {
     "@types/node": "22.19.0",
+    "playwright": "1.64.1",
     "tsx": "4.20.6",
     "typescript": "5.9.3",
+    "vite": "6.4.1",
     "vitest": "3.2.4"
   }
 }

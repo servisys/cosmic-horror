@@ -114,7 +114,14 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Carta ingrandita:** un tocco sulla lente di una carta in mano, su una carta in campo o sul nome di un territorio apre la scheda grande (illustrazione, nome, costo, forza, testo, citazione in italiano con fonte e originale inglese in piccolo); l'evento cosmico usa la stessa scheda. Si chiude toccando. Il passaggio del mouse mostra ancora la scheda piccola.
 - E12 (Il Richiamo di Dagon) usa l'immagine scelta da Matteo nel quinto giro (`illustrazioni_v7/E12_v3`). Per cambiare un'immagine basta rifare la conversione con il nuovo percorso nel file delle scelte.
 
-## 10. Elenco delle ambiguità
+## 10. Correzioni per il telefono
+
+- **Partenza senza parametri:** il ridisegno non parte finche' non c'e' una partita (`Controller.attiva`); prima dava un errore all'avvio della schermata iniziale.
+- **Solo il tocco sul telefono:** l'anteprima «al passaggio del mouse» e' ignorata per i tocchi (`pointerType` touch o `(hover: none)`); la scheda grande si apre con la lente o toccando e si chiude toccando. Il ridisegno causato dall'anteprima faceva anche perdere il tocco.
+- **Immagini senza web worker:** `Assets.setPreferences({ preferWorkers: false })` prima dei caricamenti (PixiJS usa altrimenti un worker da URL blob, vietato da una `Content-Security-Policy` con `worker-src`); se il caricamento si blocca il gioco parte dopo 10 s senza le immagini mancanti.
+- **Verifica:** `npm run prova-telefono -- <url>` (bottoni iniziali senza parametri, immagini con CSP `worker-src 'none'`, tocco con `hasTouch` e `isMobile`); `scripts/serve-sottocartella.mjs` serve una build sotto `/x/y/` (con `CSP=1` imposta l'intestazione).
+
+## 11. Elenco delle ambiguità
 
 L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è nel resoconto di Code (`scambio/da-code.md`) e nella descrizione della PR; ogni punto è stato risolto nel modo più letterale possibile, senza modificare regole, carte o eventi.
 
@@ -123,6 +130,7 @@ L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è ne
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Claude Code con le tappe 1 e 2 del prototipo. |
+| 0.1.4 | DRAFT | Aggiunto il paragrafo 10 sulle correzioni per il telefono. |
 | 0.1.3 | DRAFT | Aggiunto il paragrafo 9 sulle carte complete (tappa 4). |
 | 0.1.2 | DRAFT | Aggiunto il paragrafo 8 sull'interfaccia (tappa 3). |
 | 0.1.1 | DRAFT | Allineata a Core Rules V0.9 e ai dati V0.5: tolta la riunione delle righe di continuazione, `id` delle riserve dai dati. |

@@ -64,6 +64,11 @@ export class Controller {
     this.messaggio = `Apre ${NOME_FAZIONE[this.g.s.giocatori[0].fazione]}.`;
   }
 
+  /** C'e' una partita in corso (prima di scegliere la fazione non c'e' ancora uno stato). */
+  get attiva(): boolean {
+    return this.g !== undefined;
+  }
+
   get finita(): boolean {
     return finita(this.g);
   }

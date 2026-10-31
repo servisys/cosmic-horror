@@ -34,6 +34,7 @@ export function creaPartita(cat: Catalogo, opz: OpzioniPartita): Partita {
   s.turniCompletati = 0;
   s.vincitore = null;
   s.finitaPerLimite = false;
+  s.ultimoEvento = null;
   s.maxGiri = opz.maxGiri ?? REGOLE.maxGiriPredefinito;
   s.registro = [];
   s.cronaca = [];

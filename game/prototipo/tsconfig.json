@@ -9,8 +9,21 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node"],
-    "noEmit": true
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "noEmit": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ]
   },
-  "include": ["src", "test"]
+  "include": [
+    "src",
+    "test",
+    "vite.config.ts",
+    "scripts"
+  ]
 }

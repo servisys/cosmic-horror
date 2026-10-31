@@ -91,6 +91,8 @@ export interface Stato {
   /** Turni completati in tutta la partita (serve alle tappe consolidate e al turno di avviso). */
   turniCompletati: number;
   vincitore: number | null;
+  /** Id dell'ultimo evento cosmico risolto (serve a mostrarlo; non influisce sul gioco). */
+  ultimoEvento: string | null;
   /** Fine per limite di giri: nessun vincitore. */
   finitaPerLimite: boolean;
   maxGiri: number;

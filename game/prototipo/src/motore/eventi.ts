@@ -40,6 +40,7 @@ export function risolviEvento(g: Partita): void {
   const mz = g.s.mazzettiEventi[fase];
   const id = mz.mazzo.pop()!;
   mz.scarti.push(id);
+  g.s.ultimoEvento = id;
   const ev = g.cat.eventi.get(id)!;
   log(g, `EVENTO COSMICO: ${ev.nome}`);
   const piuEsposti = esposizionePiuAlta(g);

@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
-status: DRAFT
-version: 0.7.0
+status: APPROVED
+version: 0.8.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -13,7 +13,7 @@ related_documents:
 
 # Cosmic Horror - Regole base (Core Rules)
 
-> **BOZZA COMPLETA, PREPARATA DA COWORK.** Tutte le sezioni hanno le scelte di fondo di Matteo, registrate nel Decision Log (CT-DES-021…058). I numeri sono **provvisori** e vanno tarati nei playtest (CT-DES-030). Il documento resta `DRAFT`: passarlo in `REVIEW` o `APPROVED` è una decisione di Matteo.
+> **APPROVATE DA MATTEO il 2026-10-31 come base del prototipo (CT-DES-059). Tema: mondo di Lovecraft e Grandi Antichi (CT-DES-060).** Preparate da Cowork; tutte le scelte sono registrate nel Decision Log (CT-DES-021…058). I numeri restano **provvisori** e vanno tarati nei playtest (CT-DES-030). Ogni modifica futura passa da una nuova decisione e da una nuova versione del documento.
 
 ## 0. Riferimenti già decisi
 
@@ -133,9 +133,9 @@ Nella trasformazione, «mazzo» indica le carte ancora da pescare (CT-DES-058).
 
 | Territorio | Effetto cosmico a instabilità 5 |
 |---|---|
-| Il Faro Spento | chi lo controlla prende +1 esposizione |
-| La Biblioteca Sommersa | chi lo controlla scarta 1 carta a caso |
-| Il Cratere Stellare | vengono eliminate tutte le presenze con forza 1 o meno |
+| Innsmouth e la Scogliera del Diavolo | chi lo controlla prende +1 esposizione |
+| La Biblioteca della Miskatonic | chi lo controlla scarta 1 carta a caso |
+| La Landa Maledetta | vengono eliminate tutte le presenze con forza 1 o meno |
 
 La soglia 3, usata dai riti dei Risvegliati, non ha penalità.
 
@@ -161,7 +161,7 @@ Tipi di evento: **territorio**, **giocatore**, **campo** (tutti i territori), **
 
 Obiettivi e tappe di ciascuna fazione: §10 (CT-DES-055).
 
-**DECISIONE DI MATTEO (CT-DES-056, REGISTRATA; sostituisce CT-DES-048):** una tappa già ottenuta può essere tolta dall'avversario con carte apposite (nella prima lista: «Esorcismo» per i Custodi, «Profanazione» per i Risvegliati), ma **solo fino alla fine del turno successivo dell'avversario**: dopo, la tappa è **consolidata** e definitiva. Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne; quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso.
+**DECISIONE DI MATTEO (CT-DES-056, REGISTRATA; sostituisce CT-DES-048):** una tappa già ottenuta può essere tolta dall'avversario con carte apposite (nella prima lista: «Esorcismo di Armitage» per i Custodi, «Profanazione» per i Risvegliati), ma **solo fino alla fine del turno successivo dell'avversario**: dopo, la tappa è **consolidata** e definitiva. Se un giocatore era a un passo dalla vittoria e perde una tappa, il segnale si spegne; quando torna a un passo, il segnale riparte e l'avversario ha di nuovo il suo turno di avviso.
 
 ## 9. Informazione visibile e nascosta
 
@@ -173,7 +173,7 @@ Il computer (CT-DES-016) vede esattamente le stesse informazioni del giocatore u
 
 **DECISIONE DI MATTEO (CT-DES-041, REGISTRATA):** le due fazioni del prototipo hanno stili opposti. I nomi sono **provvisori**.
 
-| | **I Custodi** | **I Risvegliati** |
+| | **I Custodi** (della Miskatonic University di Arkham) | **I Risvegliati** (culto dei Grandi Antichi: Ordine Esoterico di Dagon, Profondi di Innsmouth) |
 |---|---|---|
 | Idea | difendono e stabilizzano i territori | corrompono i territori e cercano il potere cosmico |
 | Rapporto con il rischio | si espongono poco; possono ridurre l'instabilità | si espongono molto; puntano sulle trasformazioni |
@@ -191,7 +191,7 @@ Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Ri
 
 **Numeri provvisori:** porre un Sigillo o completare un rito costa **2 energia** (CT-DES-055).
 
-Le tappe possono essere tolte dall'avversario finché non sono consolidate: §8 (CT-DES-056). *Profanazione* richiede le stesse condizioni del rito; *Esorcismo* richiede il controllo del territorio (CT-DES-058).
+Le tappe possono essere tolte dall'avversario finché non sono consolidate: §8 (CT-DES-056). *Profanazione* richiede le stesse condizioni del rito; *Esorcismo di Armitage* richiede il controllo del territorio (CT-DES-058).
 
 ### Priorità del computer
 
@@ -210,9 +210,9 @@ Le tappe possono essere tolte dall'avversario finché non sono consolidate: §8 
 
 | Territorio | Effetto |
 |---|---|
-| Il Faro Spento | chi lo controlla pesca 1 carta in più a ogni turno |
-| La Biblioteca Sommersa | chi ne prende il controllo pesca 1 carta, poi guarda le prime 3 carte del proprio mazzo e le riordina (CT-DES-058) |
-| Il Cratere Stellare | ogni carta potente giocata qui fa salire l'instabilità di 1 in più |
+| Innsmouth e la Scogliera del Diavolo | chi lo controlla pesca 1 carta in più a ogni turno |
+| La Biblioteca della Miskatonic | chi ne prende il controllo pesca 1 carta, poi guarda le prime 3 carte del proprio mazzo e le riordina (CT-DES-058) |
+| La Landa Maledetta | ogni carta potente giocata qui fa salire l'instabilità di 1 in più |
 
 ### Carte
 
@@ -262,6 +262,7 @@ Già deciso, nessuna scelta nuova:
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.8.0 | APPROVED | Approvate da Matteo come base del prototipo (CT-DES-059). Regole identiche alla 0.7.0; aggiornati solo i nomi di fazioni, territori e carte citati, a tema Lovecraft (CT-DES-060). |
 | 0.7.0 | DRAFT | Correzioni dopo la simulazione di Cowork: condizioni e costi di Sigillo e rito (CT-DES-055), tappe consolidate (CT-DES-056), primo turno 1/3 energia (CT-DES-057), chiarimenti (CT-DES-058). |
 | 0.6.0 | DRAFT | Regole base complete nelle scelte di fondo: parità, limite di presenze, soglie di instabilità, territori fissi, fasi del turno, eventi di partenza (CT-DES-049…054). |
 | 0.5.0 | DRAFT | Tappe che si possono togliere (CT-DES-048); tipi di evento e prima lista degli eventi (proposta); glossario. |

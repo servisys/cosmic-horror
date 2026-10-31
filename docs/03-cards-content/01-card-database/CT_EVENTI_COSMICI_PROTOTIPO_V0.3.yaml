@@ -1,0 +1,46 @@
+# Cosmic Horror - Eventi cosmici del prototipo (prima lista)
+# status: DRAFT | version: 0.3.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+#
+# Lista di partenza approvata da Matteo (CT-DES-054); valori provvisori.
+# Formato provvisorio (YAML), come le carte (CT-DES-018). Tutti i valori sono provvisori (CT-DES-030).
+#
+# Come si usa (regole base §7, CT-DES-021, 035, 036, 010):
+#   - Tre mazzetti, uno per fase: fase I (giri 1-3), fase II (giri 4-6), fase III (dal giro 7).
+#   - Ogni mazzetto si mescola con il seme della partita (CT-DES-019). Un evento improvviso va nella fase II e uno nella fase III.
+#   - Alla fine di ogni giro si risolve l'evento in cima al mazzetto della fase in corso e si mostra il TIPO del successivo.
+#   - Gli eventi improvvisi mostrano «?» al posto del tipo (CT-DES-035).
+#   - «Il piu' esposto»: il giocatore con esposizione piu' alta; in parita', entrambi (regole base §7).
+#   - «Il territorio piu' instabile»: in parita', sorteggio con il seme della partita.
+#   - Se un mazzetto finisce, si rimescola.
+#
+# V0.2 (2026-10-31, CT-DES-058): chiarita la durata di Ombre Lunghe. Approvati come lista di partenza (CT-DES-054).
+#
+# V0.3 (2026-10-31, CT-DES-060): nomi a tema Lovecraft e Grandi Antichi; effetti invariati.
+#
+# Tipi: territorio | giocatore | campo (tutti i territori) | carte
+
+eventi:
+  fase_I:
+    - {id: E01, nome: "I Sogni si Diffondono", tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +1."}
+    - {id: E02, nome: "Nebbia dal Mare", tipo: territorio, effetto: "Sul territorio con piu' presenze, tutte le presenze hanno -1 forza fino alla fine del giro successivo a quello in cui si risolve l'evento."}
+    - {id: E03, nome: "Incubi Ciclopici", tipo: giocatore, effetto: "Il piu' esposto scarta 1 carta a caso dalla mano."}
+    - {id: E04, nome: "La Marea di Innsmouth", tipo: campo, effetto: "Ogni territorio con instabilita' 0 sale a 1."}
+    - {id: E05, nome: "Il Meteorite", tipo: territorio, effetto: "La Landa Maledetta: instabilita' +1."}
+    - {id: E06, nome: "Rivelazione", tipo: carte, effetto: "Ogni giocatore pesca 1 carta."}
+  fase_II:
+    - {id: E07, nome: "Il Colore si Diffonde", tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +2."}
+    - {id: E08, nome: "Shoggoth Affamato", tipo: giocatore, effetto: "Il piu' esposto elimina la propria presenza con forza piu' bassa."}
+    - {id: E09, nome: "Le Stelle si Allineano", tipo: campo, effetto: "Tutti i territori: instabilita' +1."}
+    - {id: E10, nome: "Luci sulla Scogliera del Diavolo", tipo: territorio, effetto: "Chi controlla Innsmouth e la Scogliera del Diavolo: esposizione +1."}
+    - {id: E11, nome: "Il Necronomicon Brucia", tipo: carte, effetto: "Il piu' esposto scarta 2 carte a caso dalla mano."}
+    - {id: E12, nome: "Il Richiamo di Dagon", tipo: giocatore, effetto: "Il piu' esposto: una carta casuale del suo mazzo si trasforma nella versione cosmica."}
+  fase_III:
+    - {id: E13, nome: "R'lyeh Emerge", tipo: territorio, effetto: "Il territorio piu' instabile: instabilita' +2; le presenze li' hanno -1 forza fino a fine partita."}
+    - {id: E14, nome: "Nyarlathotep Cammina tra gli Uomini", tipo: giocatore, effetto: "Il piu' esposto: esposizione +2."}
+    - {id: E15, nome: "Azathoth, il Caos Cieco", tipo: campo, effetto: "Tutti i territori: instabilita' +1; ogni presenza con forza 1 o meno viene eliminata."}
+    - {id: E16, nome: "La Capra Nera dai Mille Cuccioli", tipo: territorio, effetto: "Sul territorio piu' instabile viene eliminata la presenza con forza piu' alta (in parita', sorteggio)."}
+    - {id: E17, nome: "Le Stelle sono Giuste", tipo: campo, effetto: "Tutti i territori: instabilita' +1; ogni giocatore con esposizione 6 o piu' scarta 1 carta a caso."}
+    - {id: E18, nome: "Il Sogno di Cthulhu", tipo: giocatore, effetto: "Entrambi i giocatori: esposizione +1; il piu' esposto +1 in piu'."}
+  improvvisi:
+    - {id: E19, nome: "Cthulhu Torna a Dormire", tipo: "?", fase: II, effetto: "Tutti i territori: instabilita' -1."}
+    - {id: E20, nome: "Yog-Sothoth è la Porta", tipo: "?", fase: III, effetto: "Il piu' esposto: due carte casuali del suo mazzo si trasformano nella versione cosmica."}

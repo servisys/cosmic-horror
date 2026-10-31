@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Decision Log CT-DES-043…047 (fazioni del prototipo)
 status: DRAFT
-version: 0.2.0
+version: 0.3.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -58,7 +58,7 @@ last_reviewed: 2026-10-31
 
 ## CT-DES-045 - Priorità del computer per fazione
 
-**Stato:** REGISTRATA
+**Stato:** SUPERATA (da CT-DES-065, 2026-10-31)
 
 **Decisione:** Il computer segue, in ordine, le priorità proposte da Cowork per ciascuna fazione (regole base §10). Si provano nelle prime partite.
 
@@ -128,3 +128,4 @@ last_reviewed: 2026-10-31
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Cowork con le scelte di Matteo del 2026-10-31. |
 | 0.2.0 | DRAFT | CT-DES-043 e CT-DES-044 segnate `SUPERATA` da CT-DES-055 (Regole V0.2, regola 3). Testo delle voci invariato. |
+| 0.3.0 | DRAFT | CT-DES-045 segnata `SUPERATA` da CT-DES-065. Testo invariato. |

@@ -1,0 +1,81 @@
+# Cosmic Horror - Carte del prototipo (prima lista)
+# status: DRAFT | version: 0.1.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+#
+# PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO (CT-DES-047).
+# Formato provvisorio (YAML): il formato definitivo dei dati si decide nell'architettura tecnica (CT-DES-018).
+# Tutti i nomi, i costi, le forze e gli effetti sono PROVVISORI e vanno tarati nei playtest (CT-DES-030).
+#
+# Campi:
+#   id: codice unico | nome | tipo: presenza | azione
+#   costo: energia | forza: solo per le presenze
+#   potente: esposizione aggiunta quando la giochi (0 se non e' potente)
+#   copie: quante copie nel mazzo da 40
+#   effetto: testo dell'effetto ("" = nessuno)
+#   versione_cosmica: la carta in cui si trasforma (CT-DES-026, CT-DES-032), se esiste
+#
+# Azioni base sempre disponibili (provvisorie, regole base §10):
+#   Porre un Sigillo (Custodi): 3 energia; su un territorio che controlli con instabilita' 2 o meno; uno per territorio.
+#   Completare un rito (Risvegliati): 3 energia; su un territorio con una tua presenza e instabilita' 3 o piu'; uno per territorio.
+#   Ridurre l'esposizione (tutti): 2 energia, esposizione -1, una volta per turno.
+
+fazioni:
+  - id: custodi
+    nome: I Custodi
+    carte:
+      - {id: CU01, nome: Sentinella del Faro, tipo: presenza, costo: 1, forza: 2, potente: 0, copie: 4, effetto: ""}
+      - {id: CU02, nome: Archivista Vigile, tipo: presenza, costo: 2, forza: 2, potente: 0, copie: 3, effetto: "Quando entra: instabilita' di questo territorio -1.",
+         versione_cosmica: {nome: Archivista Sussurrante, costo: 2, forza: 2, potente: 1, effetto: "Quando entra: instabilita' di questo territorio -1 e peschi 1 carta."}}
+      - {id: CU03, nome: Guardiano di Pietra, tipo: presenza, costo: 3, forza: 4, potente: 0, copie: 3, effetto: "",
+         versione_cosmica: {nome: Guardiano Incrinato, costo: 3, forza: 6, potente: 0, effetto: "Quando entra: instabilita' di questo territorio +1."}}
+      - {id: CU04, nome: Custode dell'Abisso, tipo: presenza, costo: 5, forza: 6, potente: 0, copie: 2, effetto: "Le tue altre presenze su questo territorio hanno +1 forza."}
+      - {id: CU05, nome: Cerchio di Veglia, tipo: presenza, costo: 2, forza: 1, potente: 0, copie: 2, effetto: "Finche' e' qui, l'instabilita' di questo territorio non puo' superare 3."}
+      - {id: CU06, nome: Lanterna Benedetta, tipo: presenza, costo: 3, forza: 3, potente: 0, copie: 2, effetto: "Quando entra: peschi 1 carta.",
+         versione_cosmica: {nome: Lanterna Nera, costo: 3, forza: 3, potente: 1, effetto: "Quando entra: peschi 2 carte."}}
+      - {id: CU07, nome: Vecchio Bibliotecario, tipo: presenza, costo: 4, forza: 3, potente: 0, copie: 2, effetto: "All'inizio del tuo turno: instabilita' di questo territorio -1."}
+      - {id: CU08, nome: Muro di Sale, tipo: presenza, costo: 2, forza: 3, potente: 0, copie: 2, effetto: "Non puo' essere eliminata da azioni che costano 2 o meno."}
+      - {id: CU09, nome: Sigillo Antico, tipo: presenza, costo: 4, forza: 2, potente: 0, copie: 2, effetto: "Quando entra: se qui puoi porre un Sigillo, lo poni senza pagare energia."}
+      - {id: CU10, nome: Quiete, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Instabilita' di un territorio -1."}
+      - {id: CU11, nome: Respiro Profondo, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "La tua esposizione -1."}
+      - {id: CU12, nome: Rinforzi, tipo: azione, costo: 2, potente: 0, copie: 3, effetto: "Una tua presenza ha +2 forza fino a fine partita."}
+      - {id: CU13, nome: Esorcismo, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un rito avversario da un territorio che controlli. (Toglie una tappa: DA CONFERMARE.)"}
+      - {id: CU14, nome: Preparare il Sigillo, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "Il prossimo Sigillo che poni in questo turno costa 1 energia in meno."}
+      - {id: CU15, nome: Cacciata, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Elimina una presenza avversaria con forza 3 o meno."}
+      - {id: CU16, nome: Studio delle Stelle, tipo: azione, costo: 2, potente: 0, copie: 2, effetto: "Peschi 2 carte."}
+      - {id: CU17, nome: Rito di Contenimento, tipo: azione, costo: 4, potente: 1, copie: 1, effetto: "Instabilita' di tutti i territori -2."}
+      - {id: CU18, nome: Fiamma Sacra, tipo: azione, costo: 5, potente: 2, copie: 1, effetto: "Elimina tutte le presenze avversarie con forza 2 o meno su un territorio."}
+
+  - id: risvegliati
+    nome: I Risvegliati
+    carte:
+      - {id: RI01, nome: Accolito, tipo: presenza, costo: 1, forza: 1, potente: 0, copie: 4, effetto: "Quando entra: instabilita' di questo territorio +1.",
+         versione_cosmica: {nome: Accolito Divorato, costo: 1, forza: 2, potente: 0, effetto: "Quando entra: instabilita' di questo territorio +2."}}
+      - {id: RI02, nome: Cultista dell'Abisso, tipo: presenza, costo: 2, forza: 2, potente: 0, copie: 3, effetto: "+1 forza se l'instabilita' di questo territorio e' 3 o piu'.",
+         versione_cosmica: {nome: Cultista Trasfigurato, costo: 2, forza: 3, potente: 0, effetto: "+2 forza se l'instabilita' di questo territorio e' 3 o piu'."}}
+      - {id: RI03, nome: Profeta Febbricitante, tipo: presenza, costo: 3, forza: 2, potente: 1, copie: 2, effetto: "Quando entra: peschi 1 carta.",
+         versione_cosmica: {nome: Profeta Cieco, costo: 3, forza: 2, potente: 1, effetto: "Quando entra: peschi 2 carte."}}
+      - {id: RI04, nome: Bruto Marchiato, tipo: presenza, costo: 3, forza: 4, potente: 0, copie: 3, effetto: "",
+         versione_cosmica: {nome: Bruto Deforme, costo: 3, forza: 6, potente: 1, effetto: ""}}
+      - {id: RI05, nome: Seminatore di Crepe, tipo: presenza, costo: 2, forza: 1, potente: 0, copie: 2, effetto: "All'inizio del tuo turno: instabilita' di questo territorio +1."}
+      - {id: RI06, nome: Sacerdotessa del Varco, tipo: presenza, costo: 4, forza: 3, potente: 0, copie: 2, effetto: "I riti su questo territorio costano 1 energia in meno."}
+      - {id: RI07, nome: Ombra Strisciante, tipo: presenza, costo: 2, forza: 2, potente: 0, copie: 2, effetto: "Quando entra: una presenza avversaria su questo territorio -1 forza.",
+         versione_cosmica: {nome: Ombra Vorace, costo: 2, forza: 2, potente: 0, effetto: "Quando entra: una presenza avversaria su questo territorio -2 forza."}}
+      - {id: RI08, nome: Araldo dell'Oltre, tipo: presenza, costo: 5, forza: 6, potente: 1, copie: 2, effetto: ""}
+      - {id: RI09, nome: Marchio, tipo: presenza, costo: 1, forza: 0, potente: 0, copie: 2, effetto: "Conta come tua presenza per i riti, non per il controllo."}
+      - {id: RI10, nome: Sussurro, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Instabilita' di un territorio +1.",
+         versione_cosmica: {nome: Urlo, costo: 1, potente: 0, effetto: "Instabilita' di un territorio +2."}}
+      - {id: RI11, nome: Offerta di Sangue, tipo: azione, costo: 0, potente: 1, copie: 2, effetto: "+2 energia in questo turno."}
+      - {id: RI12, nome: Profanazione, tipo: azione, costo: 3, potente: 0, copie: 2, effetto: "Rimuovi un Sigillo avversario da un territorio con instabilita' 3 o piu'. (Toglie una tappa: DA CONFERMARE.)"}
+      - {id: RI13, nome: Visioni, tipo: azione, costo: 2, potente: 1, copie: 2, effetto: "Peschi 2 carte."}
+      - {id: RI14, nome: Corruzione, tipo: azione, costo: 2, potente: 0, copie: 3, effetto: "Una presenza avversaria -2 forza fino a fine partita."}
+      - {id: RI15, nome: Preparare il Rito, tipo: azione, costo: 1, potente: 0, copie: 2, effetto: "Il prossimo rito che completi in questo turno costa 1 energia in meno."}
+      - {id: RI16, nome: Abbraccio del Vuoto, tipo: azione, costo: 3, potente: 1, copie: 2, effetto: "Una tua presenza ha +3 forza fino a fine partita."}
+      - {id: RI17, nome: Squarcio nel Cielo, tipo: azione, costo: 4, potente: 2, copie: 1, effetto: "Instabilita' di tutti i territori +1; elimina una presenza avversaria con forza 2 o meno."}
+      - {id: RI18, nome: Richiamo dell'Abisso, tipo: azione, costo: 6, potente: 2, copie: 1, effetto: "Elimina tutte le presenze con forza 3 o meno su un territorio, anche le tue."}
+
+territori:
+  - {id: T1, nome: Il Faro Spento, effetto: "Chi lo controlla pesca 1 carta in piu' all'inizio del proprio turno.",
+     riserva: [{nome: Lampo del Faro, tipo: azione, costo: 1, potente: 0, copie: 3, effetto: "Peschi 1 carta e vedi il tipo dei prossimi 2 eventi cosmici."}]}
+  - {id: T2, nome: La Biblioteca Sommersa, effetto: "Chi ne prende il controllo guarda le prime 3 carte del proprio mazzo e le rimette nell'ordine che vuole.",
+     riserva: [{nome: Pagina Perduta, tipo: azione, costo: 1, potente: 1, copie: 3, effetto: "Cerca nel tuo mazzo una carta azione e mettila in mano."}]}
+  - {id: T3, nome: Il Cratere Stellare, effetto: "Ogni carta potente giocata qui fa salire l'instabilita' di questo territorio di 1 in piu'.",
+     riserva: [{nome: Frammento Stellare, tipo: azione, costo: 0, potente: 0, copie: 3, effetto: "+1 energia in questo turno; instabilita' di questo territorio +1."}]}

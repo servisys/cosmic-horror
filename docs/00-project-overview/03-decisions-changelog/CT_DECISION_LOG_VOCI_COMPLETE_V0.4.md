@@ -5,7 +5,7 @@ version: 0.4.0
 prepared_by: Cowork
 last_reviewed: 2026-10-31
 owner: Team Cosmic Horror
-source_decisions: CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md
+source_decisions: CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md # storico: solo nel branch della PR #13 (chiusa)
 source_answers: CT_DECISIONI_V0.3_ESITO_CHIARO.md
 source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 ---
@@ -14,7 +14,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 > **Tutte le voci sono REGISTRATE.** Matteo le ha confermate in chat il 2026-10-31 rispondendo «Tutte c» all'elenco CT-DES-001…013 preparato da Cowork. Secondo le Regole V0.2 (regola 4) la registrazione è effettiva con il merge di questo documento in `main`.
 >
-> Il campo **Decisione** riproduce invariato il testo di `CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md`.
+> Il campo **Decisione** riproduce invariato il testo di `CT_DECISION_LOG_VOCI_PROPOSTE_V0.1.md` (documento storico, non in main: branch della PR #13, chiusa).
 
 ## CT-DES-001 - Deckbuilding ibrido
 

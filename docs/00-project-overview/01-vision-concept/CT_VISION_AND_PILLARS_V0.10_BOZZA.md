@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Vision & Design Pillars
 status: DRAFT
-version: 0.9.0
+version: 0.10.0
 owner: Team Cosmic Horror
 prepared_by: Cowork
 last_reviewed: 2026-10-31
@@ -10,7 +10,7 @@ implementation_target: Planning only - non implementabile da Claude in questa ve
 project_prefix: CT_
 related_documents:
   - ../../00_MASTER_INDEX.md
-  - ../../CT_COPILOT_CLAUDE_PROTOCOL.md
+  - ../../CT_COWORK_CODE_PROTOCOL_V0.1.md
   - CT_VISION_AND_PILLARS_REVIEW_V0.1.md
   - CT_VISION_DECISIONI_V0.2_SCHEDE.md
   - ../03-decisions-changelog/CT_DECISIONI_V0.2_ESITO.md
@@ -19,13 +19,14 @@ related_documents:
   - ../03-decisions-changelog/CT_DECISIONI_V0.3_ESITO_CHIARO.md
   - ../03-decisions-changelog/CT_DECISIONI_V0.3_CHIARIMENTO_VITTORIA.md
   - ../03-decisions-changelog/CT_DECISION_LOG_REGOLE_V0.2.md
-  - ../03-decisions-changelog/CT_DECISION_LOG_VOCI_PROPOSTE_V0.7.md
+  - ../03-decisions-changelog/CT_DECISION_LOG_VOCI_COMPLETE_V0.4.md
+  - ../03-decisions-changelog/CT_DECISION_LOG_VOCI_PROPOSTE_V0.8.md
   - ../03-decisions-changelog/CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.13.md
 ---
 
 # Cosmic Horror - Vision & Design Pillars
 
-> **Stato delle decisioni (31 ottobre 2026).** `CT-DES-014` (percorso web, Godot abbandonato) è **REGISTRATA** nel Decision Log. `CT-DES-011`, `012` e `013` sono presenti nel Decision Log con `Stato: PROPOSTA`. Anche `CT-DES-001` - `CT-DES-010` sono presenti nel Decision Log con `Stato: PROPOSTA`: in questo documento compaiono come «proposte di Matteo, in attesa di registrazione». Nessuna proposta è approvata e nessuna autorizza implementazione.
+> **Stato delle decisioni (31 ottobre 2026).** Tutte le decisioni `CT-DES-001` - `CT-DES-014` sono **REGISTRATE** nel Decision Log: `CT-DES-014` dal 30 ottobre, le altre su conferma di Matteo del 31 ottobre. Le parti indicate come **DA DECIDERE** restano aperte e non autorizzano implementazione.
 
 ## 1. Funzione del documento
 
@@ -48,7 +49,7 @@ Claude non deve usare questo documento per:
 - ampliare lo scope;
 - trasformare indicazioni di atmosfera in requisiti tecnici non approvati.
 
-Le regole di governance da leggere insieme alle fonti autorevoli indicate nel task sono definite nel Master Index e nel Protocollo Copilot-Claude.
+Le regole di governance da leggere insieme alle fonti autorevoli indicate nel task sono definite nel Master Index e nel protocollo di lavoro Cowork e Claude Code (`CT_COWORK_CODE_PROTOCOL_V0.1.md`).
 
 ---
 
@@ -62,7 +63,7 @@ La presente versione è una **bozza di planning**. Tutte le formulazioni sono so
 - Il Decision Log conserva motivazione e storico. Sintassi, campi e processo di registrazione sono definiti in `CT_DECISION_LOG_REGOLE_V0.2.md`: una voce è registrata solo quando ha `Stato: REGISTRATA` e il documento viene fuso in `main`.
 - Fino alla registrazione, nessuna proposta deve essere interpretata come decisione approvata o requisito implementabile.
 
-> **PROPOSTA DI MATTEO (CT-DES-007, IN ATTESA DI REGISTRAZIONE):** mostrare le decisioni direttamente nei documenti, assegnare ID univoci e mantenere il Decision Log anche quando una decisione cambia.
+> **DECISIONE DI MATTEO (CT-DES-007, REGISTRATA):** mostrare le decisioni direttamente nei documenti, assegnare ID univoci e mantenere il Decision Log anche quando una decisione cambia.
 
 ---
 
@@ -75,11 +76,11 @@ La presente versione è una **bozza di planning**. Tutte le formulazioni sono so
 Il gioco è costruito intorno a tre idee centrali, ancora da precisare nelle decisioni di Vision:
 
 1. **Costruzione strategica del mazzo.**
-   - **PROPOSTA DI MATTEO (CT-DES-001, IN ATTESA DI REGISTRAZIONE):** il giocatore prepara un mazzo quasi completo; durante la partita possono coesistere più fonti di adattamento; una parte importante del mazzo può trasformarsi. Fonti concrete, quantità, limiti e tempi delle modifiche restano **DA DECIDERE**.
+   - **DECISIONE DI MATTEO (CT-DES-001, REGISTRATA):** il giocatore prepara un mazzo quasi completo; durante la partita possono coesistere più fonti di adattamento; una parte importante del mazzo può trasformarsi. Fonti concrete, quantità, limiti e tempi delle modifiche restano **DA DECIDERE**.
 2. **Controllo del territorio.**
-   - **PROPOSTA DI MATTEO (CT-DES-002, IN ATTESA DI REGISTRAZIONE):** ogni vittoria richiede interazione significativa con i territori; gli obiettivi possono dipendere dalla fazione senza un modello comune; prima del completamento deve esserci un segnale riconoscibile che consenta all’avversario di intervenire; se l’obiettivo viene comunque completato, la vittoria è immediata senza ulteriori risposte. La definizione di interazione significativa e le condizioni concrete restano **DA DECIDERE**.
+   - **DECISIONE DI MATTEO (CT-DES-002, REGISTRATA):** ogni vittoria richiede interazione significativa con i territori; gli obiettivi possono dipendere dalla fazione senza un modello comune; prima del completamento deve esserci un segnale riconoscibile che consenta all’avversario di intervenire; se l’obiettivo viene comunque completato, la vittoria è immediata senza ulteriori risposte. La definizione di interazione significativa e le condizioni concrete restano **DA DECIDERE**.
 3. **Potere a rischio crescente.**
-   - **PROPOSTA DI MATTEO (CT-DES-003, IN ATTESA DI REGISTRAZIONE):** le conseguenze si manifestano soprattutto sul territorio; esposizione, costi e instabilità sono componenti di un unico rischio cosmico; sia le azioni dei giocatori sia la forza cosmica contribuiscono al rischio; il primo prototipo deve mostrare tutte e tre le componenti. Veicoli, misure, persistenza e reversibilità restano **DA DECIDERE**.
+   - **DECISIONE DI MATTEO (CT-DES-003, REGISTRATA):** le conseguenze si manifestano soprattutto sul territorio; esposizione, costi e instabilità sono componenti di un unico rischio cosmico; sia le azioni dei giocatori sia la forza cosmica contribuiscono al rischio; il primo prototipo deve mostrare tutte e tre le componenti. Veicoli, misure, persistenza e reversibilità restano **DA DECIDERE**.
 
 La componente cosmic horror deve sostenere il design, non essere soltanto una decorazione applicata a un gioco di carte generico.
 
@@ -102,13 +103,13 @@ L'esperienza desiderata è **strategica, tesa e leggibile**. L'orrore deve emerg
 
 ### Principio informativo
 
-> **PROPOSTA DI MATTEO (CT-DES-005, IN ATTESA DI REGISTRAZIONE):** il rischio cosmico è visibile solo quando aumenta o sta per succedere qualcosa; il giocatore conosce il tipo generale di problema che potrebbe arrivare; normalmente può prepararsi, ma alcuni eventi possono arrivare senza preavviso. Il giocatore conosce le regole ma deve dedurre cosa prepara l’avversario e, dopo un esito sfavorevole, deve poter pensare che avrebbe potuto prepararsi meglio.
+> **DECISIONE DI MATTEO (CT-DES-005, REGISTRATA):** il rischio cosmico è visibile solo quando aumenta o sta per succedere qualcosa; il giocatore conosce il tipo generale di problema che potrebbe arrivare; normalmente può prepararsi, ma alcuni eventi possono arrivare senza preavviso. Il giocatore conosce le regole ma deve dedurre cosa prepara l’avversario e, dopo un esito sfavorevole, deve poter pensare che avrebbe potuto prepararsi meglio.
 
 Categorie di rischio, segnali, informazioni pubbliche o nascoste e casi ammessi senza preavviso restano **DA DECIDERE**.
 
 Vincolo editoriale già valido: l'incomprensibilità narrativa del cosmo non deve essere confusa con l'opacità delle regole. Gli effetti necessari a compiere una scelta devono essere comunicati in modo coerente con il principio informativo che sarà approvato.
 
-> **PROPOSTA DI MATTEO (CT-DES-005, IN ATTESA DI REGISTRAZIONE):** obiettivo e avanzamento verso la vittoria sono sempre visibili; l’avversario vede chiaramente che il giocatore è vicino alla vittoria e può intervenire prima; se l’obiettivo viene comunque completato, la vittoria è immediata e non esiste un’ulteriore possibilità di risposta. Forma e soglia del segnale precedente al completamento restano **DA DECIDERE**.
+> **DECISIONE DI MATTEO (CT-DES-005, REGISTRATA):** obiettivo e avanzamento verso la vittoria sono sempre visibili; l’avversario vede chiaramente che il giocatore è vicino alla vittoria e può intervenire prima; se l’obiettivo viene comunque completato, la vittoria è immediata e non esiste un’ulteriore possibilità di risposta. Forma e soglia del segnale precedente al completamento restano **DA DECIDERE**.
 
 ---
 
@@ -121,14 +122,14 @@ Vincolo editoriale già valido: l'incomprensibilità narrativa del cosmo non dev
 Cosmic Horror deve essere:
 
 - un gioco di strategia a carte con forte componente territoriale;
-- progettato digital-first (proposta `CT-DES-013`, `Stato: PROPOSTA`);
+- progettato digital-first (`CT-DES-013`, REGISTRATA);
 - caratterizzato da partite in cui il campo evolve visibilmente;
 - basato su fazioni con identità strategiche riconoscibili;
 - capace di integrare lore e meccaniche;
 - accessibile nelle azioni di base, ma profondo nelle interazioni;
 - progettato in modo da non precludere nuovi contenuti, senza assumere fin d'ora un modello live o a espansioni.
 
-Il percorso tecnologico è **web**: `CT-DES-014` è registrata e abbandona Godot. Non sono approvate librerie, wrapper di packaging o architettura definitiva. Le piattaforme iniziali (`CT-DES-012`) e il formato del primo prototipo (`CT-DES-011`) sono proposte nel Decision Log; il comportamento dell'avversario controllato dal gioco è **DA DECIDERE**.
+Il percorso tecnologico è **web**: `CT-DES-014` è registrata e abbandona Godot. Non sono approvate librerie, wrapper di packaging o architettura definitiva. Le piattaforme iniziali (`CT-DES-012`) e il formato del primo prototipo (`CT-DES-011`) sono registrati nel Decision Log; il comportamento dell'avversario controllato dal gioco è **DA DECIDERE**.
 
 ### 5.2 Cosa non deve essere
 
@@ -163,19 +164,19 @@ Il controllo del territorio deve:
 - interagire con carte, fazioni e condizioni di vittoria;
 - obbligare il giocatore a distribuire risorse e attenzione.
 
-> **PROPOSTA DI MATTEO (CT-DES-002, IN ATTESA DI REGISTRAZIONE):** le fazioni possono avere obiettivi territoriali differenti e vincere senza controllare più territorio.
+> **DECISIONE DI MATTEO (CT-DES-002, REGISTRATA):** le fazioni possono avere obiettivi territoriali differenti e vincere senza controllare più territorio.
 
 Il legame territoriale minimo comune, l’eventuale condizione universale e le formule di vittoria restano **DA DECIDERE**.
 
 **Verifica del pilastro:** se una versione del gioco potrebbe funzionare quasi allo stesso modo eliminando i territori, quella versione non è coerente con la Vision.
 
-> **PROPOSTA DI MATTEO (CT-DES-002, IN ATTESA DI REGISTRAZIONE):** non è richiesto uno stato base comune comprensibile allo stesso modo da tutte le fazioni; ogni fazione può interpretare e modificare il territorio secondo stati propri; più stati possono coesistere sullo stesso territorio. Gli stati indispensabili restano **DA DECIDERE**.
+> **DECISIONE DI MATTEO (CT-DES-002, REGISTRATA):** non è richiesto uno stato base comune comprensibile allo stesso modo da tutte le fazioni; ogni fazione può interpretare e modificare il territorio secondo stati propri; più stati possono coesistere sullo stesso territorio. Gli stati indispensabili restano **DA DECIDERE**.
 
 ### Pilastro 2 - Il potere ha conseguenze
 
 Le giocate più incisive non devono essere automaticamente la scelta migliore in ogni situazione.
 
-> **PROPOSTA DI MATTEO (CT-DES-003, IN ATTESA DI REGISTRAZIONE):** le conseguenze del potere si manifestano soprattutto sul territorio; il giocatore conosce il rischio e le possibili conseguenze ma non necessariamente l’esito preciso; mantenere il dominio rende progressivamente più vulnerabili.
+> **DECISIONE DI MATTEO (CT-DES-003, REGISTRATA):** le conseguenze del potere si manifestano soprattutto sul territorio; il giocatore conosce il rischio e le possibili conseguenze ma non necessariamente l’esito preciso; mantenere il dominio rende progressivamente più vulnerabili.
 
 Alterazioni concrete, possibili esiti, persistenza, reversibilità e relazione tra dominio e vulnerabilità restano **DA DECIDERE**.
 
@@ -198,7 +199,7 @@ Ogni fazione deve avere:
 - punti di forza e limiti riconoscibili;
 - almeno un comportamento strategico non integralmente replicabile dalle altre fazioni.
 
-> **PROPOSTA DI MATTEO (CT-DES-008, IN ATTESA DI REGISTRAZIONE):** forte asimmetria già nella prima versione giocabile; cambiare fazione può avvicinarsi a imparare un gioco diverso dentro lo stesso gioco; le fazioni possono rapportarsi al territorio in modi sostanzialmente differenti. La struttura del turno e la gestione di carte/mazzo restano comuni; una fazione può avere meccaniche che le altre non hanno; imparare progressivamente come funzionano le altre fazioni può essere parte della difficoltà. Il primo prototipo prevede almeno due fazioni volutamente molto diverse; l’eventuale terza fazione si decide dopo i primi playtest.
+> **DECISIONE DI MATTEO (CT-DES-008, REGISTRATA):** forte asimmetria già nella prima versione giocabile; cambiare fazione può avvicinarsi a imparare un gioco diverso dentro lo stesso gioco; le fazioni possono rapportarsi al territorio in modi sostanzialmente differenti. La struttura del turno e la gestione di carte/mazzo restano comuni; una fazione può avere meccaniche che le altre non hanno; imparare progressivamente come funzionano le altre fazioni può essere parte della difficoltà. Il primo prototipo prevede almeno due fazioni volutamente molto diverse; l’eventuale terza fazione si decide dopo i primi playtest.
 
 Dettagli delle meccaniche esclusive e limiti di complessità restano **DA DECIDERE**. L'identità non deve dipendere soltanto da colori, statistiche o parole chiave cosmetiche.
 
@@ -217,7 +218,7 @@ La direzione cosmic horror deve manifestarsi attraverso una combinazione coerent
 - conflitto tra ambizione razionale e forze incomprensibili;
 - scala cosmica percepibile senza perdere la leggibilità del gioco.
 
-> **PROPOSTA DI MATTEO (CT-DES-010, IN ATTESA DI REGISTRAZIONE):** la forza cosmica agisce da sola in modo imprevedibile. Un singolo evento cosmico produce soprattutto pressione e cambiamenti graduali; l’impatto può dipendere dall’esposizione dei giocatori; nel prototipo gli eventi possono influenzare sia i territori sia i giocatori/mazzi. La sua imprevedibilità non deve sostituire il peso delle decisioni: il rischio è comunicabile secondo CT-DES-005 e normalmente consente preparazione, pur ammettendo alcuni eventi senza preavviso.
+> **DECISIONE DI MATTEO (CT-DES-010, REGISTRATA):** la forza cosmica agisce da sola in modo imprevedibile. Un singolo evento cosmico produce soprattutto pressione e cambiamenti graduali; l’impatto può dipendere dall’esposizione dei giocatori; nel prototipo gli eventi possono influenzare sia i territori sia i giocatori/mazzi. La sua imprevedibilità non deve sostituire il peso delle decisioni: il rischio è comunicabile secondo CT-DES-005 e normalmente consente preparazione, pur ammettendo alcuni eventi senza preavviso.
 
 Numero di categorie, intensità, bersagli, frequenza e limiti di impatto restano **DA DECIDERE**.
 
@@ -288,7 +289,7 @@ Il ciclo principale ipotizzato è:
 
 ### Principio anti-snowball
 
-> **PROPOSTA DI MATTEO (CT-DES-006, IN ATTESA DI REGISTRAZIONE):** combinazione di esposizione, costi e instabilità, senza bonus artificiali per chi è indietro; il vantaggio deve restare consolidabile gestendo il rischio.
+> **DECISIONE DI MATTEO (CT-DES-006, REGISTRATA):** combinazione di esposizione, costi e instabilità, senza bonus artificiali per chi è indietro; il vantaggio deve restare consolidabile gestendo il rischio.
 
 Gerarchia fra le tre leve, misurazione e limiti restano **DA DECIDERE**.
 
@@ -393,7 +394,7 @@ Questa combinazione è un'ipotesi di posizionamento, non una unique selling prop
 ### Piattaforme
 
 - **Registrato (`CT-DES-014`):** base tecnologica web/TypeScript; Godot abbandonato.
-- **Proposta (`CT-DES-012`, `Stato: PROPOSTA`):** destinazione PC e mobile/tablet, con interfacce anche molto diverse a parità di regole; primo prototipo da provare su entrambe le classi di dispositivo.
+- **Registrato (`CT-DES-012`):** destinazione PC e mobile/tablet, con interfacce anche molto diverse a parità di regole; primo prototipo da provare su entrambe le classi di dispositivo.
 - **DA DECIDERE:** packaging per Windows, macOS, Android e iOS, che richiede specifica e prova dedicate; nessun wrapper è approvato.
 
 La scelta deve considerare interfaccia, densità delle informazioni, durata della sessione, costi di sviluppo, backend, pubblicazione e manutenzione.
@@ -426,7 +427,7 @@ Le alternative da valutare includono:
 - varianti cooperative;
 - multiplayer con più di due giocatori.
 
-> **PROPOSTA DI MATTEO (CT-DES-004, IN ATTESA DI REGISTRAZIONE):** il progetto può includere nel tempo tutte le esperienze considerate, ma la prima modalità da costruire bene è 1vs1 con elemento cosmico.
+> **DECISIONE DI MATTEO (CT-DES-004, REGISTRATA):** il progetto può includere nel tempo tutte le esperienze considerate, ma la prima modalità da costruire bene è 1vs1 con elemento cosmico.
 
 Ordine e scope delle modalità successive, interazione con PvE, cooperativo e multiplayer restano **DA DECIDERE**.
 
@@ -446,7 +447,7 @@ Una modalità aggiuntiva non deve essere pianificata se non contribuisce a valid
 
 ## 13. Scope proposto per il primo prototipo
 
-> **PROPOSTA DI MATTEO (CT-DES-009, IN ATTESA DI REGISTRAZIONE):** durata normale 10-15 minuti; alcune partite possono terminare prima e quelle combattute durare di più; gli obiettivi territoriali sono la principale pressione verso la conclusione; nelle partite prolungate i territori diventano progressivamente più instabili; un eventuale limite massimo sarà deciso dopo i playtest.
+> **DECISIONE DI MATTEO (CT-DES-009, REGISTRATA):** durata normale 10-15 minuti; alcune partite possono terminare prima e quelle combattute durare di più; gli obiettivi territoriali sono la principale pressione verso la conclusione; nelle partite prolungate i territori diventano progressivamente più instabili; un eventuale limite massimo sarà deciso dopo i playtest.
 
 > **PROPOSTA**
 
@@ -464,7 +465,7 @@ Il prototipo dovrebbe includere:
 - almeno 2 territori e condizioni di vittoria territoriali implementate;
 - interfaccia funzionale, non definitiva;
 - log degli eventi utile a debugging e playtest;
-- formato di esecuzione secondo la proposta `CT-DES-011` (`Stato: PROPOSTA`): una persona contro un avversario controllato dal gioco, con forza cosmica automatica fin dall'inizio; il comportamento minimo dell'avversario è **DA DECIDERE**.
+- formato di esecuzione secondo `CT-DES-011` (REGISTRATA): una persona contro un avversario controllato dal gioco, con forza cosmica automatica fin dall'inizio; il comportamento minimo dell'avversario è **DA DECIDERE**.
 
 Non dovrebbe includere, salvo decisione esplicita:
 
@@ -548,8 +549,9 @@ Prima di portare il documento in `REVIEW`, il Team Cosmic Horror deve decidere o
 - [ ] presenza o assenza di una forza cosmica autonoma;
 - [ ] marcatore di decisione e utilizzo del decision log;
 - [x] percorso tecnologico: web, Godot abbandonato (`CT-DES-014`, REGISTRATA);
-- [ ] piattaforme iniziali (`CT-DES-012`) e digital-first (`CT-DES-013`): oggi `PROPOSTA`;
-- [ ] formato del primo prototipo (`CT-DES-011`, `PROPOSTA`) e comportamento minimo dell'avversario controllato dal gioco;
+- [x] piattaforme iniziali (`CT-DES-012`) e digital-first (`CT-DES-013`), REGISTRATE;
+- [x] formato del primo prototipo (`CT-DES-011`, REGISTRATA);
+- [ ] comportamento minimo dell'avversario controllato dal gioco;
 - [ ] finestra di intervento prima del completamento dell'obiettivo di vittoria;
 - [ ] modello economico da approfondire;
 - [ ] grado di utilizzo degli elementi lovecraftiani nominativi;
@@ -589,6 +591,7 @@ L'ordine può essere modificato soltanto registrando la decisione nel changelog 
 | 0.7.0 | DRAFT | Integrate nel testo la comunicazione del rischio in CT-DES-005; la pressione graduale, l’impatto basato sull’esposizione e i bersagli del prototipo in CT-DES-010; il nucleo comune, le meccaniche esclusive, l’apprendimento progressivo e la decisione dell’eventuale terza fazione dopo i primi playtest in CT-DES-008. Allineato il §5.2 ai contenuti effettivi di CT-DES-005 e CT-DES-010. Aggiunta la nota aperta sulla finestra di intervento prima del completamento. Nessuna proposta registrata o approvata. |
 | 0.8.0 | DRAFT | Preparata da Cowork a partire dalla V0.7. Allineata allo stato di `main`: `CT-DES-014` registrata (web, Godot abbandonato); `CT-DES-011`, `012`, `013` citate come proposte; riferimento alle Regole del Decision Log V0.2. Aggiornati §2, §5.1, §11, §13, §17 e il riquadro iniziale. Il resto del testo è invariato. Nessuna proposta registrata o approvata oltre a `CT-DES-014`. |
 | 0.9.0 | DRAFT | Preparata da Cowork. Solo due frasi: `CT-DES-001` - `CT-DES-010` non sono più chiamati «ID provvisori», perché sono nel Decision Log con `Stato: PROPOSTA` (riquadro iniziale e §2). Aggiunto `supersedes` verso la Vision v0.1 «Cosmic Territory», da marcare `DEPRECATED`. Nessun testo di decisione cambiato. |
+| 0.10.0 | DRAFT | Preparata da Cowork. Le decisioni CT-DES-001…013 sono registrate (conferma di Matteo del 2026-10-31): i riquadri «PROPOSTA DI MATTEO, IN ATTESA DI REGISTRAZIONE» diventano «DECISIONE DI MATTEO, REGISTRATA»; aggiornati riquadro iniziale, §5.1, §11, §13 e §17; riferimenti al nuovo protocollo Cowork e Code e alle Voci V0.4 e V0.8. Testi delle decisioni invariati; le parti DA DECIDERE restano aperte. |
 
 ---
 

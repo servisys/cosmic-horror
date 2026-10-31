@@ -44,3 +44,6 @@ __pycache__/
 
 # Copyrighted reference material (local only)
 reference/literature/*.txt
+
+# Cartella di scambio locale Cowork/Code: mai nel repository
+scambio/

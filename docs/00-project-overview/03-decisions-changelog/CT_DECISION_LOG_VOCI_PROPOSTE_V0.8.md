@@ -1,22 +1,20 @@
 ---
 title: Cosmic Horror - Voci tecniche unificate proposte Decision Log
 status: DRAFT
-version: 0.7.0
+version: 0.8.0
 prepared_by: Cowork
 owner: Team Cosmic Horror
 project_prefix: CT_
-last_reviewed: 2026-10-30
+last_reviewed: 2026-10-31
 ---
 
 # Cosmic Horror - Voci tecniche unificate proposte Decision Log
 
-> **PROPOSTA DI COWORK (correzione dei riferimenti della V0.6 di Copilot), DA CONFERMARE DA MATTEO**
->
-> Tutte le voci contenute in questo documento hanno `Stato: PROPOSTA`. Nessuna voce è registrata o approvata. `CT-DES-014` non compare perché dispone del documento separato predisposto per la registrazione.
+> **Tutte le voci di questo documento sono REGISTRATE.** Matteo le ha confermate in chat il 2026-10-31 rispondendo «Tutte c». Secondo le Regole V0.2 (regola 4) la registrazione è effettiva con il merge di questo documento in `main`. `CT-DES-014` non compare perché ha un documento separato, già registrato. Il nome del file resta «VOCI_PROPOSTE» per continuità dei riferimenti.
 
 ## CT-DES-011 - Formato del primo prototipo
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
 **Decisione:** Il primo prototipo è giocato da una persona contro un avversario controllato dal gioco. La forza cosmica deve essere automatica fin dall'inizio. Il comportamento dell'avversario controllato dal gioco non è definito da questa proposta e resta da decidere.
 
@@ -47,20 +45,20 @@ last_reviewed: 2026-10-30
 
 ## CT-DES-012 - Piattaforme iniziali
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
-**Decisione:** Cosmic Horror è destinato a PC e mobile/tablet; le interfacce possono essere anche molto diverse pur mantenendo le stesse regole. Il primo prototipo deve essere provato su entrambe le classi di dispositivo. **[da chat, da confermare da Matteo]**
+**Decisione:** Cosmic Horror è destinato a PC e mobile/tablet; le interfacce possono essere anche molto diverse pur mantenendo le stesse regole. Il primo prototipo deve essere provato su entrambe le classi di dispositivo. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
-**Motivazione:** Matteo ha risposto «C» alla piattaforma principale, «B» sulla possibilità di interfacce molto diverse e «C» sulla piattaforma del primo prototipo. **[da chat, da confermare da Matteo]**
+**Motivazione:** Matteo ha risposto «C» alla piattaforma principale, «B» sulla possibilità di interfacce molto diverse e «C» sulla piattaforma del primo prototipo. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Data:** 2026-10-29
 
 **Documento interessato:** futuro `CT_PROTOTYPE_SCOPE.md`; `CT_USER_FLOWS.md`; futuro `CT_TECHNICAL_ARCHITECTURE.md`.
 
 **Alternative considerate:**
-- Piattaforma principale: **A** PC; **B** smartphone/tablet; **C** entrambi; **D** browser/web. **[da chat, da confermare da Matteo]**
-- Coerenza interfaccia: **A** sostanzialmente la stessa; **B** interfacce anche molto diverse; **C** scelta non ancora vincolata. **[da chat, da confermare da Matteo]**
-- Primo prototipo: **A** Windows/PC; **B** Android/iOS o tablet; **C** entrambe; **D** browser/web. **[da chat, da confermare da Matteo]**
+- Piattaforma principale: **A** PC; **B** smartphone/tablet; **C** entrambi; **D** browser/web. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Coerenza interfaccia: **A** sostanzialmente la stessa; **B** interfacce anche molto diverse; **C** scelta non ancora vincolata. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Primo prototipo: **A** Windows/PC; **B** Android/iOS o tablet; **C** entrambe; **D** browser/web. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** progettazione responsive/adattiva dell'interfaccia; leggibilità del campo su schermi differenti; input; Prototype Scope; UX/UI; Architecture e Build/Deployment.
 
@@ -70,20 +68,20 @@ last_reviewed: 2026-10-30
 
 ## CT-DES-013 - Digital-first
 
-**Stato:** PROPOSTA
+**Stato:** REGISTRATA
 
-**Decisione:** Cosmic Horror è digital-first. Una meccanica può essere adottata anche se sarebbe scomoda da gestire fisicamente; gestione automatica della forza cosmica, stati dei territori e trasformazioni del mazzo possono essere parte integrante dell'esperienza. **[da chat, da confermare da Matteo]**
+**Decisione:** Cosmic Horror è digital-first. Una meccanica può essere adottata anche se sarebbe scomoda da gestire fisicamente; gestione automatica della forza cosmica, stati dei territori e trasformazioni del mazzo possono essere parte integrante dell'esperienza. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
-**Motivazione:** Matteo ha risposto «A», «A», «A»: accetta meccaniche comode digitalmente ma scomode fisicamente; considera l'automazione parte integrante dell'esperienza; sceglie digital-first. **[da chat, da confermare da Matteo]**
+**Motivazione:** Matteo ha risposto «A», «A», «A»: accetta meccaniche comode digitalmente ma scomode fisicamente; considera l'automazione parte integrante dell'esperienza; sceglie digital-first. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Data:** 2026-10-29
 
 **Documento interessato:** `CT_VISION_AND_PILLARS`; futuro `CT_CORE_RULES.md`; futuro `CT_TECHNICAL_ARCHITECTURE.md`.
 
 **Alternative considerate:**
-- Meccaniche digitali difficili da riprodurre fisicamente: **A** sì; **B** preferire evitarle; **C** dipende. **[da chat, da confermare da Matteo]**
-- Automazione come parte dell'esperienza: **A** sì; **B** tutto gestibile manualmente; **C** solo alcune parti. **[da chat, da confermare da Matteo]**
-- Direzione: **A** digital-first; **B** digitale principale ma nucleo manualmente riproducibile; **C** platform-neutral. **[da chat, da confermare da Matteo]**
+- Meccaniche digitali difficili da riprodurre fisicamente: **A** sì; **B** preferire evitarle; **C** dipende. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Automazione come parte dell'esperienza: **A** sì; **B** tutto gestibile manualmente; **C** solo alcune parti. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
+- Direzione: **A** digital-first; **B** digitale principale ma nucleo manualmente riproducibile; **C** platform-neutral. **[da chat; testo confermato da Matteo in chat il 2026-10-31: «Tutte c»]**
 
 **Conseguenze / documenti influenzati:** libertà di utilizzare automazione e stati complessi; design della forza cosmica; gestione territoriale e del mazzo; Core Rules; UX/UI; Technical Architecture.
 
@@ -95,8 +93,8 @@ last_reviewed: 2026-10-30
 
 - `CT-DES-011` compare una sola volta, nella formulazione aggiornata dal chiarimento «contro il computer».
 - `CT-DES-012` e `CT-DES-013` restano invariate rispetto alla precedente V0.4 (non più presente come file: il testo valido è quello di questo documento).
-- `CT-DES-014` è stata rimossa da questo documento perché dispone del documento separato `CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.12.md` predisposto per il processo di registrazione.
-- Il merge di questo documento non registra `CT-DES-011`, `CT-DES-012` o `CT-DES-013`, perché tutte riportano `Stato: PROPOSTA`.
+- `CT-DES-014` è stata rimossa da questo documento perché dispone del documento separato `CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.13.md`, già registrato.
+- Il merge della V0.8 registra `CT-DES-011`, `CT-DES-012` e `CT-DES-013`, perché tutte riportano `Stato: REGISTRATA`.
 
 ## Changelog
 
@@ -104,3 +102,4 @@ last_reviewed: 2026-10-30
 |---|---|---|
 | 0.6.0 | DRAFT | Unificazione delle voci tecniche CT-DES-011, 012 e 013 (preparata da Copilot). |
 | 0.7.0 | DRAFT | Solo correzione di due riferimenti nella nota di unificazione: la V0.4 non è più citata come file, e il documento di CT-DES-014 è indicato col nome esistente `..._V0.12.md` (prima `..._V0.1.md`, inesistente). Intestazione e `prepared_by` aggiornati a Cowork. Nessuna voce modificata, nessuna decisione registrata o approvata. |
+| 0.8.0 | DRAFT | Preparata da Cowork. CT-DES-011, 012 e 013 passano a `Stato: REGISTRATA` su conferma di Matteo in chat il 2026-10-31 («Tutte c»); marcatori «da confermare» sostituiti con la conferma; riferimento a CT-DES-014 aggiornato alla V0.13. Testi delle decisioni invariati. |

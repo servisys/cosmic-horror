@@ -4,7 +4,7 @@ status: DRAFT
 version: 0.1.0
 owner: Team Cosmic Horror
 prepared_by: Copilot
-source_report: CT_TECH_001_REPORT_COMPARATIVO.md
+source_report: ../../../game/prove/ct-tech-001/report/REPORT_COMPARATIVO.md
 ---
 
 # CT-TECH-001 - Revisione evidenze

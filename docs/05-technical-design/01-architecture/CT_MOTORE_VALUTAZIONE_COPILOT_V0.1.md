@@ -7,7 +7,7 @@ prepared_by: Copilot
 project_prefix: CT_
 related_documents:
   - ../../00-project-overview/03-decisions-changelog/CT_DECISIONI_V0.4_ESITO_TECNICO.md
-  - ../../00-project-overview/03-decisions-changelog/CT_DECISION_LOG_VOCI_PROPOSTE_V0.4.md
+  - ../../00-project-overview/03-decisions-changelog/CT_DECISION_LOG_VOCI_PROPOSTE_V0.4.md # storico: non in main, presente nella storia del branch della PR #15
   - CT_MOTORE_VALUTAZIONE_CLAUDE_V0.1.md
 ---
 

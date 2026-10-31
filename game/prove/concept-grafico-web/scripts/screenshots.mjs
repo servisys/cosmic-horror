@@ -1,10 +1,11 @@
 // Cattura automatica del concept. Richiede l'anteprima su http://localhost:4174
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 const url = process.env.CT_URL ?? 'http://localhost:4174/';
-const out = new URL('../report/screenshots/', import.meta.url).pathname;
+const out = fileURLToPath(new URL('../report/screenshots/', import.meta.url));
 mkdirSync(out, { recursive: true });
 const formati = [
   { nome: 'telefono-orizzontale-956x440', w: 956, h: 440, dsf: 2 },

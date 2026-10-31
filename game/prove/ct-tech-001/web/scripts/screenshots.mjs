@@ -1,11 +1,12 @@
 // Cattura automatica e verifica della schermata (PC e telefono). Richiede l'anteprima su http://localhost:4173
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
 const url = process.env.CT_URL ?? 'http://localhost:4173/';
-const out = new URL('../../report/screenshots/', import.meta.url).pathname;
+const out = fileURLToPath(new URL('../../report/screenshots/', import.meta.url));
 mkdirSync(out, { recursive: true });
 
 const formati = [

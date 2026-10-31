@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: DRAFT
-version: 0.3.0
+version: 0.4.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -156,7 +156,44 @@ Il computer (CT-DES-016) vede esattamente le stesse informazioni del giocatore u
 | Punto di forza | presenze solide, difesa, controllo duraturo | colpi forti, carte cosmiche, crescita rapida |
 | Punto debole | più lenti a chiudere la partita | più colpiti dalla forza cosmica |
 
-**DA DECIDERE:** l'obiettivo fisso e le tappe di ciascuna fazione (CT-DES-037, CT-DES-038); le priorità del computer per ciascuna fazione (CT-DES-016); le 40 carte di ciascun mazzo; gli effetti dei 3 territori e le loro riserve di carte.
+### Obiettivi (3 tappe ciascuno)
+
+**DECISIONE DI MATTEO (CT-DES-043, REGISTRATA):** obiettivo dei Custodi, **«I tre Sigilli»**. Su un territorio che controlli e che ha instabilità 2 o meno puoi porre un Sigillo, al massimo uno per territorio. Ogni Sigillo è una tappa: con tre Sigilli vinci.
+
+**DECISIONE DI MATTEO (CT-DES-044, REGISTRATA):** obiettivo dei Risvegliati, **«Il Rituale»**. Su un territorio dove hai una presenza e l'instabilità è 3 o più puoi completare un rito, al massimo uno per territorio. Ogni rito è una tappa: con tre riti, su tre territori diversi, vinci.
+
+Le due fazioni si scontrano sull'instabilità: i Custodi la vogliono bassa, i Risvegliati alta.
+
+**Numeri provvisori:** porre un Sigillo o completare un rito costa 3 energia.
+
+**DA DECIDERE:** se una tappa già ottenuta può essere tolta dall'avversario. La prima lista di carte include due carte di prova che lo fanno, «Esorcismo» e «Profanazione», ma la regola va confermata.
+
+### Priorità del computer
+
+**DECISIONE DI MATTEO (CT-DES-045, REGISTRATA):** quando il computer gioca una fazione, segue queste priorità in ordine. Si provano nelle prime partite.
+
+| | Custodi | Risvegliati |
+|---|---|---|
+| 1 | se l'avversario è a un passo dalla vittoria, abbassa l'instabilità lì o contesta quel territorio | se i Custodi sono a un passo dalla vittoria, alza l'instabilità dove stanno per porre il Sigillo |
+| 2 | se può, pone un Sigillo | se può, completa un rito |
+| 3 | rinforza il territorio più conteso | gioca le carte potenti quando ha l'energia |
+| 4 | se la sua esposizione è 5 o più, la abbassa | alza l'instabilità dove ha presenze |
+
+### Territori del prototipo
+
+**DECISIONE DI MATTEO (CT-DES-046, REGISTRATA):** nomi ed effetti provvisori dei 3 territori.
+
+| Territorio | Effetto |
+|---|---|
+| Il Faro Spento | chi lo controlla pesca 1 carta in più a ogni turno |
+| La Biblioteca Sommersa | chi ne prende il controllo guarda le prime 3 carte del proprio mazzo e le riordina |
+| Il Cratere Stellare | ogni carta potente giocata qui fa salire l'instabilità di 1 in più |
+
+### Carte
+
+**DECISIONE DI MATTEO (CT-DES-047, REGISTRATA):** la prima lista delle 80 carte (40 per fazione), con le riserve dei territori, la prepara Cowork in un file di dati di testo e Matteo la rivede. File: `docs/03-cards-content/01-card-database/CT_CARTE_PROTOTIPO_V0.1.yaml`. Tutti i valori sono provvisori.
+
+**DA DECIDERE:** il mazzo degli eventi cosmici (§7).
 
 ## 11. Durata e instabilità crescente
 
@@ -173,5 +210,6 @@ Già deciso, nessuna scelta nuova:
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.4.0 | DRAFT | §10 completata: obiettivi, priorità del computer, territori, prima lista delle carte (CT-DES-043…047). |
 | 0.3.0 | DRAFT | Sezioni 9, 10 (stile delle fazioni) e 11; mazzo esaurito e presenze immobili. Scelte di Matteo del 2026-10-31 (CT-DES-039…042). |
 | 0.2.0 | DRAFT | Sezioni 5-8 con le scelte di Matteo del 2026-10-31 (CT-DES-030…038) e la tabella dei numeri provvisori proposti da Cowork. |

@@ -3,7 +3,7 @@
 **Esplorativo, non una decisione.** Nessuna scelta di motore, nessun CT-DES-014, codice non toccato.
 
 ## Cosa e' stato fatto
-`git pull` (commit 2185d75 ok). Per le 4 carte senza immagine ho usato il campo `prompt` del manifest con ComfyUI (10.100.0.30:8188, condiviso): `z_image_turbo_nvfp4`, 9 passi, cfg 1, 1200x896, PreviewImage (nulla scritto nelle cartelle del server). Prima di ogni invio coda controllata vuota; una generazione alla volta; nessuna coda altrui toccata; nulla lasciato in coda. 12 generazioni totali, 12 s ciascuna (circa 2,5 min di macchina).
+`git pull` (commit 2185d75 ok). Per le 4 carte senza immagine ho usato il campo `prompt` del manifest con ComfyUI (server ComfyUI interno, condiviso): `z_image_turbo_nvfp4`, 9 passi, cfg 1, 1200x896, PreviewImage (nulla scritto nelle cartelle del server). Prima di ogni invio coda controllata vuota; una generazione alla volta; nessuna coda altrui toccata; nulla lasciato in coda. 12 generazioni totali, 12 s ciascuna (circa 2,5 min di macchina).
 
 ## Tentativi (max 3 per carta)
 | Carta | Tentativo 1 (prompt originale) | Tentativo 2 (prefisso anti-bordo) | Tentativo 3 (prefisso diverso, "painting"->"scene") | Scelto |

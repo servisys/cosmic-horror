@@ -17,7 +17,7 @@ Windows 11, NVIDIA GeForce RTX 5060 (8 GB, driver 595.71), Node v24.18.0, npm 11
 Lettura: la carta regge 60 fps pieni con ampio margine; il costo per frame e' ~1-1,5 ms. Il modo B e' un test di margine, non un fps "reale" di gioco: varia molto tra prove (PC condiviso con altre app, frequenze GPU) quindi va letto come ordine di grandezza (centinaia di fps), non come cifra precisa.
 Prima misura scartata: un primo tentativo dava 6000-11000 fps perche' contava solo i cicli JavaScript, non il lavoro GPU; un secondo dava 8 fps perche' lasciavo aperte le pagine delle prove precedenti. Entrambi errori del mio script, corretti.
 
-## Illustrazione (ComfyUI su 10.100.0.30:8188, server condiviso)
+## Illustrazione (ComfyUI su server ComfyUI interno, server condiviso)
 Modello scelto da Matteo: `z_image_turbo_nvfp4` (+ encoder `qwen_3_4b_fp8_mixed`, VAE `ae`), 9 passi, cfg 1, 1200x896. Workflow minimo costruito da me solo con nodi gia' presenti; uscita con PreviewImage (nulla scritto nelle cartelle di output del server). Coda controllata vuota prima di ogni invio; 2 generazioni, una alla volta, 18 s e 12 s; nulla lasciato in coda; nessuna configurazione, modello o nodo toccato.
 - 1a prova scartata: il modello aveva disegnato una cornice dorata con bordo nero (si sarebbe vista doppia nella carta).
 - 2a prova (prompt "a tutto campo, senza cornice", seed 777): usata. `art.jpg` 1200x896, 180 KB.

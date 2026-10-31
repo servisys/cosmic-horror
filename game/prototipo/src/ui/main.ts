@@ -157,7 +157,10 @@ async function avvia(): Promise<void> {
   window.addEventListener('resize', ridisegna);
   // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
   // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
-  app.canvas.addEventListener('pointermove', (e) => { ultimoPuntatore = { x: e.offsetX, y: e.offsetY }; });
+  app.canvas.addEventListener('pointermove', (e) => {
+    ultimoPuntatore = { x: e.offsetX, y: e.offsetY };
+    if (ui.zoom || ui.zoomTerr !== null) setTimeout(controllaIngrandimento, 40);
+  });
   document.querySelectorAll<HTMLButtonElement>('#inizio button[data-fazione]').forEach((b) =>
     b.addEventListener('click', () => {
       const raw = (document.getElementById('seme') as HTMLInputElement).value.trim();

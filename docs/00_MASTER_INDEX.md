@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror — Master Index
 status: DRAFT
-version: 0.3.0
+version: 0.4.0
 owner: Team Cosmic Horror
 last_reviewed: 2026-10-31
 repository_scope: GitHub
@@ -183,8 +183,8 @@ Regole:
 
 | Ordine | Documento | Stato atteso |
 |---:|---|---|
-| 1 | `CT_VISION_AND_PILLARS.md` | `APPROVED` |
-| 2 | `CT_CORE_RULES.md` | `APPROVED` |
+| 1 | `CT_VISION_AND_PILLARS_V0.x_BOZZA.md` (in `00-project-overview/01-vision-concept/`; la versione più alta è quella valida) | `APPROVED` |
+| 2 | `CT_CORE_RULES_V0.x.md` (in `01-game-design/01-core-rules/`; la versione più alta è quella valida) | `APPROVED` |
 | 3 | `CT_LORE_BIBLE.md` | `APPROVED` |
 | 4 | `CT_MECHANICS_GLOSSARY.md` | `APPROVED` |
 | 5 | `CT_PROTOTYPE_SCOPE.md` | `APPROVED` |
@@ -291,3 +291,4 @@ Claude deve produrre prima un pre-flight plan e, al termine, un Implementation R
 | 0.2.0 | DRAFT | Adattamento a repository GitHub unico con link relativi e separazione `docs/`, `reference/`, `game/`, `tools/`, `tests/`. |
 | 0.2.1 | DRAFT | Progetto rinominato in Cosmic Horror; il prefisso `CT_` dei documenti resta invariato. |
 | 0.3.0 | DRAFT | Preparata da Cowork. Copilot sostituito da Cowork nel principio operativo; protocollo di riferimento ora `CT_COWORK_CODE_PROTOCOL_V0.1.md`; vecchio protocollo Copilot-Claude segnato `DEPRECATED`. Nessun'altra modifica. |
+| 0.4.0 | DRAFT | Preparata da Cowork. §6: Vision e Core Rules indicate con il nome reale dei file versionati e la loro cartella. Nessun'altra modifica. |

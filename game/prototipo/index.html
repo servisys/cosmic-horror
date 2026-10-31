@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Cosmic Horror - prototipo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d1015; overflow: hidden; font-family: system-ui, 'Segoe UI', Arial, sans-serif; color: #e8e6e0; }
+  #gioco { position: fixed; inset: 0; }
+  #gioco canvas { display: block; }
+  #inizio { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d1015; z-index: 5; }
+  #inizio .scatola { max-width: 640px; padding: 12px 20px; text-align: center; }
+  #inizio h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: .04em; }
+  #inizio p { margin: 4px 0 10px; font-size: 14px; opacity: .8; }
+  #inizio .fazioni { display: flex; gap: 14px; justify-content: center; margin: 8px 0; }
+  #inizio button { font: inherit; font-size: 16px; padding: 10px 16px; border-radius: 8px; border: 2px solid #4a5568; background: #1b2230; color: #fff; cursor: pointer; min-width: 190px; }
+  #inizio button.custodi { border-color: #4d86c2; background: #162a42; }
+  #inizio button.risvegliati { border-color: #64a56f; background: #1f2f22; }
+  #inizio label { font-size: 13px; opacity: .8; }
+  #inizio input { font: inherit; width: 90px; padding: 4px 6px; background: #151a24; color: #fff; border: 1px solid #4a5568; border-radius: 4px; }
+  #inizio small { display: block; opacity: .6; margin-top: 6px; font-size: 12px; }
+  @media (max-height: 480px) { #inizio h1 { font-size: 20px; } #inizio p { margin: 2px 0 6px; font-size: 12px; } #inizio button { padding: 7px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div id="gioco"></div>
+<div id="inizio">
+  <div class="scatola">
+    <h1>COSMIC HORROR</h1>
+    <p>Prototipo giocabile - una persona contro il computer. Scegli la fazione.</p>
+    <div class="fazioni">
+      <button class="custodi" data-fazione="custodi"><b>I Custodi</b><br><small>difendono e stabilizzano i territori</small></button>
+      <button class="risvegliati" data-fazione="risvegliati"><b>I Risvegliati</b><br><small>corrompono i territori e cercano il potere cosmico</small></button>
+    </div>
+    <label>Seme della partita (facoltativo): <input id="seme" inputmode="numeric" placeholder="casuale"></label>
+    <small>Stesso seme e stesse mosse danno la stessa partita.</small>
+  </div>
+</div>
+<script type="module" src="/src/ui/main.ts"></script>
+</body>
+</html>

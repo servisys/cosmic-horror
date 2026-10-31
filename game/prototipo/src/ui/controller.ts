@@ -266,9 +266,15 @@ export class Controller {
   }
 }
 
+const VERBI: Record<string, string> = {
+  gioca: 'giocano', finisce: 'finiscono', prende: 'prendono', riduce: 'riducono', ottiene: 'ottengono', scarta: 'scartano',
+  riordina: 'riordinano', VINCE: 'VINCONO',
+};
+
 /** Una riga di cronaca resa leggibile. */
 export function frase(riga: string): string {
-  let r = riga.replace(/^(custodi|risvegliati)\b/, (m) => NOME_FAZIONE[m]);
+  let r = riga.replace(/^SEGNALE: (custodi|risvegliati) e' a una tappa dalla vittoria/, (_m, f: string) => `SEGNALE! ${NOME_FAZIONE[f]} sono a una tappa dalla vittoria`);
+  r = r.replace(/^(custodi|risvegliati) (\w+)/, (m, f: string, v: string) => (VERBI[v] ? `${NOME_FAZIONE[f]} ${VERBI[v]}` : m));
   r = r.replace(/\b(custodi|risvegliati)\b/g, (m) => NOME_FAZIONE[m]);
-  return r.replace(/^EVENTO COSMICO: /, 'Evento cosmico: ').replace(/^SEGNALE: /, 'SEGNALE! ');
+  return r.replace(/^EVENTO COSMICO: /, 'Evento cosmico: ').replace(/^VINCE/, 'Vittoria');
 }

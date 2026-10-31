@@ -75,6 +75,7 @@ Da `game/prototipo/`, dopo `npm install`:
 | `npm test` | tutti i test automatici |
 | `npm run tipi` | controllo dei tipi TypeScript |
 | `npm run controllo-dati` | controllo dei file dati |
+| `npm run dev` / `npm run build` / `npm run preview` | interfaccia in sviluppo / build statica in `dist/` / prova della build |
 | `npm run simula -- 1000 0` | 1000 partite computer contro computer dal seme 0 (aggiungere `--json` per i dati) |
 
 ## 6. Librerie e versioni (fisse, solo in `game/prototipo/`)
@@ -97,7 +98,16 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 4. **PROPOSTA:** il limite di 30 giri delle simulazioni è solo tecnico, non una regola (CT-DES-009 rimanda la scelta ai playtest).
 5. I file dati sono letti a runtime da Node. Per il browser (tappa 3 e seguenti) la lettura va spostata in fase di build (la specifica dice «in fase di build»): il modulo `caricamento.ts` è l'unico da adattare.
 
-## 8. Elenco delle ambiguità
+## 8. Interfaccia (tappa 3)
+
+- **Struttura:** `src/ui/` e `index.html`. `controller.ts` tiene la partita e la selezione del giocatore umano e muove il computer una mossa alla volta; **non contiene regole**: ogni mossa possibile viene da `mosseLegali` e ogni informazione dalla vista. `scena.ts` disegna con PixiJS (riquadri, numeri grandi, carte come riquadri con nome e colore di fazione); `main.ts` avvia tutto (schermata iniziale in HTML, scena in PixiJS, pausa fra le mosse del computer, evento cosmico a schermo). Le illustrazioni arrivano con la tappa 4.
+- **Dati in fase di build:** `dati-build.ts` include i YAML di `docs/03-cards-content/01-card-database/` (versione più alta) nella build come testo; `dati/leggi.ts` li interpreta (lo stesso codice di Node). Un test verifica che i dati della build siano identici a quelli letti da disco.
+- **Build statica:** `npm run build` produce `dist/` (cartella statica, percorsi relativi) per la pubblicazione della tappa 5. `npm run dev` e `npm run preview` per provarla.
+- **Verifica:** `npm run verifica-tappa3` (Playwright 1.64.1) gioca una partita completa per fazione a 956×440 e a 1280×800 cliccando sull'interfaccia, salva gli screenshot e controlla scorrimenti e testi fuori dallo schermo. Serve il browser indicato in `CT_CHROMIUM` (o quello installato da Playwright).
+- Il turno del computer dura una mossa ogni 650 ms, con la frase che la spiega in alto; l'evento cosmico si chiude toccando o dopo 4,5 s. Parametri nell'indirizzo per i test: `?fazione=custodi&seme=21&pausa=120&pausaEvento=1200`.
+- **PROPOSTA:** la schermata iniziale è in HTML (serve il campo del seme) e il resto in PixiJS.
+
+## 9. Elenco delle ambiguità
 
 L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è nel resoconto di Code (`scambio/da-code.md`) e nella descrizione della PR; ogni punto è stato risolto nel modo più letterale possibile, senza modificare regole, carte o eventi.
 
@@ -106,4 +116,5 @@ L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è ne
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Claude Code con le tappe 1 e 2 del prototipo. |
+| 0.1.2 | DRAFT | Aggiunto il paragrafo 8 sull'interfaccia (tappa 3). |
 | 0.1.1 | DRAFT | Allineata a Core Rules V0.9 e ai dati V0.5: tolta la riunione delle righe di continuazione, `id` delle riserve dai dati. |

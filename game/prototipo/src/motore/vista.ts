@@ -41,6 +41,8 @@ export interface VistaTerritorio {
   mioTappa: boolean;
   loroTappa: boolean;
   loroTappaTogliibile: boolean;
+  /** La mia tappa si puo' ancora togliere (non e' al sicuro). */
+  mioTappaTogliibile: boolean;
   /** Condizioni per la mia tappa soddisfatte (costo escluso) in questo momento. */
   tappaPossibile: boolean;
   costoTappa: number;
@@ -117,6 +119,7 @@ export function creaVista(g: Partita, io: number): Vista {
         mioTappa: me.tappe[i] !== undefined,
         loroTappa: av.tappe[i] !== undefined,
         loroTappaTogliibile: tappaTogliibile(g, altro(io), i),
+        mioTappaTogliibile: tappaTogliibile(g, io, i),
         tappaPossibile: tappaPosabile(g, io, i),
         costoTappa: costoTappa(g, io, i),
         riservaRimasta: t.riserva.length,

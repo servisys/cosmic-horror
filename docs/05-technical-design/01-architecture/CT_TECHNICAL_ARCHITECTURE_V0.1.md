@@ -121,7 +121,14 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Immagini senza web worker:** `Assets.setPreferences({ preferWorkers: false })` prima dei caricamenti (PixiJS usa altrimenti un worker da URL blob, vietato da una `Content-Security-Policy` con `worker-src`); se il caricamento si blocca il gioco parte dopo 10 s senza le immagini mancanti.
 - **Verifica:** `npm run prova-telefono -- <url>` (bottoni iniziali senza parametri, immagini con CSP `worker-src 'none'`, tocco con `hasTouch` e `isMobile`); `scripts/serve-sottocartella.mjs` serve una build sotto `/x/y/` (con `CSP=1` imposta l'intestazione).
 
-## 11. Elenco delle ambiguità
+## 11. Aiuti di gioco
+
+- **Riga di suggerimento** (`src/ui/suggerimento.ts`): una frase sulla prossima cosa utile, calcolata dalla sola vista del giocatore (nessuna regola nuova, nessuna mossa automatica). Ordine: hai finito l'energia, l'avversario e' a una tappa dalla vittoria, puoi porre un Sigillo / completare un rito, la tua tappa non e' ancora al sicuro, l'instabilita' non e' dalla parte giusta, serve piu' forza per controllare un territorio, altrimenti «tocca una carta». Un tocco sulla riga la nasconde o la mostra.
+- **Segnali:** il bottone Sigillo/rito e' pieno e illuminato quando si puo' usare, spento con il motivo in piccolo quando no (`motivoTappa`); la tappa sul territorio e' un cerchio vuoto se si puo' ancora togliere (con «al sicuro dopo il turno di…») e pieno se e' al sicuro (`VistaTerritorio.mioTappaTogliibile`); toccando una carta non giocabile compare il motivo (costo, bersagli).
+- **Tutorial:** 6 passi (`passiTutorial`) con riquadro evidenziato e «Avanti»/«Salta»; parte al primo turno della prima partita, ricordato in `localStorage` (`src/ui/memoria.ts`, con try/catch), e si rivede con «Come si gioca» nella schermata iniziale. `?tutorial=0` lo disattiva (usato dalle verifiche), `?tutorial=1` lo forza.
+- **Verifica:** `npm run verifica-aiuti -- <url>` (Playwright, 956x440, `hasTouch` + `isMobile`).
+
+## 12. Elenco delle ambiguità
 
 L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è nel resoconto di Code (`scambio/da-code.md`) e nella descrizione della PR; ogni punto è stato risolto nel modo più letterale possibile, senza modificare regole, carte o eventi.
 
@@ -130,6 +137,7 @@ L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è ne
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Claude Code con le tappe 1 e 2 del prototipo. |
+| 0.1.5 | DRAFT | Aggiunto il paragrafo 11 sugli aiuti di gioco. |
 | 0.1.4 | DRAFT | Aggiunto il paragrafo 10 sulle correzioni per il telefono. |
 | 0.1.3 | DRAFT | Aggiunto il paragrafo 9 sulle carte complete (tappa 4). |
 | 0.1.2 | DRAFT | Aggiunto il paragrafo 8 sull'interfaccia (tappa 3). |

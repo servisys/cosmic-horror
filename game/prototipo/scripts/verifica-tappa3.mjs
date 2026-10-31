@@ -22,7 +22,7 @@ for (const vista of VISTE) {
     const problemi = [];
     page.on('console', (m) => { if (m.type() === 'error') problemi.push('console: ' + m.text()); });
     page.on('pageerror', (e) => problemi.push('pageerror: ' + e.message));
-    await page.goto(`${URL}?fazione=${fazione}&seme=${SEMI[fazione]}&pausa=120&pausaEvento=1200`);
+    await page.goto(`${URL}?fazione=${fazione}&seme=${SEMI[fazione]}&pausa=120&pausaEvento=1200&tutorial=0`);
     await page.waitForFunction(() => window.__ct && window.__ct.ctrl.g);
     const sigla = `${fazione}_${vista.nome}`;
     const foto = async (momento) => page.screenshot({ path: `${OUT}/${sigla}_${momento}.png` });

@@ -48,7 +48,7 @@ await prova('immagini presenti (texture caricate)', async () => {
   const errori = [];
   p.on('console', (m) => { if (m.type() === 'error' || /content security|worker/i.test(m.text())) errori.push(m.text()); });
   p.on('pageerror', (e) => errori.push(e.message));
-  await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120`);
+  await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120&tutorial=0`);
   await p.waitForFunction(() => window.__ct && window.__ct.ctrl.g);
   await p.waitForTimeout(1200);
   const n = await p.evaluate(() => window.__ct.immagini());
@@ -64,7 +64,7 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
   const errori = [];
   p.on('console', (m) => { if (m.type() === 'error') errori.push(m.text()); });
   p.on('pageerror', (e) => errori.push(e.message));
-  await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120`);
+  await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120&tutorial=0`);
   await p.waitForFunction(() => window.__ct && window.__ct.ctrl.g);
   await p.waitForTimeout(800);
   const tap = async (id) => {

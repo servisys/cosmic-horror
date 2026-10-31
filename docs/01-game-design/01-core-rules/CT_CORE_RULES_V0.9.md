@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
 status: APPROVED
-version: 0.8.0
+version: 0.9.0
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_
@@ -13,7 +13,7 @@ related_documents:
 
 # Cosmic Horror - Regole base (Core Rules)
 
-> **APPROVATE DA MATTEO il 2026-10-31 come base del prototipo (CT-DES-059). Tema: mondo di Lovecraft e Grandi Antichi (CT-DES-060).** Preparate da Cowork; tutte le scelte sono registrate nel Decision Log (CT-DES-021…058). I numeri restano **provvisori** e vanno tarati nei playtest (CT-DES-030). Ogni modifica futura passa da una nuova decisione e da una nuova versione del documento.
+> **APPROVATE DA MATTEO il 2026-10-31 come base del prototipo (CT-DES-059). Tema: mondo di Lovecraft e Grandi Antichi (CT-DES-060).** Preparate da Cowork; tutte le scelte sono registrate nel Decision Log (CT-DES-021…058, 064, 065). I numeri restano **provvisori** e vanno tarati nei playtest (CT-DES-030). Ogni modifica futura passa da una nuova decisione e da una nuova versione del documento.
 
 ## 0. Riferimenti già decisi
 
@@ -195,14 +195,17 @@ Le tappe possono essere tolte dall'avversario finché non sono consolidate: §8 
 
 ### Priorità del computer
 
-**DECISIONE DI MATTEO (CT-DES-045, REGISTRATA):** quando il computer gioca una fazione, segue queste priorità in ordine. Si provano nelle prime partite.
+**DECISIONE DI MATTEO (CT-DES-065, REGISTRATA; sostituisce CT-DES-045):** quando il computer gioca una fazione, segue queste priorità in ordine. Si provano nelle prime partite.
 
 | | Custodi | Risvegliati |
 |---|---|---|
-| 1 | se l'avversario è a un passo dalla vittoria, abbassa l'instabilità lì o contesta quel territorio | se i Custodi sono a un passo dalla vittoria, alza l'instabilità dove stanno per porre il Sigillo |
+| 1 | se l'avversario è a un passo dalla vittoria, abbassa l'instabilità sul territorio dove l'avversario può completare l'ultima tappa, oppure gioca lì presenze per superarne la forza | se i Custodi sono a un passo dalla vittoria, alza l'instabilità sopra 3 sui territori dove i Custodi possono porre l'ultimo Sigillo, oppure toglie un Sigillo non consolidato |
 | 2 | se può, pone un Sigillo | se può, completa un rito |
-| 3 | rinforza il territorio più conteso | gioca le carte potenti quando ha l'energia |
-| 4 | se la sua esposizione è 5 o più, la abbassa | alza l'instabilità dove ha presenze |
+| 3 | rinforza con presenze il territorio più conteso | **gioca presenze su un territorio con instabilità 3 o più, senza rito, dove la sua forza è minore o uguale a quella dell'avversario, per poterci completare un rito** |
+| 4 | se la sua esposizione è 5 o più, la abbassa | gioca le carte potenti quando ha l'energia |
+| 5 | — | alza l'instabilità dove ha presenze |
+
+La priorità 3 dei Risvegliati è nuova: il rito richiede almeno tanta forza quanto l'avversario (CT-DES-055), e la tabella precedente non dava al computer un modo di ottenerla.
 
 ### Territori del prototipo
 
@@ -257,11 +260,44 @@ Già deciso, nessuna scelta nuova:
 | **Riserva** | piccole carte di un territorio, guadagnate prendendone il controllo |
 | **Seme** | numero che rende ripetibile la casualità di una partita |
 
+## 13. Chiarimenti (CT-DES-064)
+
+Interpretazioni emerse scrivendo il motore del prototipo. Valgono come regole.
+
+**Regole generali**
+1. La forza di una presenza non scende mai sotto 0.
+2. Quando riprendi il controllo di un territorio (dopo una parità o dopo averlo perso), prendi un'altra carta della sua riserva, finché ce ne sono.
+3. Le trasformazioni scattano ogni volta che l'esposizione **sale** fino a 3, 6 o 9, anche dopo essere scesa sotto la soglia.
+4. **Ordine della fine del giro:** evento cosmico, poi instabilità crescente (dal giro 7), poi effetti dei territori a instabilità 5, infine termine degli effetti temporanei.
+5. Se il mazzetto della fase cosmica finisce, si rimescolano gli eventi già risolti di quella fase, compresi gli improvvisi.
+6. Non c'è un limite di giri. Il limite di 30 giri delle simulazioni è solo tecnico (CT-DES-009).
+7. Non si può ridurre l'esposizione se è già 0.
+8. **Turno di avviso:** l'ultima tappa si può completare solo dopo un turno completo dell'avversario dal momento del segnale. Vale anche per il Sigillo posto gratis dalla Pietra Stellata di Mnar.
+9. Una carta potente che bersaglia una presenza conta come giocata sul territorio di quella presenza.
+10. **Cerchio dei Vigilanti:** quando entra, porta a 3 un'instabilità più alta. Se se ne va, l'instabilità non risale da sola.
+
+**Carte**
+11. **Fattoria Barricata:** non può essere eliminata da azioni che costano 4 o meno (la carta diceva 2 o meno, ma nessuna azione di eliminazione costa così poco).
+12. Gli sconti su Sigillo e rito (Studio del Necronomicon, Formula di Dho-Hna, Lavinia Whateley) si sommano; il costo minimo è 0.
+13. **Il Tenebroso** (e la sua versione cosmica): il malus alla presenza avversaria dura fino a fine partita.
+14. **Pagina del Necronomicon:** si sceglie la carta azione dal mazzo; il mazzo non si rimescola.
+15. **Diario di Zadok Allen:** il tipo dei prossimi eventi lo vede solo chi gioca la carta.
+16. Le carte che eliminano o colpiscono presenze (Fuoco Purificatore, Dagon Emerge, Sussurro dalla Cripta e simili) si possono giocare anche se non ci sono bersagli.
+17. **Biblioteca della Miskatonic:** se nel mazzo ci sono meno di 2 carte, non c'è nulla da riordinare.
+
+**Eventi**
+18. Quando un evento richiede di scegliere tra elementi alla pari e la regola non dice come, si sorteggia con il seme della partita.
+19. **Nebbia dal Mare:** il -1 vale anche per le presenze giocate dopo, fino alla fine del giro successivo.
+20. «Forza 1 o meno» indica la forza effettiva. Comprende l'Effigie di Cthulhu, che ha forza 0.
+21. **Il Sogno di Cthulhu:** «il più esposto» si valuta prima dell'aumento.
+22. **Luci sulla Scogliera del Diavolo:** se nessuno controlla Innsmouth, non succede nulla. Negli eventi sul «più esposto», a parità di esposizione (anche 0 contro 0) sono colpiti entrambi.
+
 ## Changelog
 
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima bozza di Cowork: sezioni 1-4 con le scelte di Matteo del 2026-10-31 (CT-DES-021…029); sezioni 5-12 da fare. |
+| 0.9.0 | APPROVED | Priorità del computer riviste (CT-DES-065, sostituisce 045); nuovo §13 con i chiarimenti emersi dal motore (CT-DES-064). |
 | 0.8.0 | APPROVED | Approvate da Matteo come base del prototipo (CT-DES-059). Regole identiche alla 0.7.0; aggiornati solo i nomi di fazioni, territori e carte citati, a tema Lovecraft (CT-DES-060). |
 | 0.7.0 | DRAFT | Correzioni dopo la simulazione di Cowork: condizioni e costi di Sigillo e rito (CT-DES-055), tappe consolidate (CT-DES-056), primo turno 1/3 energia (CT-DES-057), chiarimenti (CT-DES-058). |
 | 0.6.0 | DRAFT | Regole base complete nelle scelte di fondo: parità, limite di presenze, soglie di instabilità, territori fissi, fasi del turno, eventi di partenza (CT-DES-049…054). |

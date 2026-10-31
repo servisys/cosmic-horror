@@ -8,7 +8,7 @@ project_prefix: CT_
 last_reviewed: 2026-10-31
 related_documents:
   - ../../00-project-overview/02-roadmap/CT_PROTOTYPE_SCOPE_V0.2.md
-  - ../../01-game-design/01-core-rules/CT_CORE_RULES_V0.8.md
+  - ../../01-game-design/01-core-rules/CT_CORE_RULES_V0.9.md
 ---
 
 # Architettura tecnica del prototipo (tappe 1 e 2)
@@ -52,8 +52,8 @@ I file YAML in `docs/03-cards-content/01-card-database/` sono **l'unica fonte** 
 - **Controllo dei dati** (`npm run controllo-dati`, e a ogni simulazione): campi mancanti o di tipo sbagliato, id duplicati, 40 carte per mazzo, 3 territori con una riserva da 3 copie, 20 eventi (6 + 6 + 6 + 2 improvvisi), citazioni complete, versioni cosmiche complete.
 - **Gli effetti sono scritti a parole nei file**, quindi il codice ne ha uno per carta (`effetti.ts`, `eventi.ts`). Accanto a ogni effetto il codice tiene il testo con cui è stato scritto (`TESTI_EFFETTO`, `testi-eventi.ts`): se un testo cambia nei file, il controllo dei dati segnala l'errore e dice quale carta rivedere. Una carta nuova nei file senza codice dà errore.
 - **PROPOSTA:** se in futuro gli effetti si descrivono in forma strutturata nei file (per esempio come elenco di operazioni), il codice smette di dover essere scritto carta per carta. È una decisione di dati, non di questa tappa.
-- Le riserve dei territori nei file non hanno `id`: il codice usa `<id territorio>r` (T1r, T2r, T3r).
-- I file attuali contengono righe di continuazione che PyYAML accetta e un lettore YAML 1.2 rigoroso rifiuta. Il caricamento le riunisce (`normalizzaAcapo`) senza toccare i file; il controllo lo segnala come avviso.
+- Le carte di riserva dei territori hanno il loro `id` nei file (T1r, T2r, T3r, dalla V0.5); il controllo dei dati segnala se manca.
+- I file sono YAML 1.2 valido (dalla V0.5, CT-DES-064) e si leggono senza correzioni; un file non valido fa fallire il caricamento.
 
 ## 3. Stato, mosse e registro
 
@@ -106,3 +106,4 @@ L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è ne
 | Versione | Stato | Modifica |
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura di Claude Code con le tappe 1 e 2 del prototipo. |
+| 0.1.1 | DRAFT | Allineata a Core Rules V0.9 e ai dati V0.5: tolta la riunione delle righe di continuazione, `id` delle riserve dai dati. |

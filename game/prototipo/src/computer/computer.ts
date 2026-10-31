@@ -45,26 +45,24 @@ const trovaPres = (v: Vista, uid: number): { t: VistaTerritorio; p: VistaPresenz
 };
 const conteso = (t: VistaTerritorio) => Math.abs(t.forzaMia - t.forzaLoro);
 
-// ---------- Custodi: 1 avversario a un passo -> 2 Sigillo -> 3 rinforzo del territorio conteso -> 4 esposizione ----------
+// ---------- Custodi (CT-DES-065): 1 avversario a un passo -> 2 Sigillo -> 3 rinforzo con presenze del territorio piu' conteso -> 4 esposizione ----------
 function candidatiCustodi(v: Vista): Cand[] {
   const out: Cand[] = [];
   const g = giocate(v);
   const avvUnPasso = v.tappeAvv === 2;
-  // Territori in cui l'avversario puo' ancora completare un rito: senza una sua tappa; piu' a rischio con sue presenze e instabilita' alta.
+  // Territori dove l'avversario puo' completare l'ultima tappa: senza una sua tappa e con una sua presenza.
   const minacciati = v.territori.filter((t) => !t.loroTappa && t.loro.length > 0);
-  // 1 - l'avversario e' a un passo dalla vittoria
+  // 1 - abbassa l'instabilita' li', oppure gioca li' presenze per superarne la forza
   if (avvUnPasso) {
     for (const { m, c } of g) {
-      if (c.id === ID_CUSTODI.esorcismo) out.push({ m, punti: 1000 });
       if (c.id === ID_CUSTODI.quiete && m.terr !== undefined) {
         const t = territorio(v, m.terr);
         if (minacciati.includes(t) && t.inst >= 3) out.push({ m, punti: 900 + t.inst });
       }
       if (c.id === ID_CUSTODI.contenimento && minacciati.some((t) => t.inst >= 3)) out.push({ m, punti: 850 });
-      // contesta il territorio: la presenza piu' forte dove l'avversario ha presenze e non ho il controllo
       if (c.tipo === 'presenza' && m.terr !== undefined) {
         const t = territorio(v, m.terr);
-        if (minacciati.includes(t) && t.controllo !== 'io') out.push({ m, punti: 800 + c.forza });
+        if (minacciati.includes(t) && t.forzaMia <= t.forzaLoro) out.push({ m, punti: 800 + c.forza });
       }
     }
   }
@@ -81,17 +79,12 @@ function candidatiCustodi(v: Vista): Cand[] {
       out.push({ m, punti: 690 });
     }
   }
-  // 3 - rinforza il territorio piu' conteso
+  // 3 - rinforza con presenze il territorio piu' conteso
   const contesi = [...v.territori].sort((a, b) => conteso(a) - conteso(b));
   for (const { m, c } of g) {
     if (c.tipo === 'presenza' && m.terr !== undefined) {
       const t = territorio(v, m.terr);
-      const rango = contesi.indexOf(t);
-      out.push({ m, punti: 500 - rango * 20 - (t.mioTappa ? 5 : 0) + c.forza + c.costo / 10 });
-    }
-    if (c.id === ID_CUSTODI.rinforzi && m.pres !== undefined) {
-      const x = trovaPres(v, m.pres);
-      if (x) out.push({ m, punti: 480 - contesi.indexOf(x.t) * 20 });
+      out.push({ m, punti: 500 - contesi.indexOf(t) * 20 - (t.mioTappa ? 5 : 0) + c.forza + c.costo / 10 });
     }
   }
   // 4 - se la sua esposizione e' 5 o piu', la abbassa
@@ -100,34 +93,41 @@ function candidatiCustodi(v: Vista): Cand[] {
     const r = v.mosseLegali.find((m) => m.t === 'riduci');
     if (r) out.push({ m: r, punti: 390 });
   }
-  // dopo le priorita': abbassa l'instabilita' dove serve ai Sigilli
+  // fuori tabella (mie scelte): Esorcismo per togliere un rito non consolidato, Sonno senza Sogni dove serve ai Sigilli, rinforzi
   for (const { m, c } of g) {
+    if (c.id === ID_CUSTODI.esorcismo && avvUnPasso) out.push({ m, punti: 350 });
     if (c.id === ID_CUSTODI.quiete && m.terr !== undefined) {
       const t = territorio(v, m.terr);
       if (t.inst >= 3 && !t.mioTappa) out.push({ m, punti: 300 + t.inst });
+    }
+    if (c.id === ID_CUSTODI.rinforzi && m.pres !== undefined) {
+      const x = trovaPres(v, m.pres);
+      if (x) out.push({ m, punti: 280 - contesi.indexOf(x.t) * 20 });
     }
   }
   return out;
 }
 
-// ---------- Risvegliati: 1 i Custodi a un passo -> 2 rito -> 3 carte potenti -> 4 instabilita' dove ha presenze ----------
+// ---------- Risvegliati (CT-DES-065): 1 Custodi a un passo -> 2 rito -> 3 presenze dove serve un rito -> 4 carte potenti -> 5 instabilita' dove ha presenze ----------
 function candidatiRisvegliati(v: Vista): Cand[] {
   const out: Cand[] = [];
   const g = giocate(v);
   const avvUnPasso = v.tappeAvv === 2;
-  // dove i Custodi stanno per porre il Sigillo: senza loro tappa, instabilita' 3 o meno, loro controllo
-  const sigilli = v.territori.filter((t) => !t.loroTappa && t.inst <= 3);
+  // dove i Custodi possono porre l'ultimo Sigillo: senza loro tappa, con il loro controllo e instabilita' 3 o meno
+  const sigilli = v.territori.filter((t) => !t.loroTappa && t.controllo === 'avv' && t.inst <= 3);
+  // 1 - alza l'instabilita' sopra 3 dove possono porre l'ultimo Sigillo, oppure toglie un Sigillo non consolidato
   if (avvUnPasso) {
     for (const { m, c } of g) {
       if (c.id === ID_RISVEGLIATI.profanazione) out.push({ m, punti: 1000 });
-      if ((c.id === ID_RISVEGLIATI.sussurro) && m.terr !== undefined) {
+      if (c.id === ID_RISVEGLIATI.sussurro && m.terr !== undefined) {
         const t = territorio(v, m.terr);
-        if (sigilli.includes(t) && t.inst <= 2) out.push({ m, punti: 900 + t.inst + (t.controllo === 'avv' ? 5 : 0) });
+        const aumento = c.trasformata ? 2 : 1;
+        if (sigilli.includes(t)) out.push({ m, punti: 900 + (t.inst + aumento > 3 ? 20 : 0) + t.inst });
       }
-      if (c.id === ID_RISVEGLIATI.squarcio && sigilli.some((t) => t.inst <= 2)) out.push({ m, punti: 850 });
-      if (c.tipo === 'presenza' && m.terr !== undefined && ['RI01'].includes(c.id)) {
+      if (c.id === ID_RISVEGLIATI.squarcio && sigilli.some((t) => t.inst >= 3)) out.push({ m, punti: 850 });
+      if (c.tipo === 'presenza' && c.id === 'RI01' && m.terr !== undefined) {
         const t = territorio(v, m.terr);
-        if (sigilli.includes(t) && t.inst <= 2) out.push({ m, punti: 800 + t.inst });
+        if (sigilli.includes(t)) out.push({ m, punti: 800 + t.inst });
       }
     }
   }
@@ -138,7 +138,14 @@ function candidatiRisvegliati(v: Vista): Cand[] {
       out.push({ m, punti: 690 });
     }
   }
-  // 3 - gioca le carte potenti quando ha l'energia
+  // 3 - presenze su un territorio con instabilita' 3 o piu', senza rito, dove la sua forza e' minore o uguale a quella dell'avversario
+  for (const { m, c } of g) {
+    if (c.tipo === 'presenza' && m.terr !== undefined) {
+      const t = territorio(v, m.terr);
+      if (t.inst >= 3 && !t.mioTappa && t.forzaMia <= t.forzaLoro) out.push({ m, punti: 650 + c.forza + t.inst - conteso(t) / 10 });
+    }
+  }
+  // 4 - gioca le carte potenti quando ha l'energia
   for (const { m, c } of g) {
     if (c.potente <= 0) continue;
     let punti = 600 + c.costo * 3 + c.potente;
@@ -157,7 +164,7 @@ function candidatiRisvegliati(v: Vista): Cand[] {
     }
     out.push({ m, punti });
   }
-  // 4 - alza l'instabilita' dove ha presenze
+  // 5 - alza l'instabilita' dove ha presenze
   for (const { m, c } of g) {
     if (c.id === ID_RISVEGLIATI.sussurro && m.terr !== undefined) {
       const t = territorio(v, m.terr);

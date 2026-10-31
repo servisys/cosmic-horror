@@ -1,6 +1,6 @@
 // Ripetibilita' (CT-DES-019): stesso seme e stesse mosse danno la stessa partita. E controllo dei dati.
 import { describe, expect, it } from 'vitest';
-import { caricaDati, normalizzaAcapo } from '../src/dati/caricamento.js';
+import { caricaDati } from '../src/dati/caricamento.js';
 import { controllaDati } from '../src/dati/controllo.js';
 import { creaPartita, riproduci } from '../src/motore/motore.js';
 import { giocaComputerControComputer } from '../src/simulazione/partita.js';
@@ -78,11 +78,14 @@ describe('lettura e controllo dei dati', () => {
     d.fazioni[0].carte.push(nuova);
     expect(controllaDati(d).errori.join('\n')).toContain('CU99: il codice non conosce questa carta');
   });
-  it('riunisce le righe di continuazione non valide in YAML rigoroso', () => {
-    const BS = String.fromCharCode(92);
-    const testo = `a: "uno${BS}\n  ${BS} due"\n`;
-    const r = normalizzaAcapo(testo);
-    expect(r.sostituzioni).toBe(1);
-    expect(r.testo).toBe('a: "uno due"\n');
+  it('i file V0.5 sono YAML 1.2 valido: letti senza correzioni e senza avvisi', () => {
+    const r = controllaDati(caricaDati());
+    expect(r.avvisi).toEqual([]);
+    expect(caricaDati().fileCarte).toContain('_V0.5.yaml');
+  });
+  it('segnala una carta di riserva senza id', () => {
+    const d = structuredClone(caricaDati());
+    delete (d.territori[0].riserva[0] as { id?: string }).id;
+    expect(controllaDati(d).errori.join(String.fromCharCode(10))).toContain('id mancante');
   });
 });

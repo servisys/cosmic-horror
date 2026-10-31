@@ -20,27 +20,8 @@ export function fileConVersionePiuAlta(cartella: string, prefisso: string): stri
   return join(cartella, trovati[trovati.length - 1].nome);
 }
 
-const BARRA = String.fromCharCode(92);
-
-/**
- * I file dati vanno a capo nelle stringhe tra virgolette con una barra rovesciata e una riga di continuazione indentata
- * meno del contenitore: PyYAML lo accetta, un lettore YAML 1.2 rigoroso (come questa libreria) no. Per non toccare i file,
- * il caricamento riunisce queste righe: "barra, a capo, spazi, barra, spazio" diventa uno spazio (lo stesso testo che
- * legge PyYAML). Il controllo dei dati segnala quante volte e' successo.
- */
-export function normalizzaAcapo(testo: string): { testo: string; sostituzioni: number } {
-  const re = new RegExp(BARRA + BARRA + '\\r?\\n[ \\t]*' + BARRA + BARRA + ' ', 'g');
-  let sostituzioni = 0;
-  const out = testo.replace(re, () => {
-    sostituzioni++;
-    return ' ';
-  });
-  return { testo: out, sostituzioni };
-}
-
-export function leggiYaml(file: string): { dati: any; sostituzioni: number } {
-  const n = normalizzaAcapo(readFileSync(file, 'utf-8'));
-  return { dati: parse(n.testo), sostituzioni: n.sostituzioni };
+export function leggiYaml(file: string): any {
+  return parse(readFileSync(file, 'utf-8')); // YAML 1.2 rigoroso: un file non valido lancia un errore
 }
 
 export function caricaDati(cartella: string = CARTELLA_DATI_PREDEFINITA): Dati {
@@ -48,8 +29,5 @@ export function caricaDati(cartella: string = CARTELLA_DATI_PREDEFINITA): Dati {
   const fileEventi = fileConVersionePiuAlta(cartella, 'CT_EVENTI_COSMICI_PROTOTIPO');
   const carte = leggiYaml(fileCarte);
   const eventi = leggiYaml(fileEventi);
-  return {
-    fileCarte, fileEventi, fazioni: carte.dati.fazioni, territori: carte.dati.territori, eventi: eventi.dati.eventi,
-    acapoNormalizzati: { carte: carte.sostituzioni, eventi: eventi.sostituzioni },
-  };
+  return { fileCarte, fileEventi, fazioni: carte.fazioni, territori: carte.territori, eventi: eventi.eventi };
 }

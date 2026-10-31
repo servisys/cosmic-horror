@@ -26,7 +26,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuro `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Costruzione pre-partita**; **B - Deckbuilding durante la partita**; **C - Modello ibrido**.
@@ -50,7 +50,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuro `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Vittoria esclusivamente territoriale**; **B - Territorio come fonte primaria di punti o avanzamento**; **C - Vie di vittoria multiple, tutte vincolate al territorio**; **D - Danno diretto indipendente dal territorio**.
@@ -74,7 +74,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Tracciato individuale**; **B - Alterazione dei territori**; **C - Contaminazione del mazzo**; **D - Instabilità condivisa**; **E - Costi concessi all'avversario**; **F - Sistema composito con veicolo primario e conseguenze secondarie**.
@@ -98,7 +98,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuro `CT_PROTOTYPE_SCOPE.md` e `CT_CORE_RULES.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuro `CT_PROTOTYPE_SCOPE.md` e `CT_CORE_RULES.md`.
 
 **Alternative considerate:**
 - **A - Duello 1v1 competitivo**.
@@ -123,7 +123,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e `CT_USER_FLOWS.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri `CT_CORE_RULES.md` e `CT_USER_FLOWS.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Regole ed effetti completamente trasparenti**; **B - Regole trasparenti, intenzioni nascoste**; **C - Casualità controllata e distribuzioni note**; **D - Informazione e casualità come costo acquistabile**.
@@ -147,7 +147,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri `CT_CORE_RULES.md` e documenti di Balance.
 
 **Alternative considerate:**
 - **A - Maggiore dominio, maggiore esposizione**.
@@ -196,7 +196,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri documenti Factions, `CT_CORE_RULES.md` e `CT_PROTOTYPE_SCOPE.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri documenti Factions, `CT_CORE_RULES.md` e `CT_PROTOTYPE_SCOPE.md`.
 
 **Alternative considerate:**
 - Scheda iniziale: **A - Asimmetria di contenuto**; **B - Asimmetria moderata**; **C - Asimmetria di regole completa**.
@@ -223,7 +223,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e documenti di Balance.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e documenti di Balance.
 
 **Alternative considerate:**
 - Fascia di durata: **A - breve**; **B - media**; **C - lunga**; **D - diversa per modalità**. Nell'intervista: 10-15; 20-30; 30-45; 45-60+ minuti.
@@ -247,7 +247,7 @@ source_cards: CT_VISION_DECISIONI_V0.2_SCHEDE.md
 
 **Data:** 2026-10-28 - 2026-10-29
 
-**Documento interessato:** `CT_VISION_AND_PILLARS_V0.10_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e `CT_USER_FLOWS.md`.
+**Documento interessato:** `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`; futuri `CT_CORE_RULES.md`, `CT_PROTOTYPE_SCOPE.md` e `CT_USER_FLOWS.md`.
 
 **Alternative considerate:**
 - Natura della forza cosmica: agisce solo in risposta ai giocatori; agisce autonomamente in modo prevedibile; agisce autonomamente in modo imprevedibile.

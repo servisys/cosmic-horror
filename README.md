@@ -1,9 +1,9 @@
 ---
 title: Cosmic Horror — Master Index
 status: DRAFT
-version: 0.2.1
+version: 0.3.0
 owner: Team Cosmic Horror
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-31
 repository_scope: GitHub
 implementation_target: Claude
 ---
@@ -14,14 +14,14 @@ Questo documento è il punto di ingresso della documentazione di **Cosmic Horror
 
 > **Nome del progetto:** il gioco si chiama **Cosmic Horror** (in precedenza "Cosmic Territory"). Il prefisso `CT_` dei documenti è una sigla storica, conservata per non rompere i riferimenti incrociati.
 
-> **Principio operativo:** il Team Cosmic Horror definisce e approva visione, requisiti, vincoli e criteri di accettazione. Copilot supporta planning, consolidamento e verifica. Claude revisiona e implementa soltanto specifiche approvate.
+> **Principio operativo:** il Team Cosmic Horror definisce e approva visione, requisiti, vincoli e criteri di accettazione. Cowork supporta planning, consolidamento e verifica. Claude Code revisiona e implementa soltanto specifiche approvate.
 
 ## 1. Istruzioni iniziali per Claude
 
 Prima di qualsiasi review o implementazione:
 
 1. leggere questo Master Index;
-2. leggere `CT_COPILOT_CLAUDE_PROTOCOL.md`;
+2. leggere `CT_COWORK_CODE_PROTOCOL_V0.1.md`;
 3. identificare i documenti autorevoli elencati nel task;
 4. verificarne lo stato;
 5. ignorare come requisiti i documenti `IDEA`, `DRAFT`, `REVIEW` e il materiale in `reference/`, salvo istruzioni esplicite di sola analisi;
@@ -58,7 +58,8 @@ Una divergenza deve essere risolta esplicitamente, non nascosta adattando uno de
 
 ### Governance
 
-- [`CT_COPILOT_CLAUDE_PROTOCOL.md`](CT_COPILOT_CLAUDE_PROTOCOL.md) — protocollo operativo tra team, Copilot e Claude.
+- [`CT_COWORK_CODE_PROTOCOL_V0.1.md`](CT_COWORK_CODE_PROTOCOL_V0.1.md) — protocollo operativo tra Matteo, Cowork e Claude Code.
+- [`CT_COPILOT_CLAUDE_PROTOCOL.md`](CT_COPILOT_CLAUDE_PROTOCOL.md) — `DEPRECATED`: vecchio protocollo con Copilot, non più usato.
 
 ### 00 — Project Overview
 
@@ -289,3 +290,4 @@ Claude deve produrre prima un pre-flight plan e, al termine, un Implementation R
 | 0.1.0 | DRAFT | Prima struttura per SharePoint. |
 | 0.2.0 | DRAFT | Adattamento a repository GitHub unico con link relativi e separazione `docs/`, `reference/`, `game/`, `tools/`, `tests/`. |
 | 0.2.1 | DRAFT | Progetto rinominato in Cosmic Horror; il prefisso `CT_` dei documenti resta invariato. |
+| 0.3.0 | DRAFT | Preparata da Cowork. Copilot sostituito da Cowork nel principio operativo; protocollo di riferimento ora `CT_COWORK_CODE_PROTOCOL_V0.1.md`; vecchio protocollo Copilot-Claude segnato `DEPRECATED`. Nessun'altra modifica. |

@@ -5,6 +5,7 @@ import { carta } from '../motore/catalogo.js';
 import type { Vista, VistaPresenza } from '../motore/vista.js';
 import type { Controller } from './controller.js';
 import { idImmagine, texturaDi } from './immagini.js';
+import { motivoCartaNonGiocabile, motivoTappa, passiTutorial, suggerimento } from './suggerimento.js';
 
 export interface Area {
   x: number;
@@ -26,6 +27,12 @@ export interface UiStato {
   regole: boolean;
   ordine: number[];
   copiato: string;
+  /** La riga di suggerimento e' nascosta (un tocco la mostra/nasconde). */
+  suggerimentoNascosto: boolean;
+  /** Tutorial in corso: indice del passo. */
+  tutorial: { passo: number } | null;
+  /** Messaggio breve (per esempio perche' una carta non si puo' giocare). */
+  toast: string;
 }
 
 export interface Azioni {
@@ -37,6 +44,9 @@ export interface Azioni {
   nuova(): void;
   regole(aperte: boolean): void;
   chiudiEvento(): void;
+  suggerimento(): void;
+  tutorial(azione: 'avanti' | 'salta'): void;
+  motivo(uid: number): void;
   ordine(uid: number | 'tieni' | 'azzera'): void;
 }
 
@@ -178,8 +188,26 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   d.testo(`Prossimo evento: ${NOME_TIPO_EVENTO[v.prossimoEvento] ?? v.prossimoEvento}`, W - m - 12 * u, m + 21 * u, 12, COL.oro, { anchorX: 1 });
   if (v.eventiVisti.length) d.testo(`Diario: ${v.eventiVisti.join(', ')}`, W - m - 12 * u, m + 36 * u, 10, COL.tenue, { anchorX: 1 });
 
-  // ---------- segnale di vittoria ----------
+  // ---------- riga di suggerimento ----------
   let yMid = hTop + m;
+  {
+    const sug = c.tuoTurno && !c.decisione && !c.finita ? suggerimento(v) : null;
+    const nascosta = ui.suggerimentoNascosto && !ui.toast;
+    const hS = (nascosta ? 13 : 21) * u;
+    const testoS = ui.toast || (sug ? sug.testo : c.finita ? '' : c.tuoTurno ? '' : 'Turno di Lui: aspetta, poi tocca a te.');
+    const urgente = !ui.toast && sug?.tipo === 'avversario-un-passo';
+    d.rett(m, yMid, W - 2 * m, hS, ui.toast ? 0x3a2a14 : urgente ? 0x4a1f1a : 0x14283a, {
+      stroke: ui.toast ? COL.oro : urgente ? COL.pericolo : 0x3f78b5, id: 'suggerimento', tap: () => az.suggerimento(),
+    });
+    if (nascosta) d.testo('Consiglio nascosto: tocca per mostrarlo', W / 2, yMid + 1 * u, 9.5, COL.tenue, { anchorX: 0.5 });
+    else if (testoS) {
+      d.testo(ui.toast ? '!' : 'Consiglio:', m + 6 * u, yMid + 4 * u, 10.5, COL.oro, { bold: true });
+      d.adatta(testoS, m + (ui.toast ? 18 : 62) * u, yMid + 2 * u, W - 2 * m - (ui.toast ? 26 : 70) * u, hS - 3 * u, 12, 8, 0xffffff, false, 'left');
+    }
+    yMid += hS + 3 * u;
+  }
+
+  // ---------- segnale di vittoria ----------
   if (v.segnaleMio || v.segnaleAvv) {
     const mio = v.segnaleMio;
     const txt = mio ? 'SEGNALE: sei a una sola tappa dalla vittoria. L\'avversario ha il suo turno di avviso.' : `SEGNALE: ${NOME_FAZ[v.fazioneAvv]} sono a una sola tappa dalla vittoria! Hai un turno per fermarli.`;
@@ -225,7 +253,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     d.testo(ctl, px + pw, y, 11, t.controllo === null ? COL.tenue : mioCtl ? COL.valido : COL.pericolo, { anchorX: 1, bold: true });
     y += 17 * u;
     // presenze avversarie
-    const hP = Math.min(40 * u, (hMid - 100 * u) / 2);
+    const hP = Math.max(24 * u, Math.min(40 * u, (hMid - 108 * u) / 2));
     const presenze = (lista: VistaPresenza[], yy: number, mie: boolean) => {
       const n = 4;
       const gap = 3 * u;
@@ -247,24 +275,39 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     };
     presenze(t.loro, y, false);
     y += hP + 3 * u;
-    // forze
-    const hF = 24 * u;
+    // forze e tappe: Lui a sinistra, Tu a destra; la tappa e' piena se al sicuro (consolidata), vuota se si puo' ancora togliere
+    const hF = 30 * u;
     d.rett(px, y, pw, hF, 0x0f131b, { stroke: 0x2c3444, r: 4 * u });
-    d.testo(`Lui ${t.forzaLoro}`, px + 8 * u, y + 3 * u, 16, cAvv.chiaro, { bold: true });
-    d.testo(`Tu ${t.forzaMia}`, px + pw - 8 * u, y + 3 * u, 16, colori(v.fazione === 'custodi' ? 'CU' : 'RI').chiaro, { bold: true, anchorX: 1 });
-    // tappe
+    d.testo(`Lui ${t.forzaLoro}`, px + 6 * u, y + 7 * u, 14, cAvv.chiaro, { bold: true });
+    d.testo(`Tu ${t.forzaMia}`, px + pw - 6 * u, y + 7 * u, 14, colori(v.fazione === 'custodi' ? 'CU' : 'RI').chiaro, { bold: true, anchorX: 1 });
     const sigillo = v.fazione === 'custodi' ? 'Sigillo' : 'Rito';
     const sigilloAvv = v.fazioneAvv === 'custodi' ? 'Sigillo' : 'Rito';
-    const cx = px + pw / 2;
-    d.testo(`${t.loroTappa ? '★' : '☆'}${t.loroTappa ? (t.loroTappaTogliibile ? ' ' + sigilloAvv + ' (togliibile)' : ' ' + sigilloAvv) : ''}`, cx - 4 * u, y + 5 * u, 10, t.loroTappa ? COL.pericolo : 0x59627a, { anchorX: 1 });
-    d.testo(`${t.mioTappa ? '★ ' + sigillo : '☆'}`, cx + 4 * u, y + 5 * u, 10, t.mioTappa ? COL.valido : 0x59627a);
+    const colW = (pw - 96 * u) / 2;
+    const tappaBox = (x0: number, ha: boolean, togl: boolean, nome: string, col: number, sicuro: string): void => {
+      const ic = new Graphics();
+      const cx0 = x0 + 6 * u;
+      const cy0 = y + 9 * u;
+      if (!ha) ic.circle(cx0, cy0, 4 * u).stroke({ width: 1, color: 0x59627a });
+      else if (togl) ic.circle(cx0, cy0, 4.5 * u).stroke({ width: 2, color: col });
+      else ic.circle(cx0, cy0, 4.5 * u).fill(col).stroke({ width: 1, color: 0xffffff });
+      s.addChild(ic);
+      if (!ha) { d.testo('nessuna tappa', x0 + 14 * u, y + 4 * u, 8.5, 0x59627a); return; }
+      d.testo(nome, x0 + 14 * u, y + 2 * u, 10, col, { bold: true });
+      d.adatta(togl ? sicuro : 'al sicuro', x0 + 3 * u, y + 15 * u, colW - 4 * u, 12 * u, 8.5, 7, togl ? COL.oro : COL.tenue, false, 'left');
+    };
+    tappaBox(px + 46 * u, t.loroTappa, t.loroTappaTogliibile, `${sigilloAvv} di Lui`, COL.pericolo, 'al sicuro dopo il tuo turno');
+    tappaBox(px + 46 * u + colW + 4 * u, t.mioTappa, t.mioTappaTogliibile, `${sigillo} tuo`, COL.valido, 'al sicuro dopo il turno di Lui');
     y += hF + 3 * u;
     presenze(t.mie, y, true);
     y += hP + 3 * u;
-    // pulsante tappa
+    // pulsante tappa: pieno e illuminato quando si puo' usare; spento, con il motivo in piccolo, quando no
     const puo = c.puoTappa(i);
     if (y + 20 * u <= yMid + hMid) {
-      d.bottone(`btn:tappa:${i}`, `${v.fazione === 'custodi' ? 'Poni Sigillo' : 'Completa rito'} (${t.costoTappa})`, px, y, pw, Math.min(22 * u, yMid + hMid - y - 3 * u), puo, () => { c.tappa(i); az.rerender(); }, 0x2f5a3a, 11);
+      const nomeBtn = v.fazione === 'custodi' ? 'Poni Sigillo' : 'Completa rito';
+      const hb = Math.min(24 * u, yMid + hMid - y - 3 * u);
+      if (puo) d.rett(px - 2 * u, y - 2 * u, pw + 4 * u, hb + 4 * u, 0x6ee7a1, { alpha: 0.28, r: 7 * u });
+      const motivo = puo ? null : motivoTappa(v, t);
+      d.bottone(`btn:tappa:${i}`, puo ? `${nomeBtn} (${t.costoTappa})` : motivo ? `${nomeBtn}: ${motivo}` : nomeBtn, px, y, pw, hb, puo, () => { c.tappa(i); az.rerender(); }, 0x2a9d55, puo ? 12 : 9.5);
     }
   });
 
@@ -287,7 +330,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     const y = yBot + 18 * u - (scelta ? 8 * u : 0);
     d.rett(x, y, cw, chH, giocabile ? col.scuro : 0x15181f, {
       stroke: scelta ? COL.selezione : giocabile ? col.chiaro : 0x2c3444, sw: scelta ? 3.5 : 1.5, id: `mano:${cd.uid}`,
-      tap: () => { c.scegliCarta(cd.uid); az.rerender(); },
+      tap: () => { if (scelta || giocabile) { c.scegliCarta(cd.uid); az.rerender(); } else az.motivo(cd.uid); },
       over: () => az.zoom({ id: cd.id, trasformata: cd.trasformata }), out: () => az.zoom(null),
     });
     // illustrazione, poi nome, poi tipo e forza
@@ -312,11 +355,14 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     d.s.addChild(lente);
   });
 
+  d.aree['mano:tutta'] = { x: m, y: yBot, w: W - 2 * m - wCtl - 2 * m, h: hBottom - m };
+  d.aree['territori:tutti'] = { x: m, y: yMid, w: W - 2 * m, h: hMid };
   // pannello di controllo a destra
   const cxp = W - m - wCtl - m;
   d.testo(`Energia ${v.energia}`, cxp + 6 * u, yBot + 3 * u, 18, COL.oro, { bold: true });
   d.testo(`Esposizione ${v.esposizione}/10`, cxp + 6 * u, yBot + 26 * u, 12, v.esposizione >= 6 ? COL.pericolo : COL.testo, { bold: true });
   d.testo(`Tappe ${v.tappe}/3   Mazzo ${v.nMazzo}`, cxp + 6 * u, yBot + 43 * u, 12, COL.testo);
+  d.aree['pannello:energia'] = { x: cxp, y: yBot, w: wCtl, h: 58 * u };
   const bw = wCtl - 8 * u;
   const bh = Math.min(26 * u, (hBottom - 2 * m - 62 * u) / 3 - 3 * u);
   let by = yBot + 60 * u;
@@ -344,6 +390,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   if (c.evento) eventoCosmico(d, c, W, H, az);
   if (ui.regole) pannelloRegole(d, W, H, az);
   if (c.finita) fineAPartita(d, c, W, H, az);
+  if (ui.tutorial && !c.finita) tutorialSovrapposto(d, passiTutorial(v.fazione)[ui.tutorial.passo], ui.tutorial.passo, W, H, az);
   fuori = s.children
     .filter((x): x is Text => x instanceof Text)
     .filter((x) => {
@@ -547,4 +594,37 @@ function fineAPartita(d: Disegno, c: Controller, W: number, H: number, az: Azion
   d.testo(`${vinc} · ${s.giro} giri · seme ${s.seme}`, r.x + w / 2, r.y + 52 * u, 13, COL.testo, { anchorX: 0.5 });
   d.bottone('fine:copia', 'Copia il registro della partita', r.x + 14 * u, r.y + h - 78 * u, w - 28 * u, 28 * u, true, () => az.copia(), 0x2d3b55, 13);
   d.bottone('fine:nuova', 'Nuova partita', r.x + 14 * u, r.y + h - 44 * u, w - 28 * u, 28 * u, true, () => az.nuova(), 0x2f5a3a, 13);
+}
+
+/** Fumetto del tutorial: il campo resta visibile dietro, la zona indicata e' evidenziata da una cornice. */
+function tutorialSovrapposto(d: Disegno, passo: ReturnType<typeof passiTutorial>[number], indice: number, W: number, H: number, az: Azioni): void {
+  const u = d.u;
+  const a = passo.area ? d.aree[passo.area] : undefined;
+  const velo = (x: number, y: number, w: number, h: number): void => {
+    if (w > 0 && h > 0) d.rett(x, y, w, h, 0x000000, { r: 0, alpha: 0.6, tap: () => undefined });
+  };
+  if (a) {
+    velo(0, 0, W, a.y);
+    velo(0, a.y + a.h, W, H - a.y - a.h);
+    velo(0, a.y, a.x, a.h);
+    velo(a.x + a.w, a.y, W - a.x - a.w, a.h);
+    d.rett(a.x - 2 * u, a.y - 2 * u, a.w + 4 * u, a.h + 4 * u, 0xffffff, { alpha: 0, stroke: COL.oro, sw: 3, r: 6 * u });
+  } else velo(0, 0, W, H);
+  const bw = Math.min(380 * u, W - 20 * u);
+  const hT = misura(d, passo.testo, 12.5, bw - 20 * u);
+  const bh = 40 * u + hT + 34 * u;
+  let bx = (W - bw) / 2;
+  let by = (H - bh) / 2;
+  if (a) {
+    bx = Math.max(10 * u, Math.min(W - bw - 10 * u, a.x + a.w / 2 - bw / 2));
+    const sotto = a.y + a.h + 10 * u;
+    const sopra = a.y - bh - 10 * u;
+    by = sotto + bh <= H - 4 * u ? sotto : sopra >= 4 * u ? sopra : Math.max(4 * u, H - bh - 4 * u);
+  }
+  d.rett(bx, by, bw, bh, 0x161b26, { stroke: COL.oro, sw: 2.5, tap: () => undefined });
+  d.testo(`${indice + 1}/6  ${passo.titolo}`, bx + 10 * u, by + 8 * u, 14, COL.oro, { bold: true });
+  d.testo(passo.testo, bx + 10 * u, by + 30 * u, 12.5, 0xffffff, { w: bw - 20 * u });
+  const ultimo = indice === 5;
+  d.bottone('tut:avanti', ultimo ? 'Fine' : 'Avanti', bx + bw - 100 * u, by + bh - 30 * u, 90 * u, 24 * u, true, () => az.tutorial('avanti'), 0x2a9d55, 12);
+  if (!ultimo) d.bottone('tut:salta', 'Salta', bx + bw - 196 * u, by + bh - 30 * u, 90 * u, 24 * u, true, () => az.tutorial('salta'), 0x2d3b55, 12);
 }

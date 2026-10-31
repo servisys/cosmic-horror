@@ -5,6 +5,8 @@ import { sceglieMossa } from '../computer/computer.js';
 import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
 import { caricaImmagini, numeroTexture } from './immagini.js';
+import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
+import { motivoCartaNonGiocabile, suggerimento } from './suggerimento.js';
 import { disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
@@ -12,7 +14,11 @@ const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del c
 const PAUSA_EVENTO = Number(parametri.get('pausaEvento') ?? 4500); // l'evento si chiude da solo dopo questo tempo
 
 const ctrl = new Controller(datiDelBuild());
-const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '' };
+const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '' };
+// Tutorial: parte alla prima partita (o se richiesto dal bottone «Come si gioca»), al primo turno del giocatore
+let tutorialPendente = false;
+let tutorialRichiesto = false;
+let timerToast: number | undefined;
 let app: Application;
 let aree: Record<string, Area> = {};
 let ridisegnoInCoda = false;
@@ -36,6 +42,10 @@ function ridisegna(): void {
   ridisegnoInCoda = true;
   setTimeout(() => {
     ridisegnoInCoda = false;
+    if (tutorialPendente && !ui.tutorial && ctrl.tuoTurno && !ctrl.decisione && !ctrl.evento && !ctrl.finita) {
+      tutorialPendente = false;
+      ui.tutorial = { passo: 0 };
+    }
     aree = disegnaScena(app, ctrl, ui, azioni);
     void avviaCicloSeServe();
     setTimeout(controllaIngrandimento, 40);
@@ -50,7 +60,7 @@ async function avviaCicloSeServe(): Promise<void> {
   try {
     while (ctrl.tocca_al_computer) {
       // se c'e' un evento cosmico da leggere, il gioco aspetta (si chiude toccando o dopo qualche secondo)
-      while (ctrl.evento) await dormi(60);
+      while (ctrl.evento || ui.tutorial) await dormi(60);
       await dormi(PAUSA);
       if (!ctrl.tocca_al_computer) break;
       ctrl.passoComputer();
@@ -107,6 +117,28 @@ const azioni: Azioni = {
     ui.regole = aperte;
     ridisegna();
   },
+  suggerimento() {
+    ui.suggerimentoNascosto = !ui.suggerimentoNascosto;
+    ui.toast = '';
+    ridisegna();
+  },
+  tutorial(azione) {
+    if (!ui.tutorial) return;
+    if (azione === 'avanti' && ui.tutorial.passo < 5) ui.tutorial = { passo: ui.tutorial.passo + 1 };
+    else {
+      ui.tutorial = null;
+      segnaTutorialVisto();
+    }
+    ridisegna();
+  },
+  motivo(uid) {
+    const carta = ctrl.vista().mano.find((x) => x.uid === uid);
+    if (!carta) return;
+    ui.toast = motivoCartaNonGiocabile(ctrl.vista(), carta);
+    clearTimeout(timerToast);
+    timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3500);
+    ridisegna();
+  },
   chiudiEvento() {
     clearTimeout(timerEvento);
     ctrl.chiudiEvento();
@@ -142,6 +174,9 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.regole = false;
   ui.grande = null;
   ui.ordine = [];
+  ui.toast = '';
+  ui.tutorial = null;
+  tutorialPendente = parametri.get('tutorial') === '0' ? false : tutorialRichiesto || parametri.get('tutorial') === '1' || !tutorialVisto();
   ctrl.nuova(fazione, seme);
   ridisegna();
 }
@@ -161,6 +196,13 @@ async function avvia(): Promise<void> {
     ultimoPuntatore = { x: e.offsetX, y: e.offsetY };
     if (ui.zoom || ui.zoomTerr !== null) setTimeout(controllaIngrandimento, 40);
   });
+  const bottoneTutorial = document.getElementById('come-si-gioca') as HTMLButtonElement | null;
+  bottoneTutorial?.addEventListener('click', () => {
+    tutorialRichiesto = !tutorialRichiesto;
+    bottoneTutorial.classList.toggle('attivo', tutorialRichiesto);
+    const nota = document.getElementById('nota-tutorial');
+    if (nota) nota.textContent = tutorialRichiesto ? 'Scegli la fazione: la partita parte con la spiegazione passo per passo.' : '';
+  });
   document.querySelectorAll<HTMLButtonElement>('#inizio button[data-fazione]').forEach((b) =>
     b.addEventListener('click', () => {
       const raw = (document.getElementById('seme') as HTMLInputElement).value.trim();
@@ -176,6 +218,9 @@ async function avvia(): Promise<void> {
     fuori: () => testiFuoriSchermo(),
     zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,
     immagini: () => numeroTexture(),
+    suggerimento: () => suggerimento(ctrl.vista()),
+    tutorialAttivo: () => ui.tutorial?.passo ?? -1,
+    toast: () => ui.toast,
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)

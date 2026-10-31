@@ -1,10 +1,11 @@
 ---
 title: Cosmic Horror - Vision & Design Pillars
 status: DRAFT
-version: 0.8.0
+version: 0.9.0
 owner: Team Cosmic Horror
 prepared_by: Cowork
 last_reviewed: 2026-10-31
+supersedes: CT_VISION_AND_PILLARS.md (version 0.1.0, «Cosmic Territory»)
 implementation_target: Planning only - non implementabile da Claude in questa versione
 project_prefix: CT_
 related_documents:
@@ -24,7 +25,7 @@ related_documents:
 
 # Cosmic Horror - Vision & Design Pillars
 
-> **Stato delle decisioni (31 ottobre 2026).** `CT-DES-014` (percorso web, Godot abbandonato) è **REGISTRATA** nel Decision Log. `CT-DES-011`, `012` e `013` sono presenti nel Decision Log con `Stato: PROPOSTA`. Le formulazioni `CT-DES-001` - `CT-DES-010` di questo documento restano **proposte**, con ID provvisori fino alla registrazione. Nessuna proposta è approvata e nessuna autorizza implementazione.
+> **Stato delle decisioni (31 ottobre 2026).** `CT-DES-014` (percorso web, Godot abbandonato) è **REGISTRATA** nel Decision Log. `CT-DES-011`, `012` e `013` sono presenti nel Decision Log con `Stato: PROPOSTA`. Anche `CT-DES-001` - `CT-DES-010` sono presenti nel Decision Log con `Stato: PROPOSTA`: in questo documento compaiono come «proposte di Matteo, in attesa di registrazione». Nessuna proposta è approvata e nessuna autorizza implementazione.
 
 ## 1. Funzione del documento
 
@@ -57,7 +58,7 @@ La presente versione è una **bozza di planning**. Tutte le formulazioni sono so
 
 - `PROPOSTA` indica una direzione consigliata ma non ancora approvata.
 - `DA DECIDERE` indica una scelta riservata al Team Cosmic Horror.
-- Le proposte emerse sono visibili direttamente nelle sezioni interessate e associate a ID provvisori `CT-DES-###`.
+- Le proposte emerse sono visibili direttamente nelle sezioni interessate e associate agli ID `CT-DES-###` usati nel Decision Log.
 - Il Decision Log conserva motivazione e storico. Sintassi, campi e processo di registrazione sono definiti in `CT_DECISION_LOG_REGOLE_V0.2.md`: una voce è registrata solo quando ha `Stato: REGISTRATA` e il documento viene fuso in `main`.
 - Fino alla registrazione, nessuna proposta deve essere interpretata come decisione approvata o requisito implementabile.
 
@@ -587,6 +588,7 @@ L'ordine può essere modificato soltanto registrando la decisione nel changelog 
 | 0.6.0 | DRAFT | Risolta la contraddizione sostanziale sulla vittoria tramite il chiarimento di Matteo; integrate nelle sezioni interessate le proposte mancanti su comunicazione del rischio, impatto degli eventi cosmici, nucleo comune delle fazioni e decisione della terza fazione dopo i playtest. Nessuna proposta registrata o approvata. |
 | 0.7.0 | DRAFT | Integrate nel testo la comunicazione del rischio in CT-DES-005; la pressione graduale, l’impatto basato sull’esposizione e i bersagli del prototipo in CT-DES-010; il nucleo comune, le meccaniche esclusive, l’apprendimento progressivo e la decisione dell’eventuale terza fazione dopo i primi playtest in CT-DES-008. Allineato il §5.2 ai contenuti effettivi di CT-DES-005 e CT-DES-010. Aggiunta la nota aperta sulla finestra di intervento prima del completamento. Nessuna proposta registrata o approvata. |
 | 0.8.0 | DRAFT | Preparata da Cowork a partire dalla V0.7. Allineata allo stato di `main`: `CT-DES-014` registrata (web, Godot abbandonato); `CT-DES-011`, `012`, `013` citate come proposte; riferimento alle Regole del Decision Log V0.2. Aggiornati §2, §5.1, §11, §13, §17 e il riquadro iniziale. Il resto del testo è invariato. Nessuna proposta registrata o approvata oltre a `CT-DES-014`. |
+| 0.9.0 | DRAFT | Preparata da Cowork. Solo due frasi: `CT-DES-001` - `CT-DES-010` non sono più chiamati «ID provvisori», perché sono nel Decision Log con `Stato: PROPOSTA` (riquadro iniziale e §2). Aggiunto `supersedes` verso la Vision v0.1 «Cosmic Territory», da marcare `DEPRECATED`. Nessun testo di decisione cambiato. |
 
 ---
 

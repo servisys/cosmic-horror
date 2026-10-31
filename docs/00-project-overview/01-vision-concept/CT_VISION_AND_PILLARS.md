@@ -1,7 +1,7 @@
 ---
 title: Cosmic Territory — Vision & Design Pillars
 status: DEPRECATED
-superseded_by: CT_VISION_AND_PILLARS_V0.10_BOZZA.md
+superseded_by: CT_VISION_AND_PILLARS_V0.11_BOZZA.md
 version: 0.1.0
 owner: Team Cosmic Territory
 last_reviewed: 2026-10-28
@@ -12,7 +12,7 @@ related_documents:
 
 # Cosmic Territory — Vision & Design Pillars
 
-> **DEPRECATED.** Questa è la prima bozza (v0.1.0), con il vecchio nome Cosmic Territory. È superata da CT_VISION_AND_PILLARS_V0.10_BOZZA.md. Resta solo come storia.
+> **DEPRECATED.** Questa è la prima bozza (v0.1.0), con il vecchio nome Cosmic Territory. È superata da CT_VISION_AND_PILLARS_V0.11_BOZZA.md. Resta solo come storia.
 
 ## 1. Funzione del documento
 

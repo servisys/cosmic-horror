@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror - Vision & Design Pillars
 status: DRAFT
-version: 0.10.0
+version: 0.11.0
 owner: Team Cosmic Horror
 prepared_by: Cowork
 last_reviewed: 2026-10-31
@@ -21,12 +21,13 @@ related_documents:
   - ../03-decisions-changelog/CT_DECISION_LOG_REGOLE_V0.2.md
   - ../03-decisions-changelog/CT_DECISION_LOG_VOCI_COMPLETE_V0.4.md
   - ../03-decisions-changelog/CT_DECISION_LOG_VOCI_PROPOSTE_V0.8.md
+  - ../03-decisions-changelog/CT_DECISION_LOG_CT_DES_015_016_V0.1.md
   - ../03-decisions-changelog/CT_DECISION_LOG_CT_DES_014_REGISTRATA_V0.13.md
 ---
 
 # Cosmic Horror - Vision & Design Pillars
 
-> **Stato delle decisioni (31 ottobre 2026).** Tutte le decisioni `CT-DES-001` - `CT-DES-014` sono **REGISTRATE** nel Decision Log: `CT-DES-014` dal 30 ottobre, le altre su conferma di Matteo del 31 ottobre. Le parti indicate come **DA DECIDERE** restano aperte e non autorizzano implementazione.
+> **Stato delle decisioni (31 ottobre 2026).** Tutte le decisioni `CT-DES-001` - `CT-DES-016` sono **REGISTRATE** nel Decision Log: `CT-DES-014` dal 30 ottobre, le altre su conferma o scelta di Matteo del 31 ottobre. Le parti indicate come **DA DECIDERE** restano aperte e non autorizzano implementazione.
 
 ## 1. Funzione del documento
 
@@ -465,7 +466,7 @@ Il prototipo dovrebbe includere:
 - almeno 2 territori e condizioni di vittoria territoriali implementate;
 - interfaccia funzionale, non definitiva;
 - log degli eventi utile a debugging e playtest;
-- formato di esecuzione secondo `CT-DES-011` (REGISTRATA): una persona contro un avversario controllato dal gioco, con forza cosmica automatica fin dall'inizio; il comportamento minimo dell'avversario è **DA DECIDERE**.
+- formato di esecuzione secondo `CT-DES-011` (REGISTRATA): una persona contro un avversario controllato dal gioco, con forza cosmica automatica fin dall'inizio; il comportamento dell'avversario segue `CT-DES-016` (REGISTRATA): regole fisse e semplici con priorità diverse per ogni fazione, stesse regole d'informazione del giocatore, nessun barare; le priorità concrete sono **DA DEFINIRE** nelle Core Rules.
 
 Non dovrebbe includere, salvo decisione esplicita:
 
@@ -551,8 +552,8 @@ Prima di portare il documento in `REVIEW`, il Team Cosmic Horror deve decidere o
 - [x] percorso tecnologico: web, Godot abbandonato (`CT-DES-014`, REGISTRATA);
 - [x] piattaforme iniziali (`CT-DES-012`) e digital-first (`CT-DES-013`), REGISTRATE;
 - [x] formato del primo prototipo (`CT-DES-011`, REGISTRATA);
-- [ ] comportamento minimo dell'avversario controllato dal gioco;
-- [ ] finestra di intervento prima del completamento dell'obiettivo di vittoria;
+- [x] comportamento dell'avversario controllato dal gioco (`CT-DES-016`, REGISTRATA);
+- [x] finestra di intervento prima del completamento dell'obiettivo di vittoria (`CT-DES-015`, REGISTRATA);
 - [ ] modello economico da approfondire;
 - [ ] grado di utilizzo degli elementi lovecraftiani nominativi;
 - [ ] confine tra canone originale e riferimenti letterari;
@@ -592,9 +593,10 @@ L'ordine può essere modificato soltanto registrando la decisione nel changelog 
 | 0.8.0 | DRAFT | Preparata da Cowork a partire dalla V0.7. Allineata allo stato di `main`: `CT-DES-014` registrata (web, Godot abbandonato); `CT-DES-011`, `012`, `013` citate come proposte; riferimento alle Regole del Decision Log V0.2. Aggiornati §2, §5.1, §11, §13, §17 e il riquadro iniziale. Il resto del testo è invariato. Nessuna proposta registrata o approvata oltre a `CT-DES-014`. |
 | 0.9.0 | DRAFT | Preparata da Cowork. Solo due frasi: `CT-DES-001` - `CT-DES-010` non sono più chiamati «ID provvisori», perché sono nel Decision Log con `Stato: PROPOSTA` (riquadro iniziale e §2). Aggiunto `supersedes` verso la Vision v0.1 «Cosmic Territory», da marcare `DEPRECATED`. Nessun testo di decisione cambiato. |
 | 0.10.0 | DRAFT | Preparata da Cowork. Le decisioni CT-DES-001…013 sono registrate (conferma di Matteo del 2026-10-31): i riquadri «PROPOSTA DI MATTEO, IN ATTESA DI REGISTRAZIONE» diventano «DECISIONE DI MATTEO, REGISTRATA»; aggiornati riquadro iniziale, §5.1, §11, §13 e §17; riferimenti al nuovo protocollo Cowork e Code e alle Voci V0.4 e V0.8. Testi delle decisioni invariati; le parti DA DECIDERE restano aperte. |
+| 0.11.0 | DRAFT | Preparata da Cowork. Integrate le nuove decisioni registrate `CT-DES-015` (turno di avviso garantito prima della vittoria) e `CT-DES-016` (avversario del prototipo con regole fisse per fazione, senza barare): riquadro iniziale, §13, §17, nota sulla vittoria, front matter. |
 
 ---
 
 ## Nota aperta sulla vittoria
 
-Il chiarimento sulla vittoria introduce una **finestra di intervento prima del completamento** dell’obiettivo. La finestra non è ancora definita: durata, condizioni di apertura, azioni consentite e modalità di segnalazione restano **DA DECIDERE**. Dopo il completamento dell’obiettivo, la proposta prevede vittoria immediata senza ulteriori risposte.
+Il chiarimento sulla vittoria introduce una **finestra di intervento prima del completamento** dell’obiettivo. **DECISIONE DI MATTEO (CT-DES-015, REGISTRATA):** quando un giocatore è a un passo dall'obiettivo, il gioco mostra un segnale chiaro e l'avversario ha sempre almeno un proprio turno completo per reagire. Dopo il completamento dell’obiettivo la vittoria è immediata, senza ulteriori risposte. La soglia «a un passo», la forma del segnale e le azioni di reazione restano **DA DEFINIRE** nelle Core Rules.

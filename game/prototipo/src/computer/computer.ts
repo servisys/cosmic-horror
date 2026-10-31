@@ -108,7 +108,7 @@ function candidatiCustodi(v: Vista): Cand[] {
   return out;
 }
 
-// ---------- Risvegliati (CT-DES-065, 066): 1 Custodi a un passo -> 2 rito -> 3 presenze dove la forza non basta -> 4 carte potenti -> 5 instabilita' dove ha presenze ----------
+// ---------- Risvegliati (CT-DES-065, 067): 1 Custodi a un passo -> 2 rito -> 3 presenze dove la forza non basta -> 4 carte potenti -> 5 instabilita' dove ha presenze ----------
 function candidatiRisvegliati(v: Vista): Cand[] {
   const out: Cand[] = [];
   const g = giocate(v);
@@ -138,12 +138,13 @@ function candidatiRisvegliati(v: Vista): Cand[] {
       out.push({ m, punti: 690 });
     }
   }
-  // 3 - (CT-DES-066) presenze su un territorio senza rito dove la sua forza e' minore o uguale a quella dell'avversario;
-  //     tra piu' territori sceglie quello con l'instabilita' piu' alta, e li' la presenza piu' forte
+  // 3 - (CT-DES-067) presenze su un territorio senza rito dove la sua forza e' minore o uguale a quella dell'avversario
+  //     e dove l'instabilita' e' almeno 2 oppure ha gia' una presenza; tra piu' territori sceglie quello con l'instabilita' piu' alta,
+  //     e li' la presenza piu' forte
   for (const { m, c } of g) {
     if (c.tipo === 'presenza' && m.terr !== undefined) {
       const t = territorio(v, m.terr);
-      if (!t.mioTappa && t.forzaMia <= t.forzaLoro) out.push({ m, punti: 650 + t.inst * 5 + c.forza });
+      if (!t.mioTappa && t.forzaMia <= t.forzaLoro && (t.inst >= 2 || t.mie.length > 0)) out.push({ m, punti: 650 + t.inst * 5 + c.forza });
     }
   }
   // 4 - gioca le carte potenti quando ha l'energia

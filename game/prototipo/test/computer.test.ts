@@ -169,24 +169,33 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
     expect(m.t === 'gioca' && m.terr).toBe(2);
     expect(idCarta(v, m)).toBe('CU04'); // la presenza piu' forte
   });
-  it('Risvegliati 3 (CT-DES-066): dal primo turno gioca presenze dove la sua forza e minore o uguale, anche con instabilita bassa', () => {
+  it('Risvegliati 3 (CT-DES-067): contende dove l instabilita e almeno 2, anche senza una propria presenza', () => {
     const g = partita('risvegliati');
     presenza(g, 1, 1, 'CU03'); // 4 contro 0
-    inst(g, 1, 1); // instabilita' bassa: la vecchia soglia 3 l'avrebbe escluso
+    inst(g, 1, 2);
     mano(g, 0, 'RI01', 'RI04');
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
     expect(m.t === 'gioca' && m.terr).toBe(1);
     expect(idCarta(v, m)).toBe('RI04'); // la presenza piu' forte
   });
+  it('Risvegliati 3: dove ha gia una presenza contende anche con instabilita bassa', () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, 2, 'RI09'); // forza 0 (conta come presenza)
+    presenza(g, 1, 2, 'CU03'); // 4 contro 0, instabilita' 0
+    presenza(g, 1, 0, 'CU03'); // altro territorio svantaggioso ma senza presenza propria e instabilita' 0
+    mano(g, 0, 'RI04');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(2);
+  });
   it('Risvegliati 3: tra piu territori sceglie quello con l instabilita piu alta', () => {
     const g = partita('risvegliati');
     presenza(g, 1, 0, 'CU03');
     presenza(g, 1, 1, 'CU03');
     presenza(g, 1, 2, 'CU03');
-    inst(g, 0, 1);
-    inst(g, 1, 2);
-    inst(g, 2, 0);
+    inst(g, 0, 2);
+    inst(g, 1, 3);
+    inst(g, 2, 2);
     mano(g, 0, 'RI04');
     const m = sceglieMossa(creaVista(g, 0), cat);
     expect(m.t === 'gioca' && m.terr).toBe(1);
@@ -197,6 +206,7 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
     presenza(g, 1, 2, 'CU03');
     g.s.giocatori[0].tappe[2] = 0; // rito gia' fatto alla Landa
     presenza(g, 1, 0, 'CU03');
+    inst(g, 0, 2);
     mano(g, 0, 'RI04');
     const m = sceglieMossa(creaVista(g, 0), cat);
     expect(m.t === 'gioca' && m.terr).toBe(0);

@@ -1,5 +1,7 @@
 # Concept grafico - carta (percorso web)
 
+> **Stato al 31 ottobre 2026.** Concept esplorativo, conservato come storia del percorso web (CT-DES-014, registrata). Non è una decisione di design. Rispetto al testo sotto: scintille e giroscopio sono stati tolti. Le illustrazioni in `public/` sono di prova, generate con il modello z_image_turbo: la licenza del modello va confermata sulla pagina ufficiale prima di qualsiasi uso nel gioco.
+
 **CONCEPT ESPLORATIVO, NON DI DESIGN E NON UNA DECISIONE.** Non sceglie il motore e non registra CT-DES-014. Nome della carta, testi e valori sono segnaposto. Nasce dalla richiesta di Matteo di misurare il *tetto grafico* del percorso web (TypeScript, Vite, three.js); l'identificativo formale della prova va assegnato da Matteo e Copilot.
 
 ## Cosa mostra

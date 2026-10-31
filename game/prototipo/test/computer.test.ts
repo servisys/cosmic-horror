@@ -169,27 +169,37 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
     expect(m.t === 'gioca' && m.terr).toBe(2);
     expect(idCarta(v, m)).toBe('CU04'); // la presenza piu' forte
   });
-  it('Risvegliati 3: gioca presenze su un territorio con instabilita 3 o piu, senza rito, dove la sua forza e minore o uguale', () => {
+  it('Risvegliati 3 (CT-DES-066): dal primo turno gioca presenze dove la sua forza e minore o uguale, anche con instabilita bassa', () => {
     const g = partita('risvegliati');
-    inst(g, 1, 3);
     presenza(g, 1, 1, 'CU03'); // 4 contro 0
-    inst(g, 0, 1);
+    inst(g, 1, 1); // instabilita' bassa: la vecchia soglia 3 l'avrebbe escluso
     mano(g, 0, 'RI01', 'RI04');
-    energia(g, 0, 20);
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
     expect(m.t === 'gioca' && m.terr).toBe(1);
-    expect(idCarta(v, m)).toBe('RI04');
+    expect(idCarta(v, m)).toBe('RI04'); // la presenza piu' forte
   });
-  it('Risvegliati 3: non gioca li se ha gia la forza maggiore o c e gia il suo rito', () => {
+  it('Risvegliati 3: tra piu territori sceglie quello con l instabilita piu alta', () => {
     const g = partita('risvegliati');
-    inst(g, 1, 3);
-    presenza(g, 0, 1, 'RI08'); // 6 contro 0
-    g.s.giocatori[0].tappe[1] = 0;
+    presenza(g, 1, 0, 'CU03');
+    presenza(g, 1, 1, 'CU03');
+    presenza(g, 1, 2, 'CU03');
+    inst(g, 0, 1);
+    inst(g, 1, 2);
+    inst(g, 2, 0);
     mano(g, 0, 'RI04');
-    const v = creaVista(g, 0);
-    const m = sceglieMossa(v, cat);
-    expect(m.t === 'gioca' && m.terr).not.toBe(1);
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(1);
+  });
+  it('Risvegliati 3: non gioca dove ha gia il suo rito, ne dove ha gia la forza maggiore', () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, 1, 'RI08'); // 6 contro 0: forza maggiore
+    presenza(g, 1, 2, 'CU03');
+    g.s.giocatori[0].tappe[2] = 0; // rito gia' fatto alla Landa
+    presenza(g, 1, 0, 'CU03');
+    mano(g, 0, 'RI04');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(0);
   });
   it('Risvegliati 1: a un passo dalla sconfitta alza l instabilita sopra 3 dove i Custodi possono porre l ultimo Sigillo', () => {
     const g = partita('risvegliati');

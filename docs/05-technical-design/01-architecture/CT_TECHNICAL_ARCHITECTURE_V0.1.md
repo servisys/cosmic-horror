@@ -8,7 +8,7 @@ project_prefix: CT_
 last_reviewed: 2026-10-31
 related_documents:
   - ../../00-project-overview/02-roadmap/CT_PROTOTYPE_SCOPE_V0.2.md
-  - ../../01-game-design/01-core-rules/CT_CORE_RULES_V0.9.md
+  - ../../01-game-design/01-core-rules/
 ---
 
 # Architettura tecnica del prototipo (tappe 1 e 2)

@@ -1,6 +1,6 @@
 ---
 id: CT-DEV-005
-fase: piano
+fase: esecuzione
 pronto: si
 branch: feature/ct-dev-004-pubblicazione-prova-produzione
 scritto_da: Cowork (chat Claude del progetto)
@@ -30,3 +30,6 @@ Cowork ha letto il diff della PR #74: va bene. Restano due cose da sistemare **s
 
 ## Fuori perimetro
 Nessuna altra modifica. Niente fusioni o chiusure.
+
+## Via di Matteo per la fase esecuzione (2026-11-01, in chat a Cowork)
+Matteo ha dato il via («procedi») al tuo piano, compresi i due casi di prova in più. Sul dubbio della guida: tieni la voce «Produzione: segnaposto» riformulata come errore possibile se qualcuno rimette dei segnaposto.

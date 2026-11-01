@@ -1,5 +1,35 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-001 - fase esecuzione - 2026-11-01 15:23 - FATTO
+
+**Resoconto CT-DEL-001 (fase esecuzione): FATTO**
+
+**Richiesta eseguita:** ripetuti in sola lettura i controlli sulla PR 70. Non ho modificato nulla.
+
+**Verifiche (`gh pr view 70`):**
+- La PR è aperta (`OPEN`) e punta a `main`.
+- La testa è `084d1d087bdf6d10c353ae724727346394be3854`, uguale allo sha del campo `fusioni`.
+- Risulta fondibile (`MERGEABLE`).
+- I 12 file toccati stanno tutti dentro `file_attesi_70`:
+  - i 4 file `docs/` (indice master e protocolli V0.2, V0.3, V0.4);
+  - `strumenti/windows-scambio/LEGGIMI.md` e `osserva-scambio.ps1`;
+  - 6 file sotto `strumenti/windows-scambio/prove/deleghe/`.
+- Il repository di lavoro è su `main` ed è pulito.
+
+**Cosa è stato fatto:** nessun commit, branch, push o PR.
+
+**Branch e PR:** nessun branch. La PR 70 non è fusa da me: la fusione la esegue lo script dopo questo resoconto.
+
+**Non verificato:** non ho letto il contenuto dei file della PR, solo l'elenco. Non c'erano test da lanciare.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- PR #70: FUSA (merge commit, testa 084d1d087bdf6d10c353ae724727346394be3854).
+
+---
+
 ## CT-DEL-001 - fase piano - 2026-11-01 14:59 - FATTO
 
 **Resoconto CT-DEL-001, fase piano**

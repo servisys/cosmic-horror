@@ -1,5 +1,32 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-002 - fase esecuzione - 2026-11-01 16:12 - FATTO
+
+Resoconto CT-DEL-002 (fase esecuzione)
+
+**Richiesta eseguita:** ho ripetuto in sola lettura i controlli sulla PR 71. Non ho modificato nulla e non ho fuso. La fusione spetta allo script.
+
+**Verifiche (`gh pr view 71`):**
+- La PR è aperta (`OPEN`).
+- Il branch di destinazione è `main`.
+- La testa è `1a80198516d4b501e9b006c96f232acd2bf7a2b8`, uguale allo sha nel campo `fusioni`.
+- Lo stato è `MERGEABLE`.
+- I file toccati sono solo `README.md` e `docs/00-project-overview/01-vision-concept/CT_VISION_AND_PILLARS_V0.11_BOZZA.md`. Coincidono con `file_attesi_71`.
+
+**Esito:** controlli tutti positivi, FATTO.
+
+**Branch e PR:** nessun branch, commit, push o PR creati. Il repository è su `main`, pulito.
+
+**Non verificato:** non ho letto il contenuto del diff. Ho controllato solo i file toccati. Non ho eseguito test, perché il task non li richiede.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- PR #71: FUSA (merge commit, testa 1a80198516d4b501e9b006c96f232acd2bf7a2b8).
+
+---
+
 ## CT-DEL-002 - fase piano - 2026-11-01 16:05 - FATTO
 
 **Richiesta eseguita:** CT-DEL-002, fase piano, sola lettura. Non ho modificato nulla e non ho fuso nulla.

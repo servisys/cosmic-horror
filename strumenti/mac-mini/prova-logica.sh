@@ -9,17 +9,27 @@ RADICE="$(cd "$QUI/../.." && pwd)"
 T=$(mktemp -d "${TMPDIR:-/tmp}/macprova.XXXX")
 git clone -q --bare "$RADICE" "$T/remoto.git" 2>/dev/null
 git clone -q "$T/remoto.git" "$T/w" && git -C "$T/w" config user.email t@t && git -C "$T/w" config user.name t
+# gli script che si provano (anche se non ancora committati) stanno nel repository finto, come in quello vero: il job li ricopia da li'
+mkdir -p "$T/w/strumenti/mac-mini"
+cp "$QUI/controlla-e-pubblica.sh" "$QUI/percorso-node.sh" "$QUI/it.cosmichorror.pubblica.plist.modello" "$T/w/strumenti/mac-mini/"
+git -C "$T/w" add -A; git -C "$T/w" commit -q -m "script in prova" --allow-empty; git -C "$T/w" push -q origin HEAD:main
 # il clone «del Mac»: un clone normale con origin = il repository finto
 mkdir -p "$T/progetti"
 git clone -q "$T/remoto.git" "$T/progetti/cosmic-horror"
 CL="$T/progetti/cosmic-horror"
 BASE="$CL/.pubblicazione"
+# il job gira dalla sua copia in .pubblicazione/bin, come sul Mac (installa.sh)
+mkdir -p "$BASE/bin"
+cp "$QUI/controlla-e-pubblica.sh" "$QUI/percorso-node.sh" "$BASE/bin/"
+S="$BASE/bin/controlla-e-pubblica.sh"
 printf '%s\n' "TOKEN-DI-PROVA-123" > "$CL/.swa-token-prova"; chmod 600 "$CL/.swa-token-prova"
 permessi() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1" 2>/dev/null; }
 # dove chmod non vale (per esempio un disco di Windows) il controllo dei permessi si salta e la prova 17 non si fa
 PERMESSI_OK=1; [ "$(permessi "$CL/.swa-token-prova")" = 600 ] || { PERMESSI_OK=""; export CT_SALTA_PERMESSI=1; }
 : > "$T/ps.txt"
-export CT_CLONE="$CL" CT_NPM_CI="echo ci-ok" CT_PS="cat $T/ps.txt"
+# CT_NPM: il comando che il job cerca nel PATH (qui «true», che c'e' sempre; i casi 21 e 22 lo cambiano)
+export CT_CLONE="$CL" CT_NPM_CI="echo ci-ok" CT_PS="cat $T/ps.txt" CT_NPM=true
+export CT_PLIST="$T/nessun-plist" # mai il plist vero di launchd; il caso 24 ne mette uno finto
 export LUCCHETTO_FOLK_LORE="$T/mandi/.coda/batteria.lock" CARTELLA_PROGETTI="$T/progetti"
 mkdir -p "$T/mandi/.coda"
 # la pubblicazione finta stampa anche il token letto dal file (il job deve coprirlo nel log) e conta le chiamate
@@ -92,7 +102,7 @@ verifica "16. senza token: non pubblica e non segna fallito" "$(chiamate)|$(cat 
 verifica "    il problema e' scritto una volta sola" "$(grep -c 'manca il token del sito di prova' "$BASE/log/pubblica.log")" 1
 printf '%s\n' "TOKEN-DI-PROVA-123" > "$CL/.swa-token-prova"; chmod 644 "$CL/.swa-token-prova"
 if [ -n "$PERMESSI_OK" ]; then
-  bash "$S"; verifica "17. token con permessi 644: non pubblica, chiede chmod 600" "$(chiamate)|$(grep -c 'chmod 600' "$BASE/log/pubblica.log")" "$n|1"
+  bash "$S"; verifica "17. token con permessi 644: non pubblica, chiede chmod 600" "$(chiamate)|$(grep -c 'ha permessi 644' "$BASE/log/pubblica.log")" "$n|1"
 else
   echo "--  17. (permessi non verificabili su questo sistema: saltata)"
 fi
@@ -102,6 +112,32 @@ git -C "$CL" remote set-url origin "file://$T/non-esiste.git"
 nuovo_commit otto; bash "$S"; verifica "19. repository irraggiungibile: nessun danno" "$(grep -c 'non raggiungibile' "$BASE/log/pubblica.log")" 1
 git -C "$CL" remote set-url origin "$T/remoto.git"
 n=$(chiamate); bash "$S"; verifica "20. torna raggiungibile: pubblica" "$(chiamate)" "$((n+1))"
+# su Windows git converte i fine riga nel clone: il confronto li ignora
+uguali_senza_cr() { [ "$(tr -d '\r' < "$1" | cksum)" = "$(tr -d '\r' < "$2" | cksum)" ]; }
+# Node: npm assente dal PATH e' un problema di configurazione (non della build); CARTELLA_NODE lo rende trovabile
+nuovo_commit nove; n=$(chiamate)
+CT_NPM=npm-finto bash "$S"; CT_NPM=npm-finto bash "$S"
+verifica "21. npm assente dal PATH: non pubblica e non segna fallito" "$(chiamate)|$(cat "$BASE/stato/ultimo-fallito" 2>/dev/null | wc -c | tr -d ' ')" "$n|0"
+verifica "    il PROBLEMA e' scritto una volta sola" "$(grep -c 'PROBLEMA: non trovo npm-finto' "$BASE/log/pubblica.log")" 1
+mkdir -p "$T/nodebin"; printf '#!/bin/sh\nexit 0\n' > "$T/nodebin/npm-finto"; chmod +x "$T/nodebin/npm-finto"
+CT_NPM=npm-finto CARTELLA_NODE="$T/nodebin" bash "$S"
+verifica "22. CARTELLA_NODE rende npm trovabile: pubblica quello in attesa" "$(chiamate)" "$((n+1))"
+verifica "    il problema di Node e' rientrato" "$(ls "$BASE/stato" | grep -c 'problema-node')" 0
+# il job si aggiorna da solo dopo il checkout: script e file condiviso ricopiati (mv: lo script che gira non cambia), plist solo segnalato
+echo "# aggiornato" >> "$T/w/strumenti/mac-mini/percorso-node.sh"; echo "# aggiornato" >> "$T/w/strumenti/mac-mini/controlla-e-pubblica.sh"
+nuovo_commit dieci; n=$(chiamate); bash "$S"
+verifica "23. job aggiornato da solo: lo script e il file condiviso in bin sono quelli del commit nuovo" "$(uguali_senza_cr "$T/w/strumenti/mac-mini/controlla-e-pubblica.sh" "$BASE/bin/controlla-e-pubblica.sh" && uguali_senza_cr "$T/w/strumenti/mac-mini/percorso-node.sh" "$BASE/bin/percorso-node.sh" && echo uguali || echo diversi)" uguali
+verifica "    e il giro in corso e' arrivato in fondo (pubblicato)" "$(chiamate)|$(cat "$BASE/stato/ultimo-pubblicato")" "$((n+1))|$(testa_remota)"
+verifica "    il log lo dice" "$(grep -c 'job aggiornato: percorso-node.sh' "$BASE/log/pubblica.log" | grep -c '^[1-9]')" 1
+. "$QUI/percorso-node.sh"
+export CT_PLIST="$T/plist-installato"
+genera_plist "$T/w/strumenti/mac-mini/it.cosmichorror.pubblica.plist.modello" "$BASE/bin/controlla-e-pubblica.sh" "$BASE" "$HOME" > "$CT_PLIST"
+nuovo_commit undici; bash "$S"
+verifica "24. plist uguale al modello: nessun problema" "$(grep -c 'PROBLEMA: il plist' "$BASE/log/pubblica.log")" 0
+echo "<!-- modello cambiato -->" >> "$T/w/strumenti/mac-mini/it.cosmichorror.pubblica.plist.modello"
+nuovo_commit dodici; bash "$S"
+nuovo_commit tredici; bash "$S"
+verifica "25. plist cambiato nel repository: PROBLEMA «rilancia installa.sh» (una volta sola), launchd non toccato" "$(grep -c 'PROBLEMA: il plist.*rilancia installa.sh' "$BASE/log/pubblica.log")|$(cat "$CT_PLIST" | grep -c 'modello cambiato')" "1|0"
 bash "$S" --stato | head -4
 echo "--- log:"; cat "$BASE/log/pubblica.log"
 echo "RISULTATO: $ok ok, $ko ko"

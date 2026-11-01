@@ -10,3 +10,10 @@ LUCCHETTO_FOLK_LORE=/Users/builder/dev-machine/progetti/mandi/.coda/batteria.loc
 
 # Cartella dei progetti: se sotto questa cartella (ma fuori da Cosmic Horror) gira un node/npm/vite/vitest/tsc/playwright/esbuild, il giro si salta.
 CARTELLA_PROGETTI=/Users/builder/dev-machine/progetti
+
+# Cartella che contiene node, npm e npx, messa in testa al PATH del job (launchd parte con un PATH minimo e non vede Node installato con mise, nvm...).
+# Esempio con mise: CARTELLA_NODE=/Users/builder/.local/share/mise/installs/node/22/bin
+# installa.sh la compila da solo con la cartella del «node» del terminale. Se la lasci vuota il job prova da solo i posti tipici
+# (mise, ~/.local/bin, nvm, volta). Se Node cambia cartella (per esempio nuova versione maggiore): svuota la riga e rilancia installa.sh.
+# Se npm non si trova, il job scrive un PROBLEMA nel log e non segna il commit come fallito.
+CARTELLA_NODE=

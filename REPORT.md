@@ -1,5 +1,45 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-003 - fase piano - 2026-11-01 20:05 - FATTO
+
+**Esito CT-DEL-003, fase piano: tutti i controlli positivi, task pronto. Non ho fuso nulla.**
+
+**Richiesta eseguita:** controlli in sola lettura sulla PR 72, come da punto 1 del task.
+
+**Verifiche (fatte con `gh pr view 72`):**
+- Protocollo V0.4: `status: APPROVED`. Il task indica solo il §3, che non ho letto riga per riga.
+- La PR è aperta e non è una bozza.
+- La base è `main`.
+- La testa è `c2e5529755042f83472653eb76f8e06fc1a8a754`, uguale allo sha indicato in `fusioni`.
+- Il branch è `feature/ct-feat-001-cinque-territori`.
+- Il merge è fattibile: `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN`. Quindi nessun conflitto con `main`, che nel frattempo è avanzato con le PR 71 e 73.
+- I file toccati sono 51 e stanno tutti dentro `file_attesi_72`. Le cartelle sono:
+  - `docs/00_MASTER_INDEX.md`
+  - `docs/00-project-overview/02-roadmap`
+  - `docs/00-project-overview/03-decisions-changelog`
+  - `docs/01-game-design/01-core-rules`
+  - `docs/03-cards-content/01-card-database`
+  - `game/prototipo/`, cioè `.gitignore`, `package.json`, `scripts`, `src` e `test`
+- Il repository locale è su `main` e pulito.
+
+**Cosa è stato fatto:** nessuna modifica, commit, branch, push o PR. Il file nella cartella di scambio non è stato toccato.
+
+**Cosa non è stato verificato:**
+- Alla prima lettura `mergeable` era `UNKNOWN`. Alla seconda era `MERGEABLE`, quindi vale quest'ultima.
+- Non c'è nessun controllo automatico (CI) sulla PR. L'elenco dei check è vuoto.
+- Non ho provato il merge in locale, perché richiedeva un `git fetch` e questa fase è solo lettura.
+- Non ho letto il contenuto dei 51 file. Ho controllato solo i percorsi.
+
+**Prossimo passo:** serve la conferma esplicita di Matteo «fondi la 72» prima della fase esecuzione. La fusione la esegue lo script.
+
+Comandi bloccati dai permessi: 1. Primi 1: `sleep 5; gh pr view 72 --json mergeable,mergeStateStatus,statusCheckRollup --jq '{mergeable,mergeStateStatus,checks:[.st...`
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-FEAT-002 - fase esecuzione - 2026-11-01 19:50 - FATTO
 
 # Resoconto CT-FEAT-002: cinque territori, seconda parte

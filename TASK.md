@@ -1,6 +1,6 @@
 ---
 id: CT-DEL-004
-fase: piano
+fase: esecuzione
 pronto: si
 tipo: deleghe
 branch: nessuno
@@ -38,3 +38,6 @@ Nessuno oltre ai controlli del punto 1.
 
 ## Output richiesto
 Resoconto breve con l'esito dei controlli.
+
+## Via di Matteo
+Matteo ha confermato in chat a Cowork il 2026-11-01 la fusione della PR 74 («ok procedi» a «Vuoi che proceda con la fusione della PR 74?»); il piano ha dato controlli tutti positivi.

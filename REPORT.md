@@ -1,5 +1,95 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-004 - fase piano - 2026-11-01 20:18 - FATTO
+
+Sto leggendo i file e ho quasi finito. Ecco il pre-flight plan, nessun file modificato.
+
+# Resoconto CT-DEV-004, fase piano
+
+## Richiesta eseguita
+Pre-flight plan per allineare la pubblicazione a Folk Lore: prova automatica, produzione a mano.
+
+## Verifiche documenti
+- `00_MASTER_INDEX.md` è APPROVED (v0.6.0) e `CT_COWORK_CODE_PROTOCOL_V0.4.md` è APPROVED (v0.4.0).
+- La guida V0.1 è DRAFT, come dice il task. Serve solo come contesto.
+- La decisione di Matteo del 2026-11-01 è citata nel task, ma non posso verificarla. Mi fido del task.
+- Il task è pronto (`pronto: si`). Non ci sono conflitti con game design, lore o economia.
+
+## Stato attuale, letto nel codice
+- `pubblica.mjs` legge `SWA_CLI_DEPLOYMENT_TOKEN`, ha solo `--prova` e pubblica sempre in produzione.
+- `controlla-e-pubblica.sh` usa `$HOME/CosmicHorrorPubblica`, il Portachiavi (`security`), le modalità `main` e `versioni` e un blocco `stato/blocco` valido solo per questo progetto.
+- `vite.config.ts` ricava la versione da `CT_VERSIONE` o da git. Il commento dice che `pubblica` imposta `CT_VERSIONE`, ma `pubblica.mjs` non lo fa. Lo sistemo.
+- `src/ui/versione.ts` e `main.ts:347` mostrano «Versione: …».
+- Nel `.gitignore` non c'è niente su `.swa-token-*`.
+
+## Passi
+1. **`pubblica.mjs`**
+   - L'argomento `prova` o `produzione` è obbligatorio. Senza argomento o con un valore sconosciuto esce subito con codice 2 e un messaggio.
+   - Il token viene da `SWA_DEPLOYMENT_TOKEN_PROVA` o `_PRODUZIONE`, oppure dal file `.swa-token-<ambiente>` nella radice del clone. Il vecchio `SWA_CLI_DEPLOYMENT_TOKEN` non si legge più. Il token resta nell'ambiente del processo figlio e viene coperto nell'output.
+   - L'opzione `--prova` resta, quindi `pubblica -- prova --prova` fa solo controlli e build.
+   - `prova` fa tipi, test e build con `CT_VERSIONE` che include l'ambiente. Poi copia `dist` in una cartella per commit, per esempio `.build-prova/<sha>/` fuori dal repository (vedi domande), e pubblica.
+   - `produzione` non ricostruisce e non esegue test.
+     - Cerca la copia di quel commit, altrimenti si ferma con un messaggio chiaro.
+     - Chiede al sito di prova quale commit serve e si ferma se è diverso.
+     - Poi pubblica quella copia.
+   - Per far rispondere il sito con il commit, la build scrive un file `versione.json` in `dist` con `{commit, ambiente}`. Il controllo legge `<URL prova>/versione.json`.
+   - Il file `versione.json` va escluso dal precache del service worker, o aggiunto a `no-cache` in `staticwebapp.config.json`. Devo verificare quale delle due, perché il service worker potrebbe servire un file vecchio.
+   - Anche l'URL del sito di prova va da qualche parte (vedi domande).
+   - Nella build di produzione la scritta dell'ambiente deve dire «produzione». Per questo si cambia solo `versione.json` e il testo mostrato, oppure si ricostruisce. Lo sciolgo con la domanda 3.
+2. **Versione nel gioco**: `vite.config.ts` aggiunge l'ambiente al testo, per esempio `main · abc1234 · 2026-11-01 · prova`. Il job pubblica in prova, quindi il testo dice «prova» in automatico.
+3. **`strumenti/mac-mini/`**
+   - Percorsi:
+     - BASE: `/Users/builder/dev-machine/cosmic-horror-pubblica`. Se serve il clone in `/Users/builder/dev-machine/progetti/cosmic-horror`, la cartella di lavoro punta lì.
+     - Log: `<BASE>/log`.
+   - Il job pubblica solo in prova.
+     - Chiama `npm run pubblica -- prova`.
+     - Legge il token da `.swa-token-prova` nel clone, controllando che i permessi siano 600.
+     - Niente `security` e niente `SERVIZIO_PORTACHIAVI`.
+     - Via la modalità `versioni`, perché non serve più. Da confermare.
+   - `installa.sh` e `disinstalla.sh`: l'utente deve essere `builder`, l'opzione `--token` crea il file con permessi 600 invece del Portachiavi, e il `.gitignore` copre i file token.
+   - `pubblica.conf.esempio` e `LEGGIMI.md` aggiornati.
+   - `prova-logica.sh` aggiornato: token da file, nessun `security`, blocco comune, solo prova.
+4. **«Una build pesante alla volta».** Proposta, in due livelli:
+   - **File di blocco comune** `/Users/builder/dev-machine/.blocco-build/`, creato con `mkdir` (atomico), con pid e data dentro. Vale il controllo già esistente: pid vivo e meno di 120 minuti.
+   - **Cooperazione richiesta a Folk Lore**: il suo script deve usare la stessa cartella di blocco, altrimenti il primo livello non basta. Serve il via di Matteo.
+   - **Controllo di riserva** (non protegge se Folk Lore non coopera): prima di partire, il job cerca con `pgrep` processi `vite`, `tsc`, `vitest`, `playwright` o `npm` con cartella di lavoro sotto `progetti/` diversa da Cosmic Horror. Se ne trova uno, esce senza segnare fallimento e riprova dopo 60 secondi. Non lo faccio bloccante da solo, perché potrebbe fermare tutto per sbaglio.
+   - Il job è già a 60 secondi, quindi non aggiungo attese: se è occupato, salta il giro.
+5. **Guida V0.2.** Nuovo file `CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md` (DRAFT) con tutti i punti elencati nel task, e V0.1 passa a DEPRECATED. Aggiorno anche i riferimenti incrociati, cioè Master Index e LEGGIMI.
+6. **Test.** Prove della logica di produzione con un token finto e una CLI finta (variabile per sostituire `npx`, sul modello di `CT_PUBBLICA`), poi `npm test`, `npm run tipi`, `npm run build`, `pubblica -- prova --prova` e `prova-logica.sh` su Git Bash. Se serve, aggiungo un test automatico per la logica di produzione (argomenti, copia mancante, commit diverso).
+7. **PR** verso `main` con descrizione in italiano. Il `git diff --stat` va nel resoconto.
+
+## File toccati
+- `game/prototipo/scripts/pubblica.mjs`
+- `game/prototipo/vite.config.ts`
+- `game/prototipo/package.json`, solo se serve uno script di prova
+- `game/prototipo/public/staticwebapp.config.json`, per la cache di `versione.json`
+- `game/prototipo/vite-plugin-sw.ts`, se `versione.json` va escluso dal precache
+- `.gitignore`
+- `strumenti/mac-mini/`: tutti gli script, il plist, il LEGGIMI e `pubblica.conf.esempio`
+- `CT_GUIDA_PUBBLICAZIONE_AZURE_V0.1.md` (DEPRECATED) e `_V0.2.md` nuovo
+- `00_MASTER_INDEX.md` e `README`, per i riferimenti alla guida
+
+## Rischi
+- Il Mac vero non è raggiungibile: percorsi, permessi 600, launchd e SSH come `builder` restano da provare a mano.
+- Se Folk Lore non usa lo stesso blocco, due build pesanti possono partire insieme.
+- Il controllo del commit in prova dipende dal fatto che il sito risponda con `versione.json`. Se la cache o il service worker lo servono vecchio, produzione si fermerebbe a torto.
+- La copia della build di prova occupa spazio su disco. Tengo solo le ultime N copie, per esempio 10.
+- Il vecchio token nel Portachiavi resta sul Mac finché Matteo non lo toglie. Va scritto nella guida.
+
+## Domande per Matteo
+1. **Blocco comune:** Matteo ci dice se lo script di Folk Lore può usare lo stesso file di blocco in `/Users/builder/dev-machine/`, e come si chiama oggi il suo, se esiste.
+2. **URL dei due siti di prova e produzione:** dove si configurano? Propongo `pubblica.conf` più una variabile `CT_URL_PROVA`, oppure un file nel repository (non è un segreto).
+3. **Ambiente nella scritta del gioco:** in produzione va ricostruito il bundle con scritta «produzione», oppure basta mostrare «prova» finché non si decide? Con «stesso commit senza ricostruire» la build è identica, quindi l'ambiente si legge a runtime dal dominio o da `versione.json`. Propongo di leggerlo a runtime: `versione.json` scritto al momento del deploy, e il gioco lo mostra.
+4. **Modalità `versioni` (tag):** la tolgo?
+5. **Dove stanno le copie delle build di prova:** dentro il clone ma ignorate da git, oppure sotto `/Users/builder/dev-machine/`?
+
+## Non verificato
+Nulla di eseguibile in questa fase. I test partono nella fase esecuzione.
+
+Comandi bloccati dai permessi: 1. Primi 1: `[Grep] C:\Users\MatteoTemporini-Laye\cosmic-horror\game\prototipo`
+
+---
+
 ## CT-DEL-003 - fase esecuzione - 2026-11-01 20:10 - FATTO
 
 **Esito: FATTO.** Ho ripetuto i controlli in sola lettura con `gh pr view 72` e sono tutti positivi.

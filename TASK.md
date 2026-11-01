@@ -1,6 +1,6 @@
 ---
 id: CT-DEL-002
-fase: piano
+fase: esecuzione
 pronto: si
 tipo: deleghe
 branch: nessuno
@@ -15,6 +15,9 @@ file_attesi_71: README.md, docs/00-project-overview/01-vision-concept/CT_VISION_
 ## Documenti autorevoli
 - `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` §3 (APPROVED).
 - Autorizzazione di Matteo in chat a Cowork il 2026-11-01: «fondi 71». Cowork ha letto il diff della PR su GitHub: 2 file, solo i riferimenti al protocollo e una riga di changelog nella Vision.
+
+## Via di Matteo
+Matteo ha dato il via alla fase esecuzione (fusione della PR 71) in chat a Cowork il 2026-11-01 («sì»), dopo il piano con tutti i controlli positivi.
 
 ## Obiettivo
 Fondere la PR 71 tramite lo script. Task dedicato: nessun lavoro nuovo.

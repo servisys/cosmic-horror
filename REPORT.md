@@ -1,5 +1,82 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FIX-006 - fase piano - 2026-11-01 21:29 - FATTO
+
+# Pre-flight plan CT-FIX-006 (fase piano, nessun file toccato)
+
+## Richiesta eseguita
+Letto TASK.md e i file coinvolti. Nessuna modifica, commit o push.
+
+## Documenti autorevoli
+- `docs/00_MASTER_INDEX.md`: APPROVED.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md`: APPROVED.
+- `strumenti/mac-mini/`: presente.
+- **Guida V0.2: non presente nel mio checkout.** Il checkout locale è `main` a PR #73 e contiene solo `CT_GUIDA_PUBBLICAZIONE_AZURE_V0.1.md`. La V0.2 dovrebbe arrivare con la PR #74.
+  - Non ho potuto controllare `origin/main`: il comando git è stato bloccato dai permessi.
+  - In esecuzione serve `git pull` prima di partire.
+  - Se la V0.2 non c'è su `main`, mi fermo. Non invento io il file.
+
+## Passi previsti
+1. **`controlla-e-pubblica.sh`**
+   - Funzione `prepara_path_node` dopo `leggi_conf`. La riga 18 imposta il PATH prima che la conf venga letta, quindi la chiave va gestita dopo.
+   - Nuova chiave `CARTELLA_NODE`, letta con `leggi_conf` e anteposta al PATH se valorizzata.
+   - Se vuota, ripiego sul PATH con: `$HOME/.local/share/mise/shims`, `$HOME/.local/bin`, la `bin` più recente in `mise/installs/node/*`, poi nvm e volta. Niente script di profilo.
+   - La più recente va scelta con `sort -V` o confronto numerico. L'ordine alfabetico sbaglia con 9 contro 22.
+   - Dopo il controllo del token e prima di `INIZIO`, se `npm` non si trova scrivo `problema node "..."` (una sola volta) ed esco con `exit 0`. Non scrivo `ultimo-fallito`. Con `nessun_problema node` quando sparisce.
+   - Il controllo va dopo i controlli "già pubblicato" e "già fallito", così non fa rumore a ogni giro.
+   - Con `CT_NPM_CI` e `CT_PUBBLICA` finti, i test non hanno npm vero. Il controllo deve quindi valere solo se il comando usato è quello predefinito, oppure usare un override come `CT_NPM`. Da decidere in esecuzione.
+2. **`installa.sh`**
+   - Stessa logica del PATH come funzione condivisa. Serve un file `percorso-node.sh` incluso con `source` da entrambi, e copiato in `$BASE/bin`. Altrimenti duplico il codice.
+   - Controllo `node` e `npm` con quel PATH.
+   - Se `CARTELLA_NODE` è vuota in `pubblica.conf`, scrivo `dirname "$(command -v node)"` del terminale. Sostituisco o aggiungo la riga con `sed`, senza toccare le altre chiavi.
+   - Se con il PATH del job npm non c'è, esco con un messaggio chiaro.
+   - La conf viene creata dopo il controllo Node. Il controllo va riordinato.
+3. **`pubblica.conf.esempio`, `LEGGIMI.md`, guida V0.2**
+   - Chiave `CARTELLA_NODE` con l'esempio mise.
+   - Cosa fare se Node cambia versione: rilanciare `installa.sh`.
+   - Sezione "dopo la fusione": `git pull`, `./strumenti/mac-mini/installa.sh`, `.pubblicazione/bin/controlla-e-pubblica.sh --riprova` (commit dceca70).
+   - Il LEGGIMI punta ancora alla V0.1: va corretto.
+4. **`prova-logica.sh`**
+   - Caso A: npm assente dal PATH. Atteso: PROBLEMA scritto una volta, commit non segnato fallito, nessuna chiamata.
+   - Caso B: `CARTELLA_NODE` con un finto `npm`. Atteso: pubblica.
+   - Per simulare l'assenza serve un PATH ripulito. Su Windows con Git Bash, `/usr/bin` e `/bin` contengono già tool veri e il Node di Windows è nel PATH. Il PATH del test va quindi costruito con cura.
+5. **Verifiche su Windows**: `npm run tipi`, `npm test`, `npm run build` in `game/prototipo`, poi `prova-logica.sh` con Git Bash.
+6. **PR verso `main`.** Nessuna fusione. Nel resoconto: sha completo e `git diff --stat`.
+
+## File toccati
+- `controlla-e-pubblica.sh`
+- `installa.sh`
+- `prova-logica.sh`
+- `pubblica.conf.esempio`
+- `LEGGIMI.md`
+- Guida V0.2
+- Nuovo file condiviso per il PATH, se si sceglie quella strada
+
+## Rischi
+- **Bash 3.2 di macOS.** Niente array associativi né `${var,,}`. `sort -V` esiste su macOS recente, ma va verificato. Ripiego: confronto numerico con `sort -t. -k1,1n`.
+- **Test su Windows.** Il Node di Windows nel PATH può far passare il caso "npm assente" in modo falso. Serve un PATH isolato.
+- **`set -u`** sulle variabili nuove.
+- **`installa.sh` non è testabile qui**, perché esce se `uname` non è Darwin. Lo verifico solo con `bash -n` e leggendolo. Va detto nel resoconto.
+- **Test sul Mac vero:** nessuno da qui. Il riprovare di dceca70 resta a Matteo.
+- **Guida V0.2 assente**, vedi sopra.
+
+## Domande aperte
+1. Il controllo npm va saltato quando `CT_NPM_CI` è personalizzato? Propongo di sì, oppure di leggere un override `CT_NPM`.
+2. File condiviso `percorso-node.sh` (propongo questo) oppure codice duplicato in due script?
+3. La guida V0.2 è davvero su `main` dopo la PR #74? Va confermato con `git pull`.
+
+## Il task è pronto?
+Sì, a condizione che la guida V0.2 sia su `main`. Le domande 1 e 2 le decido io come sopra, a meno che Matteo non dica altro.
+
+## Non verificato
+- Contenuto di `origin/main` e della guida V0.2.
+- Il comportamento sul Mac vero e sotto launchd.
+- Qualsiasi build o test: in fase piano non li ho lanciati.
+
+Comandi bloccati dai permessi: 3. Primi 3: `cd /c/Users/MatteoTemporini-Laye/cosmic-horror/strumenti/mac-mini && cat prova-logica.sh pubblica.conf.esempio LEGGIMI.m...`; `git log origin/main --oneline -3; git ls-remote origin refs/heads/main; ls strumenti/mac-mini/LEGGIMI.md && cat strument...`; `git -C /c/Users/MatteoTemporini-Laye/cosmic-horror log origin/main --oneline -3`
+
+---
+
 ## CT-DEL-004 - fase esecuzione - 2026-11-01 21:19 - FATTO
 
 Resoconto CT-DEL-004 (fase esecuzione)

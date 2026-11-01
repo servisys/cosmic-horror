@@ -19,7 +19,9 @@
     "grafica-finale": "node scripts/grafica-finale.mjs",
     "verifica-animazioni": "node scripts/verifica-animazioni.mjs",
     "leggibilita": "node scripts/leggibilita.mjs",
-    "sovrapposizioni": "node scripts/sovrapposizioni.mjs"
+    "sovrapposizioni": "node scripts/sovrapposizioni.mjs",
+    "verifica-pwa": "node scripts/verifica-pwa.mjs",
+    "pubblica": "node scripts/pubblica.mjs"
   },
   "dependencies": {
     "pixi.js": "8.6.6",

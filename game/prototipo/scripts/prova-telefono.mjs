@@ -14,6 +14,7 @@ const browser = await chromium.launch({
   executablePath: process.env.CT_CHROMIUM || undefined,
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
 });
+const eSw = (t) => /sw.js/.test(t); // con la CSP worker-src 'none' il service worker non parte: previsto, il gioco parte lo stesso
 const esiti = [];
 const prova = async (nome, fn) => {
   try { const r = await fn(); esiti.push({ nome, ok: r.ok, dettaglio: r.dettaglio }); }
@@ -27,7 +28,7 @@ for (const attesa of [300, 1500, 3000]) {
       const ctx = await browser.newContext({ viewport: { width: 956, height: 440 } });
       const p = await ctx.newPage();
       const errori = [];
-      p.on('console', (m) => { if (m.type() === 'error') errori.push(m.text()); });
+      p.on('console', (m) => { if (m.type() === 'error' && !eSw(m.text())) errori.push(m.text()); });
       p.on('pageerror', (e) => errori.push(e.message));
       await p.goto(URL);
       await p.waitForTimeout(attesa);
@@ -47,7 +48,7 @@ await prova('immagini presenti (texture caricate)', async () => {
   const ctx = await browser.newContext({ viewport: { width: 956, height: 440 } });
   const p = await ctx.newPage();
   const errori = [];
-  p.on('console', (m) => { if (m.type() === 'error' || /content security|worker/i.test(m.text())) errori.push(m.text()); });
+  p.on('console', (m) => { if ((m.type() === 'error' || /content security|worker/i.test(m.text())) && !eSw(m.text())) errori.push(m.text()); });
   p.on('pageerror', (e) => errori.push(e.message));
   await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120&tutorial=0`);
   await p.waitForFunction(() => window.__ct && window.__ct.ctrl.g);
@@ -63,7 +64,7 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
   const ctx = await browser.newContext({ viewport: { width: 956, height: 440 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   const p = await ctx.newPage();
   const errori = [];
-  p.on('console', (m) => { if (m.type() === 'error') errori.push(m.text()); });
+  p.on('console', (m) => { if (m.type() === 'error' && !eSw(m.text())) errori.push(m.text()); });
   p.on('pageerror', (e) => errori.push(e.message));
   await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120&tutorial=0`);
   await p.waitForFunction(() => window.__ct && window.__ct.ctrl.g);

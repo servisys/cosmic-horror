@@ -6,6 +6,8 @@ import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
 import { alCaricarsiDiUnaScena, caricaImmagini, caricaScene, caricaSfondo, numeroTexture } from './immagini.js';
 import { caricaFont } from './tipografia.js';
+import { VERSIONE } from './versione.js';
+import { registraServiceWorker, tuttoSchermoAlPrimoTocco } from './pwa.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { anim, type FotoStato } from './animazioni.js';
 import { SETTORI, inSchermo } from './config-plancia.js';
@@ -341,7 +343,11 @@ async function avvia(): Promise<void> {
   // scene 3D dei luoghi: si caricano in background dopo la partenza (poche centinaia di KB), la scena si ridisegna quando arrivano
   alCaricarsiDiUnaScena(() => { if (ui.scena) ridisegna(); });
   void caricaScene(SETTORI.map((x) => x.scena));
+  const elVersione = document.getElementById('versione');
+  if (elVersione) elVersione.textContent = 'Versione: ' + VERSIONE;
   gesti();
+  tuttoSchermoAlPrimoTocco();
+  registraServiceWorker(() => ctrl.attiva && !ctrl.finita);
   anim.suFine = ridisegna;
   // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
   // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
@@ -370,6 +376,7 @@ async function avvia(): Promise<void> {
     ctrl,
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
+    versione: () => VERSIONE,
     piccoli: () => testiPiccoli(),
     misure: () => misureUltimoDisegno(),
     zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,

@@ -1,0 +1,31 @@
+{
+  "routes": [
+    { "route": "/.auth/login/twitter", "statusCode": 404 },
+    { "route": "/.auth/login/google", "statusCode": 404 },
+    { "route": "/.auth/login/facebook", "statusCode": 404 },
+    { "route": "/.auth/login/apple", "statusCode": 404 },
+    { "route": "/accesso-negato.html", "allowedRoles": ["anonymous", "authenticated"], "headers": { "cache-control": "no-cache" } },
+    { "route": "/index.html", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },
+    { "route": "/sw.js", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },
+    { "route": "/manifest.webmanifest", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },
+    { "route": "/assets/*", "allowedRoles": ["giocatore"], "headers": { "cache-control": "private, max-age=31536000, immutable" } },
+    { "route": "/icons/*", "allowedRoles": ["giocatore"], "headers": { "cache-control": "private, max-age=86400" } },
+    { "route": "/*", "allowedRoles": ["giocatore"] }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/icons/*", "/*.webmanifest", "/sw.js", "/*.{png,webp,woff2,js,css,json,txt,html}"]
+  },
+  "responseOverrides": {
+    "401": { "statusCode": 302, "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer" },
+    "403": { "statusCode": 302, "redirect": "/accesso-negato.html" }
+  },
+  "mimeTypes": {
+    ".webmanifest": "application/manifest+json",
+    ".webp": "image/webp",
+    ".woff2": "font/woff2"
+  },
+  "globalHeaders": {
+    "x-content-type-options": "nosniff"
+  }
+}

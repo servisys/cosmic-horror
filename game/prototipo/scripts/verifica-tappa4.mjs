@@ -47,6 +47,7 @@ for (const vista of VISTE) {
   while (guardia++ < 3000 && !(fatti.has('4_evento') && fatti.has('5_zoom_territorio'))) {
     const s = await stato();
     if (s.fine) break;
+    if (await page.evaluate(() => !!window.__ct.scena())) { await clic('scena:indietro'); continue; } // vedi verifica-tappa3
     if (s.evento) {
       await foto('4_evento');
       await clic('evento:chiudi');

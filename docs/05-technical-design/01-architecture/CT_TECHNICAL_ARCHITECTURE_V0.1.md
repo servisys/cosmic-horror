@@ -82,6 +82,7 @@ Da `game/prototipo/`, dopo `npm install`:
 
 | Libreria | Versione | Uso |
 |---|---|---|
+| 0.1.7 | DRAFT | Paragrafo 12: ingresso nei territori con le scene 3D (scorrimento, pizzico, «Gioca una carta qui»). |
 | 0.1.6 | DRAFT | Aggiunto il paragrafo 12 sulla grafica finale (plancia, carte, caratteri); l'elenco delle ambiguità diventa il 13. |
 | yaml | 2.8.1 | lettura dei file dati |
 | typescript | 5.9.3 | linguaggio |
@@ -137,6 +138,8 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Caratteri:** Cinzel (titoli e numeri) e Crimson Text (testi), licenza SIL OFL, come file WOFF2 in `src/assets/font/` con i file di licenza; si caricano con `FontFace` prima del primo disegno (`src/ui/tipografia.ts`, con tempo massimo).
 - **Anteprima al mouse:** sta in un livello a parte sopra la scena (`disegnaAnteprima`): mostrarla non ricostruisce la scena, quindi non fa perdere un clic.
 - **Verifica:** `npm run grafica-finale -- <url>` (screenshot a 956x440 con tocco e a 1280x800) in aggiunta alle verifiche precedenti. Le verifiche aspettano che la scena sia ferma (`window.__ct.stabile()`) prima di toccare: la scena si ricostruisce dopo ogni cambiamento di stato e un tocco nei pochi millisecondi prima del ridisegno colpirebbe la scena vecchia.
+
+- **Dentro un territorio** (`src/ui/scena-territorio.ts`): un tocco su un quadro della plancia (o sul pozzo) che non gioca la carta selezionata entra nella scena 3D del luogo (`src/assets/scene/`, WebP 1920 e 1280, scelti in base ai pixel reali; si caricano in background dopo la partenza, circa 600 KB per misura). In alto: freccia indietro, nome, effetto, cinque pallini dei luoghi con le frecce per il vicino; a sinistra le carte di Lui in grande (cornice media), a destra le tue; il pannello con forza di Lui e tua, instabilita', tappe, «cosa ti manca per prenderlo» (`cosaManca`, solo numeri della vista) e i bottoni. «Gioca una carta qui» apre la mano con le sole carte che il motore dice giocabili in quel territorio (`Controller.carteGiocabiliIn`); se la carta chiede una presenza come bersaglio, le carte in scena si illuminano e basta toccarne una. **Scorrere** a destra o sinistra passa al luogo vicino; **freccia** o **pizzico** (due dita che si allargano, in `main.ts`) tornano alla plancia. Dunwich e R'lyeh si possono visitare ma si guardano soltanto («Non ancora in gioco»). L'ordine dei luoghi e i file delle scene sono in `config-plancia.ts`.
 
 ## 13. Elenco delle ambiguità
 

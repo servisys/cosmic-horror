@@ -19,11 +19,13 @@ const prova = async (nome, fn) => {
   try { const r = await fn(); esiti.push({ nome, ok: r.ok, dettaglio: r.dettaglio }); }
   catch (e) { esiti.push({ nome, ok: false, dettaglio: String(e).slice(0, 220) }); }
 };
+const storia = [];
 const aiuti = (p) => {
   const tap = async (id) => {
     await p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined);
     const a = await p.evaluate((i) => window.__ct.aree()[i] ?? null, id);
-    if (!a) throw new Error('area ' + id + ' non trovata');
+    if (!a) throw new Error('area ' + id + ' non trovata ' + JSON.stringify(await p.evaluate(() => ({ scena: window.__ct.scena(), sel: window.__ct.ctrl.selezione, grande: !!window.__ct.aree()['grande:chiudi'], dec: !!window.__ct.ctrl.decisione, ev: !!window.__ct.ctrl.evento, tuo: window.__ct.ctrl.tuoTurno, aree: Object.keys(window.__ct.aree()).slice(0, 12) }))) + ' storia: ' + storia.slice(-6).join(' '));
+    storia.push(id + '@' + Math.round(a.x + a.w / 2) + ',' + Math.round(a.y + a.h / 2));
     await p.touchscreen.tap(a.x + a.w / 2, a.y + a.h / 2);
     await p.waitForTimeout(220);
   };
@@ -110,6 +112,7 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
     for (let k = 0; k < 400; k++) {
       const st = await p.evaluate(() => { const c = window.__ct.ctrl; return { fine: c.finita, tuo: c.tuoTurno, dec: !!c.decisione, ev: !!c.evento }; });
       if (st.fine) break;
+      if (await p.evaluate(() => !!window.__ct.scena())) { await a.tap('scena:indietro'); continue; } // un tocco al centro mentre l'evento si chiudeva puo' aprire la scena del pozzo
       if (st.ev) { await a.tap('evento:chiudi').catch(() => undefined); continue; } // con pausaEvento breve si chiude anche da solo
       if (st.dec) { await a.tap('btn:tieni'); continue; }
       if (!st.tuo) { await p.waitForTimeout(80); continue; }

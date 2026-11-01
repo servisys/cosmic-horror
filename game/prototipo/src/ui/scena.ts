@@ -8,6 +8,7 @@ import { IMG_H, IMG_W, SETTORI, coverTrasformazione, inSchermo, settoreDelTerrit
 import type { Controller } from './controller.js';
 import { COL, colori, Disegno, texturaGradiente, type Area } from './disegno.js';
 import { idImmagine, texturaSfondo } from './immagini.js';
+import { disegnaTerritorio } from './scena-territorio.js';
 import { motivoTappa, passiTutorial, suggerimento } from './suggerimento.js';
 
 export type { Area } from './disegno.js';
@@ -33,6 +34,10 @@ export interface UiStato {
   toast: string;
   /** La mano e' alzata (un tocco sulla zona della mano la alza o la abbassa; con una carta selezionata e' sempre alzata). */
   manoAlzata: boolean;
+  /** Dentro la scena 3D di un luogo (id del settore), o sulla plancia (null). */
+  scena: Settore['id'] | null;
+  /** Nella scena: e' aperta la scelta della carta da giocare li'. */
+  manoQui: boolean;
 }
 
 export interface Azioni {
@@ -51,6 +56,10 @@ export interface Azioni {
   alzaMano(): void;
   /** Tocco su un quadro della plancia che non gioca la carta selezionata. */
   settore(id: Settore['id']): void;
+  esci(): void;
+  vicino(dir: -1 | 1): void;
+  manoQui(aperta: boolean): void;
+  giocaQui(uid: number): void;
 }
 
 export const NOME_FAZ: Record<string, string> = { custodi: 'I Custodi', risvegliati: 'I Risvegliati' };
@@ -72,97 +81,103 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   const sel = c.selezione;
   const hBar = 30 * u;
 
-  d.rett(0, 0, W, H, COL.sfondo, { r: 0 });
-  sfondo(d, W, H);
+  if (ui.scena) {
+    disegnaTerritorio(d, c, ui, az, W, H);
+  } else {
+    d.rett(0, 0, W, H, COL.sfondo, { r: 0 });
+    sfondo(d, W, H);
 
-  // ---------- quadri della plancia ----------
-  const terrDelSettore = (st: Settore): number => (st.territorioId ? c.cat.dati.territori.findIndex((t) => t.id === st.territorioId) : -1);
-  const visibili = new Map<string, Area>();
-  for (const st of SETTORI) visibili.set(st.id, inSchermo(st.zona, W, H));
-  for (const st of SETTORI) {
-    const i = terrDelSettore(st);
-    const vis = visibili.get(st.id)!;
-    const reg: Area = { x: 0, y: 0, w: 28 * u, h: 18 * u }; // provvisorio: il punto libero si sceglie a fine disegno
-    if (st.id === 'rlyeh') {
-      pozzo(d, st, vis, reg, az);
-      continue;
+    // ---------- quadri della plancia ----------
+    const terrDelSettore = (st: Settore): number => (st.territorioId ? c.cat.dati.territori.findIndex((t) => t.id === st.territorioId) : -1);
+    const visibili = new Map<string, Area>();
+    for (const st of SETTORI) visibili.set(st.id, inSchermo(st.zona, W, H));
+    for (const st of SETTORI) {
+      const i = terrDelSettore(st);
+      const vis = visibili.get(st.id)!;
+      const reg: Area = { x: 0, y: 0, w: 28 * u, h: 18 * u }; // provvisorio: il punto libero si sceglie a fine disegno
+      if (st.id === 'rlyeh') {
+        pozzo(d, st, vis, reg, az);
+        continue;
+      }
+      const valido = i >= 0 && opz.terr.includes(i);
+      if (i < 0) {
+        // quadro non in gioco: leggermente scurito (senza coprire il pozzo)
+        const pz = visibili.get('rlyeh')!;
+        const passo = Math.max(2, 3 * u);
+        for (let yy = vis.y; yy < vis.y + vis.h; yy += passo) {
+          const hh = Math.min(passo, vis.y + vis.h - yy);
+          const dy = (yy + hh / 2 - (pz.y + pz.h / 2)) / (pz.h / 2);
+          if (Math.abs(dy) >= 1) { d.rett(vis.x, yy, vis.w, hh + 0.5, 0x000000, { alpha: 0.36, r: 0 }); continue; }
+          const dx = (pz.w / 2) * Math.sqrt(1 - dy * dy);
+          const sx = pz.x + pz.w / 2 - dx;
+          const dxr = pz.x + pz.w / 2 + dx;
+          if (sx > vis.x) d.rett(vis.x, yy, Math.min(sx, vis.x + vis.w) - vis.x, hh + 0.5, 0x000000, { alpha: 0.36, r: 0 });
+          if (dxr < vis.x + vis.w) d.rett(Math.max(dxr, vis.x), yy, vis.x + vis.w - Math.max(dxr, vis.x), hh + 0.5, 0x000000, { alpha: 0.36, r: 0 });
+        }
+      }
+      d.rett(vis.x, vis.y, vis.w, vis.h, 0xffffff, {
+        alpha: 0.001, r: 0, tap: () => { if (i >= 0 && c.opzioni().terr.includes(i)) { c.scegliTerritorio(i); az.rerender(); } else az.settore(st.id); },
+      });
+      if (i >= 0) d.aree[`terr:${i}`] = reg;
+      else d.aree[`settore:${st.id}`] = reg;
+      if (valido) glowQuadro(d, vis);
     }
-    const valido = i >= 0 && opz.terr.includes(i);
-    if (i < 0) {
-      // quadro non in gioco: leggermente scurito (senza coprire il pozzo)
-      const pz = visibili.get('rlyeh')!;
-      const passo = Math.max(2, 3 * u);
-      for (let yy = vis.y; yy < vis.y + vis.h; yy += passo) {
-        const hh = Math.min(passo, vis.y + vis.h - yy);
-        const dy = (yy + hh / 2 - (pz.y + pz.h / 2)) / (pz.h / 2);
-        if (Math.abs(dy) >= 1) { d.rett(vis.x, yy, vis.w, hh + 0.5, 0x000000, { alpha: 0.36, r: 0 }); continue; }
-        const dx = (pz.w / 2) * Math.sqrt(1 - dy * dy);
-        const sx = pz.x + pz.w / 2 - dx;
-        const dxr = pz.x + pz.w / 2 + dx;
-        if (sx > vis.x) d.rett(vis.x, yy, Math.min(sx, vis.x + vis.w) - vis.x, hh + 0.5, 0x000000, { alpha: 0.36, r: 0 });
-        if (dxr < vis.x + vis.w) d.rett(Math.max(dxr, vis.x), yy, vis.x + vis.w - Math.max(dxr, vis.x), hh + 0.5, 0x000000, { alpha: 0.36, r: 0 });
+
+    // ---------- targhette, miniature, bottoni ----------
+    const cAvv = colori(v.fazioneAvv === 'custodi' ? 'CU' : 'RI');
+    const ostacoli: Area[] = [{ x: 0, y: 0, w: W, h: hBar }];
+    v.territori.forEach((t, i) => {
+      const st = settoreDelTerritorio(c.cat.dati.territori[i].id);
+      if (!st) return;
+      ostacoli.push(targhetta(d, c, ui, az, v, t, i, st, visibili.get(st.id)!, opz, hBar, W));
+    });
+    d.aree['territori:tutti'] = { x: 0, y: hBar, w: W, h: H - hBar - 58 * u };
+
+    // ---------- barra in alto: avversario, messaggio, giro ----------
+    barraAlto(d, c, v, W, hBar, cAvv.chiaro);
+
+    // ---------- segnale di vittoria ----------
+    let yTop = hBar + 4 * u;
+    if (v.segnaleMio || v.segnaleAvv) {
+      const mio = v.segnaleMio;
+      const txt = mio ? 'SEGNALE: sei a una sola tappa dalla vittoria. L\'avversario ha il suo turno di avviso.' : `SEGNALE: ${NOME_FAZ[v.fazioneAvv]} sono a una sola tappa dalla vittoria! Hai un turno per fermarli.`;
+      const w = Math.min(W - 24 * u, d.larghezza(txt, 12, { bold: true }) + 24 * u);
+      d.rett((W - w) / 2, yTop, w, 20 * u, mio ? 0x1f3a22 : 0x5a1f1a, { stroke: mio ? COL.valido : COL.pericolo, r: 10 * u, alpha: 0.94 });
+      d.testo(txt, W / 2, yTop + 10 * u, 12, 0xffffff, { bold: true, anchorX: 0.5, anchorY: 0.5 }).y = yTop + 10 * u;
+      yTop += 24 * u;
+    }
+
+    // ---------- mano ----------
+    const mano = disegnaMano(d, c, ui, az, v, sel, W, H);
+    ostacoli.push(mano.zona);
+
+    // ---------- riga di suggerimento (sopra la mano) ----------
+    {
+      const sug = c.tuoTurno && !c.decisione && !c.finita ? suggerimento(v) : null;
+      const nascosta = ui.suggerimentoNascosto && !ui.toast;
+      const hS = (nascosta ? 15 : 24) * u;
+      const testoS = ui.toast || (sug ? sug.testo : c.finita ? '' : c.tuoTurno ? '' : 'Turno di Lui: aspetta, poi tocca a te.');
+      const urgente = !ui.toast && sug?.tipo === 'avversario-un-passo';
+      const wS = Math.min(470 * u, W - 330 * u);
+      const xS = (W - wS) / 2;
+      const yS = mano.yAlto - hS - 6 * u;
+      ostacoli.push({ x: xS, y: H - 118 * u - 10 * u - hS - 6 * u - 12 * u, w: wS, h: hS + 24 * u });
+      d.rett(xS, yS, wS, hS, ui.toast ? 0x3a2a14 : urgente ? 0x4a1f1a : 0x0e1a26, {
+        stroke: ui.toast ? COL.oro : urgente ? COL.pericolo : 0x3f78b5, id: 'suggerimento', tap: () => az.suggerimento(), r: hS / 2, alpha: 0.92,
+      });
+      if (nascosta) d.testo('Consiglio nascosto: tocca per mostrarlo', W / 2, yS + hS / 2, 10.5, COL.tenue, { anchorX: 0.5, anchorY: 0.5 }).y = yS + hS / 2;
+      else if (testoS) {
+        d.testo(ui.toast ? '!' : 'Consiglio:', xS + 10 * u, yS + hS / 2, 11, COL.oroChiaro, { titoli: true, bold: true, anchorY: 0.5 }).y = yS + hS / 2;
+        d.adatta(testoS, xS + (ui.toast ? 24 : 76) * u, yS + 2 * u, wS - (ui.toast ? 34 : 86) * u, hS - 4 * u, 12.5, 10, 0xffffff, false, 'left');
       }
     }
-    d.rett(vis.x, vis.y, vis.w, vis.h, 0xffffff, {
-      alpha: 0.001, r: 0, tap: () => { if (i >= 0 && c.opzioni().terr.includes(i)) { c.scegliTerritorio(i); az.rerender(); } else az.settore(st.id); },
-    });
-    if (i >= 0) d.aree[`terr:${i}`] = reg;
-    else d.aree[`settore:${st.id}`] = reg;
-    if (valido) glowQuadro(d, vis);
+
+    // ---------- energia, fine turno, regole e registro ----------
+    ostacoli.push(...controlli(d, c, ui, az, v, sel, opz, W, H));
+    puntiLiberi(d, c, visibili, ostacoli, terrDelSettore);
+
+
   }
-
-  // ---------- targhette, miniature, bottoni ----------
-  const cAvv = colori(v.fazioneAvv === 'custodi' ? 'CU' : 'RI');
-  const ostacoli: Area[] = [{ x: 0, y: 0, w: W, h: hBar }];
-  v.territori.forEach((t, i) => {
-    const st = settoreDelTerritorio(c.cat.dati.territori[i].id);
-    if (!st) return;
-    ostacoli.push(targhetta(d, c, ui, az, v, t, i, st, visibili.get(st.id)!, opz, hBar, W));
-  });
-  d.aree['territori:tutti'] = { x: 0, y: hBar, w: W, h: H - hBar - 58 * u };
-
-  // ---------- barra in alto: avversario, messaggio, giro ----------
-  barraAlto(d, c, v, W, hBar, cAvv.chiaro);
-
-  // ---------- segnale di vittoria ----------
-  let yTop = hBar + 4 * u;
-  if (v.segnaleMio || v.segnaleAvv) {
-    const mio = v.segnaleMio;
-    const txt = mio ? 'SEGNALE: sei a una sola tappa dalla vittoria. L\'avversario ha il suo turno di avviso.' : `SEGNALE: ${NOME_FAZ[v.fazioneAvv]} sono a una sola tappa dalla vittoria! Hai un turno per fermarli.`;
-    const w = Math.min(W - 24 * u, d.larghezza(txt, 12, { bold: true }) + 24 * u);
-    d.rett((W - w) / 2, yTop, w, 20 * u, mio ? 0x1f3a22 : 0x5a1f1a, { stroke: mio ? COL.valido : COL.pericolo, r: 10 * u, alpha: 0.94 });
-    d.testo(txt, W / 2, yTop + 10 * u, 12, 0xffffff, { bold: true, anchorX: 0.5, anchorY: 0.5 }).y = yTop + 10 * u;
-    yTop += 24 * u;
-  }
-
-  // ---------- mano ----------
-  const mano = disegnaMano(d, c, ui, az, v, sel, W, H);
-  ostacoli.push(mano.zona);
-
-  // ---------- riga di suggerimento (sopra la mano) ----------
-  {
-    const sug = c.tuoTurno && !c.decisione && !c.finita ? suggerimento(v) : null;
-    const nascosta = ui.suggerimentoNascosto && !ui.toast;
-    const hS = (nascosta ? 15 : 24) * u;
-    const testoS = ui.toast || (sug ? sug.testo : c.finita ? '' : c.tuoTurno ? '' : 'Turno di Lui: aspetta, poi tocca a te.');
-    const urgente = !ui.toast && sug?.tipo === 'avversario-un-passo';
-    const wS = Math.min(470 * u, W - 330 * u);
-    const xS = (W - wS) / 2;
-    const yS = mano.yAlto - hS - 6 * u;
-    ostacoli.push({ x: xS, y: H - 118 * u - 10 * u - hS - 6 * u - 12 * u, w: wS, h: hS + 24 * u });
-    d.rett(xS, yS, wS, hS, ui.toast ? 0x3a2a14 : urgente ? 0x4a1f1a : 0x0e1a26, {
-      stroke: ui.toast ? COL.oro : urgente ? COL.pericolo : 0x3f78b5, id: 'suggerimento', tap: () => az.suggerimento(), r: hS / 2, alpha: 0.92,
-    });
-    if (nascosta) d.testo('Consiglio nascosto: tocca per mostrarlo', W / 2, yS + hS / 2, 10.5, COL.tenue, { anchorX: 0.5, anchorY: 0.5 }).y = yS + hS / 2;
-    else if (testoS) {
-      d.testo(ui.toast ? '!' : 'Consiglio:', xS + 10 * u, yS + hS / 2, 11, COL.oroChiaro, { titoli: true, bold: true, anchorY: 0.5 }).y = yS + hS / 2;
-      d.adatta(testoS, xS + (ui.toast ? 24 : 76) * u, yS + 2 * u, wS - (ui.toast ? 34 : 86) * u, hS - 4 * u, 12.5, 10, 0xffffff, false, 'left');
-    }
-  }
-
-  // ---------- energia, fine turno, regole e registro ----------
-  ostacoli.push(...controlli(d, c, ui, az, v, sel, opz, W, H));
-  puntiLiberi(d, c, visibili, ostacoli, terrDelSettore);
 
   // ---------- sovrapposizioni ----------
   const modale = opz.cerca.length > 0 || !!c.decisione || !!c.evento || ui.regole || c.finita || !!ui.grande;

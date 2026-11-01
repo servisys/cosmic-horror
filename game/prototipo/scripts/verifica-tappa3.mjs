@@ -54,6 +54,8 @@ for (const vista of VISTE) {
       scrollMax = [Math.max(scrollMax[0], s.scroll[0]), Math.max(scrollMax[1], s.scroll[1])];
       for (const t of await page.evaluate(() => window.__ct.fuori())) sforati.add(t);
       if (s.fine) break;
+      // un tocco al centro mentre l'evento si chiudeva da solo puo' aver aperto la scena del pozzo: si torna alla plancia
+      if (await page.evaluate(() => !!window.__ct.scena())) { await clic('scena:indietro'); continue; }
       if (s.segnaleMio || s.segnaleAvv) await una('5_segnale');
       if (s.evento) {
         await una('4_evento_cosmico');

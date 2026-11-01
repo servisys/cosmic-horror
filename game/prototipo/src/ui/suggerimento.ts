@@ -97,6 +97,17 @@ export function suggerimento(v: Vista): Suggerimento | null {
   return { tipo: 'tocca-una-carta', testo: `Hai ${v.energia} di energia: tocca una carta della mano e poi un territorio evidenziato per giocarla.` };
 }
 
+/** Nella scena del territorio: le tue presenze e cosa ti manca per prenderlo (solo numeri gia' visibili nella vista). */
+export function cosaManca(t: VistaTerritorio): string {
+  const mie = t.mie.length ? `${t.mie.length} (forza ${t.forzaMia})` : 'nessuna';
+  const servono = t.forzaLoro + 1;
+  const mancano = servono - t.forzaMia;
+  if (t.controllo === 'io') return `Le tue presenze: ${mie}.
+Lo controlli tu.`;
+  return `Le tue presenze: ${mie}.
+Ti servono ${servono} di forza per prenderlo${t.forzaMia > 0 ? ` (te ne mancano ${mancano})` : ''}.`;
+}
+
 /** Perche' non si puo' porre il Sigillo / completare il rito su un territorio adesso; null se si puo' (o non e' il tuo turno ma e' possibile). */
 export function motivoTappa(v: Vista, t: VistaTerritorio): string | null {
   if (!v.mioTurno) return 'turno di Lui';

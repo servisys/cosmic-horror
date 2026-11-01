@@ -10,7 +10,7 @@ implementation_target: Planning only - non implementabile da Claude in questa ve
 project_prefix: CT_
 related_documents:
   - ../../00_MASTER_INDEX.md
-  - ../../CT_COWORK_CODE_PROTOCOL_V0.1.md
+  - ../../CT_COWORK_CODE_PROTOCOL_V0.4.md
   - CT_VISION_AND_PILLARS_REVIEW_V0.1.md
   - CT_VISION_DECISIONI_V0.2_SCHEDE.md
   - ../03-decisions-changelog/CT_DECISIONI_V0.2_ESITO.md
@@ -50,7 +50,7 @@ Claude non deve usare questo documento per:
 - ampliare lo scope;
 - trasformare indicazioni di atmosfera in requisiti tecnici non approvati.
 
-Le regole di governance da leggere insieme alle fonti autorevoli indicate nel task sono definite nel Master Index e nel protocollo di lavoro Cowork e Claude Code (`CT_COWORK_CODE_PROTOCOL_V0.1.md`).
+Le regole di governance da leggere insieme alle fonti autorevoli indicate nel task sono definite nel Master Index e nel protocollo di lavoro Cowork e Claude Code (`CT_COWORK_CODE_PROTOCOL_V0.4.md`).
 
 ---
 
@@ -594,6 +594,7 @@ L'ordine può essere modificato soltanto registrando la decisione nel changelog 
 | 0.9.0 | DRAFT | Preparata da Cowork. Solo due frasi: `CT-DES-001` - `CT-DES-010` non sono più chiamati «ID provvisori», perché sono nel Decision Log con `Stato: PROPOSTA` (riquadro iniziale e §2). Aggiunto `supersedes` verso la Vision v0.1 «Cosmic Territory», da marcare `DEPRECATED`. Nessun testo di decisione cambiato. |
 | 0.10.0 | DRAFT | Preparata da Cowork. Le decisioni CT-DES-001…013 sono registrate (conferma di Matteo del 2026-10-31): i riquadri «PROPOSTA DI MATTEO, IN ATTESA DI REGISTRAZIONE» diventano «DECISIONE DI MATTEO, REGISTRATA»; aggiornati riquadro iniziale, §5.1, §11, §13 e §17; riferimenti al nuovo protocollo Cowork e Code e alle Voci V0.4 e V0.8. Testi delle decisioni invariati; le parti DA DECIDERE restano aperte. |
 | 0.11.0 | DRAFT | Preparata da Cowork. Integrate le nuove decisioni registrate `CT-DES-015` (turno di avviso garantito prima della vittoria) e `CT-DES-016` (avversario del prototipo con regole fisse per fazione, senza barare): riquadro iniziale, §13, §17, nota sulla vittoria, front matter. |
+| 0.11.0 (nota del 2026-11-01) | DRAFT | Aggiornati solo i due riferimenti al protocollo di lavoro (`related_documents` e §1), da V0.1 a V0.4. La `version` non cambia. Nessun altro testo modificato. |
 
 ---
 

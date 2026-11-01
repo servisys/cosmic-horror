@@ -1,5 +1,73 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-002 - fase esecuzione - 2026-11-01 13:55 - FATTO
+
+# Resoconto CT-DEV-002
+
+**Richiesta eseguita:** fusioni e chiusure di PR autorizzate da Matteo tramite Cowork, eseguite dallo script e mai da Code.
+
+**Esito:** fatto, ma le prove non sono state eseguite (vedi sotto).
+
+## Cosa è stato fatto
+- **Protocollo V0.3** (`docs/CT_COWORK_CODE_PROTOCOL_V0.3.md`, DRAFT, con la dicitura «PROPOSTA DI COWORK, DA CONFERMARE DA MATTEO»).
+  - Cambiano solo §2.1, §3, §8 e il changelog. La V0.2 non è toccata.
+  - In §8 ho aggiunto il punto sul controllo CI futuro, come da risposta 2.
+- **Formato del task** a chiavi piatte, come approvato:
+  - `fusioni: 69@<sha40>, 71@<sha40>`
+  - `file_attesi_69: docs/a.md, docs/cartella/` (facoltativo; una cartella finisce con `/`)
+  - `chiusure: 70, 72`
+  - `motivo_70: testo` (obbligatorio per ogni chiusura)
+- **Script `osserva-scambio.ps1`:**
+  - Le deleghe le legge dal task prima di avviare Code, quindi Code non può cambiarle mentre lavora.
+  - Agiscono solo in fase `esecuzione` e solo se Code finisce con esito FATTO.
+  - **Fusione:** `gh pr merge N --merge --match-head-commit <sha>`. Prima lo script controlla questi punti:
+    - PR aperta, base `main`, non da fork, non in bozza.
+    - Testa uguale allo sha del task.
+    - Fondibile senza conflitti.
+    - File toccati dentro `file_attesi`, se presente.
+  - **Chiusura:** `gh pr close N --comment <motivo>`, solo se la PR è aperta.
+  - Un errore di formato ferma tutto. Una PR non elencata non viene mai toccata. Senza i campi non cambia nulla.
+  - Il resoconto pubblicato ha una riga per PR: FUSA, CHIUSA o FERMATA, con il motivo.
+  - Le regole date a Code dicono ora che fusioni e chiusure del task le fa lo script. I permessi vietati a Code (`gh pr merge`, `gh pr close`) sono invariati.
+  - Ho esteso la lettura del front matter a chiavi con numeri.
+  - Il punto dove aggiungere un controllo CI è indicato in `Esegui-Deleghe`, prima di `gh pr merge`.
+- **Opzione `-ProvaDeleghe <TASK.md> [-DatiPr file.json]`:** mostra cosa farebbe lo script, senza fondere né chiudere nulla.
+- **Prove** in `prove/controlla-deleghe.ps1`, con dati finti in `prove/deleghe/`:
+  - PR del task con lo sha giusto passano.
+  - Sono fermate: sha diverso, base diversa, conflitti, file fuori elenco, PR già fusa o chiusa.
+  - Una PR non elencata non compare nell'uscita.
+  - Un task con errori di formato non esegue nulla; un task senza campi non cambia nulla.
+- **LEGGIMI aggiornato.**
+
+## Verifiche
+- `git diff --stat`: 11 file, +406/−5.
+- Nei `.ps1` non ci sono caratteri non ASCII.
+
+## Branch e PR
+- Branch `feature/ct-dev-002-fusioni-tramite-cowork`, PR #69 verso `main`. La PR non è stata fusa né chiusa. Sono tornato su `main`.
+
+## Cosa non è stato verificato
+- **Non ho eseguito nessuna prova.** In questa sessione `powershell.exe` richiedeva un'approvazione che non c'era. Il codice non è mai stato eseguito.
+- I file `*.atteso.txt` li ho scritti a mano ragionando sul codice, non con `-Scrivi`. Se qualche riga non combacia, la causa può essere un errore di battitura mio o un bug vero.
+- **Mai eseguiti davvero:** `gh pr merge`, `gh pr close`, `gh pr view --json …` e `gh pr diff --name-only`. Non so se `gh pr view --json` accetta davvero tutti i campi che chiedo, né se tutta la sezione fusioni/chiusure gira nel flusso reale. L'attesa del campo `mergeable` quando vale `UNKNOWN` (4 tentativi da 3 secondi) è anch'essa non provata.
+- L'integrazione nel flusso principale (resoconto con le righe per PR) non è stata provata end-to-end.
+
+## Comandi da lanciare
+1. Prove con dati finti (da `cosmic-horror`):
+   `powershell -NoProfile -ExecutionPolicy Bypass -File strumenti\windows-scambio\prove\controlla-deleghe.ps1`
+   Se mostra differenze volute, `-Scrivi` riscrive i file attesi.
+2. Prova con `gh` vero, in sola lettura, su un task vero:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File strumenti\windows-scambio\osserva-scambio.ps1 -ProvaDeleghe C:\percorso\TASK.md`
+3. Prova di `gh` su una PR vera, senza azioni: `gh pr view 69 --json state,baseRefName,headRefOid,mergeable,isDraft,isCrossRepository`.
+
+## Rischi residui
+- Se `gh` fallisce a metà tra una fusione e l'altra, alcune PR possono risultare fuse e altre ferme. Il resoconto lo dice, ma non c'è un rollback.
+- Chi scrive su `scambio` può delegare fusioni e chiusure. Il punto è annotato in §8 della V0.3.
+
+Comandi bloccati dai permessi: 2. Primi 2: `cd strumenti/windows-scambio/prove 2>/dev/null; powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./controlla-dele...`; `powershell.exe -NoProfile -ExecutionPolicy Bypass -File strumenti/windows-scambio/prove/controlla-deleghe.ps1 -Scrivi`
+
+---
+
 ## CT-DEV-002 - fase piano - 2026-11-01 13:48 - FATTO
 
 # Pre-flight plan CT-DEV-002 (fase piano)

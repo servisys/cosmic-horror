@@ -1,0 +1,9 @@
+- PR #69: SAREBBE FUSA (prova: controlli passati, nessuna azione).
+- PR #71: FERMATA, la testa e' 9999999999999999999999999999999999999999, non bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.
+- PR #72: FERMATA, la base e' 'feature/altro', non main.
+- PR #73: FERMATA, la PR non e' fondibile senza conflitti (stato CONFLICTING).
+- PR #74: FERMATA, tocca file non previsti: src/codice.js.
+- PR #75: FERMATA, la PR non e' aperta (stato MERGED).
+- PR #76: SAREBBE FUSA (prova: controlli passati, nessuna azione).
+- PR #80: SAREBBE CHIUSA con commento (prova, nessuna azione).
+- PR #81: FERMATA, la PR non e' aperta (stato CLOSED).

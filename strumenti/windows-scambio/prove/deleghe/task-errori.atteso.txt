@@ -1,0 +1,4 @@
+- Errore di formato nel task: voce di fusioni non valida '69@aaaa' (serve numero@sha di 40 caratteri minuscoli)
+- Errore di formato nel task: PR 70 elencata due volte
+- Errore di formato nel task: chiusura della PR 80 senza motivo_80
+- Nessuna fusione o chiusura eseguita (un errore di formato ferma tutto).

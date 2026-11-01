@@ -15,6 +15,8 @@
 #   -Stato    mostra a che punto e' (ultime righe del log, blocco, STATO.md)
 #   -Riprova  esegue di nuovo il TASK.md attuale anche se e' gia' stato eseguito
 #   -Prova <file.jsonl>  non lancia Code: mostra resoconto, comandi.txt e riga dei bloccati ricavati da un flusso salvato
+#   -ProvaDeleghe <TASK.md> [-DatiPr <file.json>]  non lancia Code e non fonde ne' chiude nulla: mostra cosa farebbe lo script
+#                        con i campi fusioni/chiusure del task (dati delle PR da gh in sola lettura, oppure dal file json)
 # Scritto per Windows PowerShell 5.1 (quello incluso in Windows). Solo caratteri ASCII in questo file.
 
 param(
@@ -24,6 +26,8 @@ param(
   [string]$Claude = '',
   [int]$TimeoutMinuti = 90,
   [string]$Prova = '',
+  [string]$ProvaDeleghe = '',
+  [string]$DatiPr = '',
   [switch]$Stato,
   [switch]$Riprova
 )
@@ -35,12 +39,12 @@ $Branch = 'scambio'
 $StatoDir = Join-Path $Base 'stato'
 $LogDir = Join-Path $Base 'log'
 $RunDir = Join-Path $Base 'esecuzioni'
-if (-not $Prova) { New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null }   # -Prova non crea nulla
+if (-not $Prova -and -not $ProvaDeleghe) { New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null }   # -Prova non crea nulla
 $Log = Join-Path $LogDir 'scambio.log'
 $Blocco = Join-Path $StatoDir 'blocco'
 $Fatti = Join-Path $StatoDir 'task-eseguiti.txt'
 $Vuoto = Join-Path $StatoDir 'vuoto.txt'
-if (-not $Prova -and -not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
+if (-not $Prova -and -not $ProvaDeleghe -and -not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
 
 # ---------------------------------------------------------------- utilita'
 
@@ -78,7 +82,7 @@ function Leggi-FrontMatter([string]$testo) {
   if ($righe.Count -eq 0 -or $righe[0].Trim() -ne '---') { return $h }
   for ($i = 1; $i -lt $righe.Count; $i++) {
     if ($righe[$i].Trim() -eq '---') { break }
-    if ($righe[$i] -match '^\s*([A-Za-z_]+)\s*:\s*(.*?)\s*$') {
+    if ($righe[$i] -match '^\s*([A-Za-z0-9_]+)\s*:\s*(.*?)\s*$') {
       $h[$matches[1].ToLower()] = $matches[2].Trim([char[]]@('"', "'"))
     }
   }
@@ -241,6 +245,143 @@ function Riga-Bloccati($info) {
   return $riga
 }
 
+# ---------------------------------------------------------------- fusioni e chiusure (le fa lo script, mai Code)
+#
+# Campi piatti nel front matter di TASK.md (scritti da Cowork solo dopo il si' di Matteo in chat per quella PR):
+#   fusioni: 69@<sha40>, 71@<sha40>     numero@sha completo (40 caratteri minuscoli) della testa della PR
+#   file_attesi_69: docs/a.md, docs/b/  facoltativo: file che la PR puo' toccare (percorso esatto, o cartella che finisce con /)
+#   chiusure: 70, 72                    numeri delle PR da chiudere
+#   motivo_70: testo del commento       obbligatorio per ogni chiusura
+# Qualsiasi errore di formato = non si esegue niente. Senza questi campi nulla cambia: fusioni e chiusure restano bloccate.
+
+function Leggi-Deleghe($fm) {
+  $fusioni = New-Object System.Collections.ArrayList
+  $chiusure = New-Object System.Collections.ArrayList
+  $errori = New-Object System.Collections.ArrayList
+  $visti = @{}
+  $presente = $false
+  if ($fm['fusioni']) {
+    $presente = $true
+    foreach ($v in ($fm['fusioni'] -split ',')) {
+      $v = $v.Trim()
+      if (-not $v) { continue }
+      if ($v -cmatch '^(\d+)@([0-9a-f]{40})$') {
+        $n = [int]$matches[1]; $sha = $matches[2]
+        if ($visti.ContainsKey($n)) { [void]$errori.Add("PR $n elencata due volte"); continue }
+        $visti[$n] = $true
+        $attesi = @()
+        if ($fm["file_attesi_$n"]) { $attesi = @(($fm["file_attesi_$n"] -split ',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
+        [void]$fusioni.Add(@{ Pr = $n; Sha = $sha; Attesi = $attesi })
+      } else { [void]$errori.Add("voce di fusioni non valida '$v' (serve numero@sha di 40 caratteri minuscoli)") }
+    }
+  }
+  if ($fm['chiusure']) {
+    $presente = $true
+    foreach ($v in ($fm['chiusure'] -split ',')) {
+      $v = $v.Trim()
+      if (-not $v) { continue }
+      if ($v -notmatch '^\d+$') { [void]$errori.Add("voce di chiusure non valida '$v' (serve il numero della PR)"); continue }
+      $n = [int]$v
+      if ($visti.ContainsKey($n)) { [void]$errori.Add("PR $n elencata due volte (fusioni/chiusure)"); continue }
+      $visti[$n] = $true
+      $motivo = ("" + $fm["motivo_$n"]).Replace('"', "'").Trim()
+      if (-not $motivo) { [void]$errori.Add("chiusura della PR $n senza motivo_$n"); continue }
+      [void]$chiusure.Add(@{ Pr = $n; Motivo = $motivo })
+    }
+  }
+  if ($presente -and $fusioni.Count -eq 0 -and $chiusure.Count -eq 0 -and $errori.Count -eq 0) { [void]$errori.Add('campi fusioni/chiusure vuoti') }
+  return @{ Presente = $presente; Fusioni = @($fusioni); Chiusure = @($chiusure); Errori = @($errori) }
+}
+
+# gh dalla cartella del repository; restituisce testo e codice di uscita
+function Invoke-Gh {
+  $ErrorActionPreference = 'Continue'
+  Push-Location $Repo
+  try {
+    $out = & gh @args 2>&1
+    $code = $LASTEXITCODE
+  } catch {
+    $out = $_.Exception.Message
+    $code = 1
+  } finally { Pop-Location }
+  $testo = ($out | ForEach-Object { "$_" }) -join "`n"
+  return @{ Out = $testo.Trim(); Code = $code }
+}
+
+# dati di una PR: da gh (sola lettura) oppure, per le prove, da un file json { "69": { stato, base, testa, fondibile, bozza, forkEsterno, file } }
+function Dati-Pr([int]$n) {
+  if ($DatiPr) {
+    $j = [IO.File]::ReadAllText($DatiPr, $Utf8) | ConvertFrom-Json
+    $o = $j."$n"
+    if (-not $o) { return @{ Errore = "PR $n non trovata" } }
+    return @{ Stato = [string]$o.stato; Base = [string]$o.base; Testa = [string]$o.testa; Fondibile = [string]$o.fondibile; Bozza = [bool]$o.bozza; Fork = [bool]$o.forkEsterno; File = @($o.file) }
+  }
+  $o = $null
+  for ($i = 1; $i -le 4; $i++) {
+    $v = Invoke-Gh pr view "$n" --json 'state,baseRefName,headRefOid,mergeable,isDraft,isCrossRepository'
+    if ($v.Code -ne 0) { return @{ Errore = "gh pr view non riuscito: $($v.Out)" } }
+    try { $o = $v.Out | ConvertFrom-Json } catch { return @{ Errore = 'risposta di gh non leggibile' } }
+    if ($o.mergeable -ne 'UNKNOWN') { break }
+    Start-Sleep -Seconds 3
+  }
+  $d = Invoke-Gh pr diff "$n" --name-only
+  if ($d.Code -ne 0) { return @{ Errore = "gh pr diff non riuscito: $($d.Out)" } }
+  $file = @(($d.Out -split "`n") | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+  return @{ Stato = [string]$o.state; Base = [string]$o.baseRefName; Testa = [string]$o.headRefOid; Fondibile = [string]$o.mergeable; Bozza = [bool]$o.isDraft; Fork = [bool]$o.isCrossRepository; File = $file }
+}
+
+# esegue le deleghe del task con i controlli dello script; restituisce una riga per PR. $simula = non fonde e non chiude nulla.
+function Esegui-Deleghe($dl, [bool]$simula) {
+  $righe = New-Object System.Collections.ArrayList
+  if ($dl.Errori.Count -gt 0) {
+    foreach ($e in $dl.Errori) { [void]$righe.Add("- Errore di formato nel task: $e") }
+    [void]$righe.Add('- Nessuna fusione o chiusura eseguita (un errore di formato ferma tutto).')
+    return @($righe)
+  }
+  if (-not $simula -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    [void]$righe.Add('- gh non trovato sul PC: nessuna fusione o chiusura eseguita.')
+    return @($righe)
+  }
+  foreach ($f in $dl.Fusioni) {
+    $n = $f.Pr
+    $p = Dati-Pr $n
+    $stop = ''
+    if ($p.Errore) { $stop = $p.Errore }
+    elseif ($p.Stato -ne 'OPEN') { $stop = "la PR non e' aperta (stato $($p.Stato))" }
+    elseif ($p.Base -ne 'main') { $stop = "la base e' '$($p.Base)', non main" }
+    elseif ($p.Fork) { $stop = 'la PR arriva da un fork' }
+    elseif ($p.Bozza) { $stop = 'la PR e'' in bozza' }
+    elseif ($p.Testa -cne $f.Sha) { $stop = "la testa e' $($p.Testa), non $($f.Sha)" }
+    elseif ($p.Fondibile -ne 'MERGEABLE') { $stop = "la PR non e' fondibile senza conflitti (stato $($p.Fondibile))" }
+    elseif ($p.File.Count -eq 0) { $stop = 'la PR non tocca nessun file' }
+    elseif ($f.Attesi.Count -gt 0) {
+      $fuori = @($p.File | Where-Object {
+        $x = $_
+        -not (@($f.Attesi | Where-Object { ($_ -ceq $x) -or ($_.EndsWith('/') -and $x.StartsWith($_)) }).Count -gt 0)
+      })
+      if ($fuori.Count -gt 0) { $stop = "tocca file non previsti: $($fuori -join ', ')" }
+    }
+    if ($stop) { [void]$righe.Add("- PR #${n}: FERMATA, $stop."); continue }
+    if ($simula) { [void]$righe.Add("- PR #${n}: SAREBBE FUSA (prova: controlli passati, nessuna azione)."); continue }
+    $m = Invoke-Gh pr merge "$n" --merge --match-head-commit $f.Sha
+    if ($m.Code -eq 0) { [void]$righe.Add("- PR #${n}: FUSA (merge commit, testa $($f.Sha)).") }
+    else { [void]$righe.Add("- PR #${n}: FERMATA, gh pr merge non riuscito: $($m.Out -replace '\s+', ' ').") }
+  }
+  foreach ($c in $dl.Chiusure) {
+    $n = $c.Pr
+    $p = Dati-Pr $n
+    $stop = ''
+    if ($p.Errore) { $stop = $p.Errore }
+    elseif ($p.Stato -ne 'OPEN') { $stop = "la PR non e' aperta (stato $($p.Stato))" }
+    if ($stop) { [void]$righe.Add("- PR #${n}: FERMATA, $stop."); continue }
+    if ($simula) { [void]$righe.Add("- PR #${n}: SAREBBE CHIUSA con commento (prova, nessuna azione)."); continue }
+    $m = Invoke-Gh pr close "$n" --comment $c.Motivo
+    if ($m.Code -eq 0) { [void]$righe.Add("- PR #${n}: CHIUSA con commento.") }
+    else { [void]$righe.Add("- PR #${n}: FERMATA, gh pr close non riuscito: $($m.Out -replace '\s+', ' ').") }
+  }
+  return @($righe)
+}
+
 # ---------------------------------------------------------------- regole fisse per Code
 
 $RegoleComuni = 'Sei Claude Code avviato in automatico dallo script di scambio di Cosmic Horror, senza nessuno davanti allo schermo. ' +
@@ -258,7 +399,8 @@ $RegoleEsecuzione = 'FASE ESECUZIONE: esegui il task seguendo il pre-flight plan
   'Il push si fa SOLO con il comando esatto: git push -u origin HEAD (nessun altro argomento: niente HEAD:nome, niente nome del branch, niente pipe). Ogni altro push e vietato e viene bloccato. ' +
   'A fine lavoro torna su main con git switch main (oppure git checkout main), cosi il repository di lavoro resta pulito. ' +
   'Non usare cd (sei gia nel repository), ne pipe, ne sed: per modificare i file usa lo strumento Edit, e ogni comando git va dato da solo. ' +
-  'Non fondere, non chiudere PR, non cancellare branch, niente force push. Lancia i test indicati nel task e riportane l esito.'
+  'Non fondere, non chiudere PR, non cancellare branch, niente force push. Lancia i test indicati nel task e riportane l esito. ' +
+  'Se il task elenca fusioni o chiusure, le esegue lo script dopo di te con i suoi controlli: tu non devi farle e non devi dire che sono fatte.'
 
 $ToolPiano = 'Read,Glob,Grep,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch --show-current),Bash(git branch --list:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*)'
 # fase esecuzione: niente node ne' npx; git solo coi sottocomandi necessari; push solo di HEAD (nessun refspec possibile: ne' :, ne' +, ne' main);
@@ -298,6 +440,16 @@ if ($Prova) {
   Write-Output $info.Comandi
   Write-Output '=== RIGA PUBBLICATA ==='
   Write-Output (Riga-Bloccati $info)
+  exit 0
+}
+
+# ---------------------------------------------------------------- comando -ProvaDeleghe
+
+if ($ProvaDeleghe) {
+  $fmP = Leggi-FrontMatter ([IO.File]::ReadAllText($ProvaDeleghe, $Utf8))
+  $dlP = Leggi-Deleghe $fmP
+  if (-not $dlP.Presente) { Write-Output 'Il task non ha campi fusioni/chiusure: nessuna delega, fusioni e chiusure restano bloccate.'; exit 0 }
+  Esegui-Deleghe $dlP $true | ForEach-Object { Write-Output $_ }
   exit 0
 }
 
@@ -419,6 +571,20 @@ try {
     $corpo = "Claude Code non ha prodotto un resoconto. Ultime righe degli errori:`n`n``````text`n$err`n``````"
   }
   if ($rigaBloccati) { $corpo = $corpo.TrimEnd() + "`n`n" + $rigaBloccati }
+
+  # fusioni e chiusure: solo in fase esecuzione, solo se l'esito di Code e' FATTO, solo quelle elencate nel task (letto prima dell'avvio di Code)
+  $dl = Leggi-Deleghe $fm
+  if ($dl.Presente) {
+    $righeDeleghe = @()
+    if ($fase -ne 'esecuzione') { $righeDeleghe = @("- Campi fusioni/chiusure ignorati: la fase e' $fase, non esecuzione.") }
+    elseif ($esito -ne 'FATTO') { $righeDeleghe = @("- Nessuna fusione o chiusura eseguita: esito di Code $esito.") }
+    else {
+      try { $righeDeleghe = @(Esegui-Deleghe $dl $false) }
+      catch { $righeDeleghe = @("- Nessuna fusione o chiusura completata per un errore dello script: $($_.Exception.Message)") }
+    }
+    foreach ($r in $righeDeleghe) { Scrivi-Log "$id | deleghe | $r" }
+    $corpo = $corpo.TrimEnd() + "`n`n**Fusioni e chiusure (eseguite dallo script, non da Code):**`n`n" + ($righeDeleghe -join "`n")
+  }
   $branchDopo = (Invoke-Git $Repo rev-parse --abbrev-ref HEAD).Out
   $durata = [int]($fine - $inizio).TotalMinutes
 

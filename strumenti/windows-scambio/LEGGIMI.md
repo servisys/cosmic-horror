@@ -19,7 +19,7 @@ Le regole stanno nello script, non nel task: un testo in `TASK.md` non può alla
 - Fase `piano`: solo lettura. Può leggere file e usare solo `git status`, `log`, `diff`, `show`, `fetch`, `ls-files`, `git branch --show-current` e `git branch --list`, e `gh pr view`, `list`, `diff`. Niente modifiche, commit, push o creazione di branch.
 - Fase `esecuzione`: modifica file, fa commit e push **solo di branch `feature/`, `fix/` o `planning/`**, e può aprire PR. `git` è limitato ai sottocomandi necessari (`status`, `log`, `diff`, `show`, `fetch`, `ls-files`, `add`, `commit`, `checkout`/`switch` verso un branch `feature/`, `fix/`, `planning/` o `main`, `push` di quei branch). `npm` solo `ci`, `test`, `run build`, `run verifica…`. Niente `node` né `npx`.
 - Sempre vietati: fusioni, chiusure di PR, force push (anche con `+` davanti al branch), push che cancellano branch (`:branch`, `--delete`), push su `main`, `git reset --hard`, `git clean`, `gh api`.
-- Fusioni e chiusure restano come nel protocollo: le autorizza solo Matteo, scrivendo direttamente a Code in una sessione interattiva.
+- Fusioni e chiusure le autorizza solo Matteo: scrivendo a Code in una sessione interattiva, oppure parlando con la chat (vedi «Fusioni e chiusure autorizzate» più sotto). In ogni caso Code non ha mai il permesso di farle: nel canale automatico le fa lo script.
 
 I divieti sono regole di Claude Code sui comandi, quindi un comando scritto in modo diverso potrebbe sfuggire. La protezione vera di `main` è una regola di branch (ruleset) su GitHub: blocca force push e cancellazione e richiede una PR per modificare `main`.
 
@@ -70,6 +70,37 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\CosmicHorr
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\disinstalla.ps1            # solo l'attività
 powershell -NoProfile -ExecutionPolicy Bypass -File .\disinstalla.ps1 -AncheCartella
+```
+
+## Fusioni e chiusure autorizzate (campi facoltativi del task)
+
+La chat li scrive nel front matter di `TASK.md` solo dopo un sì esplicito di Matteo che nomina la PR. Senza questi campi non cambia nulla: fusioni e chiusure restano bloccate.
+
+```yaml
+fusioni: 69@<sha completo di 40 caratteri minuscoli>, 71@<sha>
+file_attesi_69: docs/a.md, docs/cartella/    # facoltativo; una cartella finisce con /
+chiusure: 70, 72
+motivo_70: testo del commento                # obbligatorio per ogni chiusura
+motivo_72: testo del commento
+```
+
+Cosa fa lo script (e non Code), solo in fase `esecuzione`, solo dopo che Code ha finito con esito FATTO:
+
+- **Fusione** (`gh pr merge <n> --merge --match-head-commit <sha>`, mai `--squash`, `--rebase`, `--delete-branch`, `--admin`, `--auto`), solo se: PR aperta, base `main`, non da fork, non in bozza, testa uguale allo sha del task, fondibile senza conflitti, file toccati tutti dentro `file_attesi` (se c'è).
+- **Chiusura** (`gh pr close <n> --comment <motivo>`, mai `--delete-branch`), solo se la PR è aperta.
+- Un errore di formato (sha corto, PR doppia, chiusura senza motivo) ferma tutto. Una PR non elencata non viene mai toccata.
+- Il task usato è quello letto prima dell'avvio di Code: Code non può cambiarlo mentre lavora.
+- Il resoconto su `REPORT.md` ha in fondo una riga per PR: FUSA, CHIUSA o FERMATA e perché.
+- Se Code non finisce con FATTO (errore o tempo scaduto), non si fonde e non si chiude nulla.
+- Dove aggiungere un controllo CI in futuro: in `Esegui-Deleghe`, prima di `gh pr merge` (per esempio `gh pr checks`).
+
+Prove (non fondono e non chiudono nulla):
+
+```powershell
+# regole con dati finti: passano solo le PR del task con lo sha giusto, le altre vengono fermate
+powershell -NoProfile -ExecutionPolicy Bypass -File prove\controlla-deleghe.ps1
+# con gh vero, in sola lettura, su un task vero: mostra cosa farebbe lo script
+powershell -NoProfile -ExecutionPolicy Bypass -File osserva-scambio.ps1 -ProvaDeleghe C:\percorso\TASK.md
 ```
 
 ## Formato di TASK.md

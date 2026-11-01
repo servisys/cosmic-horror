@@ -1,5 +1,35 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-003 - fase esecuzione - 2026-11-01 20:10 - FATTO
+
+**Esito: FATTO.** Ho ripetuto i controlli in sola lettura con `gh pr view 72` e sono tutti positivi.
+
+- **Stato:** la PR 72 è aperta (`OPEN`).
+- **Destinazione:** `main`.
+- **Testa:** `c2e5529755042f83472653eb76f8e06fc1a8a754`, uguale allo sha indicato in `fusioni`.
+- **Fondibilità:** `MERGEABLE` e `CLEAN`, quindi senza conflitti con `main`, che nel frattempo è avanzato con le PR 71 e 73.
+- **File toccati:** sono 51, come scritto nel task. Stanno tutti dentro `file_attesi_72`:
+  - `docs/00_MASTER_INDEX.md`
+  - `docs/00-project-overview/02-roadmap/`
+  - `docs/00-project-overview/03-decisions-changelog/`
+  - `docs/01-game-design/01-core-rules/`
+  - `docs/03-cards-content/01-card-database/`
+  - `game/prototipo/`
+
+**Cosa ho fatto:** niente di diverso dai controlli. Non ho modificato file, non ho creato commit, branch, push né PR, e non ho toccato la descrizione della PR. Il repository è rimasto su `main`, pulito.
+
+**Fusione:** non l'ho eseguita e non la considero fatta. La esegue lo script con i suoi controlli.
+
+**Non verificato:** non ho lanciato test, perché il task non li richiede oltre ai controlli del punto 1. Non ho letto il contenuto dei 51 file, solo i percorsi.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- PR #72: FUSA (merge commit, testa c2e5529755042f83472653eb76f8e06fc1a8a754).
+
+---
+
 ## CT-DEL-003 - fase piano - 2026-11-01 20:05 - FATTO
 
 **Esito CT-DEL-003, fase piano: tutti i controlli positivi, task pronto. Non ho fuso nulla.**

@@ -1,6 +1,6 @@
 ---
 id: CT-DEV-002
-fase: piano
+fase: esecuzione
 pronto: si
 branch: feature/ct-dev-002-fusioni-tramite-cowork
 scritto_da: Cowork (chat Claude del progetto)
@@ -14,6 +14,14 @@ data: 2026-11-01
 - `docs/00_MASTER_INDEX.md` (APPROVED 0.5.0).
 - `strumenti/windows-scambio/osserva-scambio.ps1` e `LEGGIMI.md`.
 - Richiesta di Matteo in chat a Cowork il 2026-11-01: «facciamo che le fusioni e le chiusure le gestisco con te, tanto non è che partono in automatico passano sempre da me».
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («vai»). Segui il pre-flight plan (fusioni e chiusure eseguite dallo script, non da Code; `gh pr merge` e `gh pr close` restano vietati a Code). Risposte:
+1. Sì: fusioni e chiusure dopo il lavoro di Code, solo se l'esito è FATTO.
+2. Nessun controllo CI per ora (il repository non ne ha); prevedi dove aggiungerlo.
+3. Master Index non aggiornato alla V0.3 finché Matteo non la approva.
+4. Sì al formato a chiavi piatte (`fusioni: N@sha40`, `file_attesi_N`, `chiusure: N`, `motivo_N`).
+Nel resoconto: elenco esplicito di cosa non è stato eseguito davvero e il comando per la prova con `gh` vero.
 
 ## Obiettivo
 Matteo vuole autorizzare fusioni e chiusure di PR parlando solo con Cowork. Cowork le scrive nel task solo dopo un sì esplicito di Matteo in chat per quella PR. Il canale automatico deve poterle eseguire, con protezioni strette.

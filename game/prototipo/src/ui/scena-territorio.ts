@@ -7,6 +7,7 @@ import type { Controller } from './controller.js';
 import { COL, Disegno, texturaGradiente } from './disegno.js';
 import { texturaScena } from './immagini.js';
 import type { Azioni, UiStato } from './scena.js';
+import { aloneLuce, anim } from './animazioni.js';
 import { cosaManca, motivoTappa } from './suggerimento.js';
 import type { VistaPresenza } from '../motore/vista.js';
 
@@ -58,6 +59,18 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
     d.s.addChild(sp);
   } else {
     d.testo('Caricamento della scena…', W / 2, H / 2, 14, COL.tenue, { anchorX: 0.5, anchorY: 0.5, corsivo: true });
+  }
+  // candele, lanterne e bagliori della scena (si animano)
+  if (tex && st.luci) {
+    const k = Math.max(W / tex.width, H / tex.height);
+    const ox = (W - tex.width * k) / 2;
+    const oy = (H - tex.height * k) / 2;
+    const colori = { candela: 0xffa040, viola: 0xb070ff, verde: 0x40ffa8 } as const;
+    for (const l of st.luci) {
+      const dd = l.d * tex.width * k;
+      const sp = aloneLuce(d, ox + l.x * tex.width * k, oy + l.y * tex.height * k, dd, dd, colori[l.tipo]);
+      anim.luce(sp, l.tipo === 'candela' ? 'candela' : 'pulsa', { min: l.tipo === 'candela' ? 0.3 : 0.15, max: l.tipo === 'candela' ? 0.8 : 0.5, periodo: l.tipo === 'candela' ? 900 : 3400 });
+    }
   }
   const vg = new Sprite(texturaVignetta());
   vg.width = W;
@@ -146,8 +159,12 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
   const px = W - 20 * u - pw;
   let y = 62 * u;
   d.rett(px, y, pw, 54 * u, 0x0a0704, { alpha: 0.86, stroke: COL.oroScuro, sw: 1.2, r: 6 * u });
-  d.testo(String(t.forzaLoro), px + 22 * u, y + 27 * u, 30, COL.lui, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = y + 27 * u;
-  d.testo(String(t.forzaMia), px + pw - 22 * u, y + 27 * u, 30, COL.tu, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = y + 27 * u;
+  const nL = d.testo(String(t.forzaLoro), px + 22 * u, y + 27 * u, 30, COL.lui, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 });
+  nL.y = y + 27 * u;
+  anim.numero(`t${i}:lui`, t.forzaLoro, nL);
+  const nM = d.testo(String(t.forzaMia), px + pw - 22 * u, y + 27 * u, 30, COL.tu, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 });
+  nM.y = y + 27 * u;
+  anim.numero(`t${i}:mia`, t.forzaMia, nM);
   const cxp = px + pw / 2;
   for (let k = 1; k <= 5; k++) {
     const pieno = k <= t.inst;
@@ -165,6 +182,7 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
     const col = faz === 'custodi' ? 0xb3301f : 0x2f8a4c;
     const luce = faz === 'custodi' ? 0xff7a62 : 0x9ff0b8;
     d.rett(px, y, pw, 26 * u, 0x0a0704, { alpha: 0.82, stroke: luce, sw: 1, r: 6 * u });
+    d.punti[`disco:${i}:${faz === v.fazione ? 'mio' : 'loro'}`] = { x: px + 15 * u, y: y + 13 * u };
     if (togl) d.cerchio(px + 15 * u, y + 13 * u, 8 * u, 0x000000, { alpha: 0.4, stroke: luce, sw: 2 });
     else { d.cerchio(px + 15 * u, y + 13 * u, 10 * u, luce, { alpha: 0.25 }); d.cerchio(px + 15 * u, y + 13 * u, 8 * u, col, { stroke: luce, sw: 1 }); }
     d.adatta(togl ? `${testo}: ${sicuro}` : `${testo}: al sicuro`, px + 30 * u, y + 3 * u, pw - 36 * u, 20 * u, 12, 10, 0xe6dcc4, false, 'left');

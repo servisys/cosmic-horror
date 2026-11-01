@@ -78,12 +78,15 @@ export interface OpzRett {
 
 export class Disegno {
   aree: Record<string, Area> = {};
+  /** Punti notevoli del disegno (per esempio il centro dei dischi delle tappe): servono alle animazioni. */
+  punti: Record<string, { x: number; y: number }> = {};
   constructor(readonly s: Container, readonly u: number) {}
 
   /** Un altro disegno che scrive dentro un contenitore (coordinate locali) ma condivide scala e registro delle aree. */
   dentro(contenitore: Container): Disegno {
     const n = new Disegno(contenitore, this.u);
     n.aree = this.aree;
+    n.punti = this.punti;
     return n;
   }
 

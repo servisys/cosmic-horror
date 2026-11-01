@@ -160,7 +160,7 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
         if (await a.ha('btn:gioca')) await a.tap('btn:gioca');
       }
       const n1 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
-      if (n1 <= n0) { const dbg = await p.evaluate(() => ({ sel: window.__ct.ctrl.selezione, opz: window.__ct.ctrl.opzioni(), grande: !!window.__ct.aree()['grande:chiudi'], tut: window.__ct.tutorialAttivo() })); await p.screenshot({ path: `${OUT}/_errore.png` }); await ctx.close(); return { ok: false, dettaglio: 'mossa senza effetto: ' + JSON.stringify(m) + ' ' + JSON.stringify(dbg) }; }
+      if (n1 <= n0) { const dbg = await p.evaluate(() => ({ sel: window.__ct.ctrl.selezione, opz: window.__ct.ctrl.opzioni(), grande: !!window.__ct.aree()['grande:chiudi'], tut: window.__ct.tutorialAttivo() })); await p.screenshot({ path: `${OUT}/_errore.png` }); await ctx.close(); return { ok: false, dettaglio: 'mossa senza effetto: ' + JSON.stringify(m) + ' ' + JSON.stringify(dbg) + ' storia: ' + storia.slice(-6).join(' ') }; }
     }
     await ctx.close();
   }

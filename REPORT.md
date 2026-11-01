@@ -1,5 +1,113 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FEAT-002 - fase esecuzione - 2026-11-01 19:50 - FATTO
+
+# Resoconto CT-FEAT-002: cinque territori, seconda parte
+
+## Richiesta eseguita
+Ho completato il gioco a 5 territori: computer secondo CT-DES-074, interfaccia con 5 quadri giocabili, simulazioni e build. Ho lavorato sullo stesso branch della PR 72, come deciso (opzione A). **Non sono riuscito ad aggiornare la descrizione della PR**: `gh pr edit` richiede un'approvazione che qui non c'era.
+
+## Verifiche
+Tutto da `game/prototipo`.
+
+| Controllo | Esito |
+|---|---|
+| `npm run tipi` | verde |
+| `npm test` | 265 test verdi (erano 243) |
+| `npm run build` | ok |
+| `npm run leggibilita` | ok, 956x440, 844x390, 740x340, 5 quadri |
+| `npm run sovrapposizioni` | ok, stesse tre misure, 0/3/6 carte per lato |
+| `verifica-cinque-territori` (nuova) | ok |
+| `verifica-tappa3`, `verifica-tappa4`, `verifica-aiuti`, `verifica-animazioni` | ok |
+| `verifica-pwa` sulla build in `scambio/da-claude/tappa5/dist/`, da sottocartella e con CSP | ok |
+
+- **La nuova verifica** copre la targhetta «ULTIMA TAPPA», le Pietre ritte, la Pietra Incisa e una partita completa per fazione vinta dall'interfaccia. In entrambe la tappa vincente è a R'lyeh.
+- **`verifica-pwa`:** il controllo «tutto schermo al primo tocco» è fallito alla prima esecuzione sulla build finale e passato alla seconda. Sembra instabile, non rotto.
+- **`ELENCO_FILE.txt`** è aggiornato con i 104 file della build.
+
+## Cosa è stato fatto
+- **Computer:**
+  - `computer.ts` segue la tabella CT-DES-074 e usa Pietre ritte, Pietra Incisa (sceglie il segno) e Idolo di Cthulhu.
+  - Nel codice non ci sono id né indici di territorio, e un test lo controlla. R'lyeh si riconosce da due campi nuovi della vista, `luogoUltimaTappa` e `ultimaTappaSbloccata`; le regole del motore non sono cambiate.
+- **Interfaccia:**
+  - Dunwich e R'lyeh sono in gioco. R'lyeh ha targhetta, bottone e miniature al centro del pozzo.
+  - Sopra la targhetta c'è «ULTIMA TAPPA»: spenta sotto le 2 tappe, accesa e pulsante da 2 in su. Compare anche nella scena di R'lyeh, accanto al nome.
+  - Consigli, tutorial e regole parlano dell'ultima tappa a R'lyeh.
+- **Pietre ritte sul telefono:** c'è una pillola «PIETRE · 1» accanto alla targhetta di Dunwich, e un bottone nella scena di Dunwich. Apre un pannello con i territori e due bottoni PIÙ 1 / MENO 1, accesi solo se il motore ammette la mossa.
+- **Pietra Incisa:** carta, poi territorio, poi PIÙ 1 / MENO 1.
+- **Segnaposto:** T4 e T5 usano `dunwich_v2` e `rlyeh_v2`; T4r e T5r un riquadro col nome della carta.
+- **Layout di Dunwich:** sta in basso a sinistra, dove c'è il pannello dell'energia. Ho rialzato la targhetta e messo le miniature più piccole accanto al bottone.
+- **Script:**
+  - Quelli esistenti sono aggiornati per Pietre ritte e Pietra Incisa.
+  - Quelli che aprono il gioco (leggibilità, sovrapposizioni, verifica-*, prova-telefono, grafica-finale) partono da soli: se non c'è un server su 5183 servono la cartella `dist`.
+  - Le loro immagini sono in `.gitignore`.
+
+## Simulazioni
+1000 partite, semi 0-999.
+
+| | 3 territori (main) | 5 territori, computer non adattato (PR 1) | 5 territori, computer CT-DES-074 |
+|---|---|---|---|
+| Custodi / Risvegliati / nessuno | 635 / 360 / 5 | 925 / 75 / 0 | 963 / 37 / 0 |
+| Giri medi / mediana | 8,54 / 7 | 5,75 / 5 | 5,31 / 5 |
+| Oltre 15 giri | 73 | 1 | 0 |
+| Pietre ritte (media a partita) | - | 0 | 0,22 |
+| Pietra Incisa (media a partita) | - | 0 | 0,15 |
+| Idolo di Cthulhu (media a partita) | - | 0,09 | 0,12 |
+| Cthulhu si agita (media a partita) | - | 0,08 | 0,12 |
+| Orrore di Dunwich, presenze eliminate (media) | - | 0,11 | 0,01 |
+
+**Squilibri (non corretti):**
+- I Custodi vincono il 96,3% delle partite. Chi apre non cambia nulla: i Custodi vincono 494 su 508 se aprono e 469 su 492 se aprono i Risvegliati.
+- L'89,9% delle partite finisce tra il giro 4 e il giro 6, contro i 10-15 minuti di CT-DES-009.
+- Ipotesi non verificata: il Sigillo chiede instabilità 3 o meno (si parte da 0), il rito chiede 3 o più e va costruito.
+- Proposte, nessuna applicata:
+  - instabilità di partenza più alta;
+  - soglia del rito a 2;
+  - Sigillo a R'lyeh solo con instabilità 2 o meno.
+
+## Interpretazioni di CT-DES-074 da confermare
+1. «Con meno di 2 tappe» e «con 2 tappe» contano le tappe del computer; «se l'avversario ha 2 tappe» conta le sue.
+2. I Custodi difendono R'lyeh con le carte solo se i Risvegliati hanno una presenza lì, come in CT-DES-065. L'Esorcismo passa dalle «fuori tabella» alla priorità 1 e vale anche senza presenza a R'lyeh.
+3. «Abbassa sotto 3» significa continuare finché R'lyeh ha instabilità 3 o più.
+4. Ordine dentro la priorità 1:
+   - **Custodi:** carta CU10, Pietre ritte −1, Pietra Incisa −1, Esorcismo, carta CU17, presenze.
+   - **Risvegliati:** Profanazione, carta RI10, Pietre ritte +1, Pietra Incisa +1, carta RI17, presenze.
+   - L'attacco con le carte parte solo se i Custodi possono davvero porre il Sigillo a R'lyeh.
+5. Priorità 3 dei Custodi:
+   - Con 1 tappa, R'lyeh entra nella classifica del territorio più conteso (minore differenza di forza) e a parità viene dopo gli esterni.
+   - Con 0 tappe non mette presenze a R'lyeh.
+   - Con 2 tappe mette presenze solo a R'lyeh, finché non lo controlla.
+6. Priorità 3 dei Risvegliati:
+   - Con 1 tappa contendono R'lyeh con la condizione di CT-DES-067, a parità con priorità lievemente inferiore.
+   - Con 2 tappe solo a R'lyeh, finché non hanno una presenza e almeno la forza dell'avversario.
+7. Priorità 5, Pietre ritte (la Pietra Incisa fa lo stesso con un punteggio poco più basso, dopo le Pietre perché costa una carta):
+   - **Custodi:** −1 su R'lyeh se sopra 3, «prima dell'ultima tappa» inteso come finché non vincono; −1 su un esterno che controllano, senza loro Sigillo, sopra 3, solo con meno di 2 tappe.
+   - **Risvegliati:** +1 su R'lyeh se sotto 3, altrimenti +1 su un esterno con una loro presenza, senza loro rito, sotto 5.
+8. A parità di punteggio, il territorio con indice più basso (vale per Pietre ritte e Pietra Incisa).
+9. Idolo di Cthulhu, «controllo contestato»: l'avversario ha presenze a R'lyeh e la forza del computer non lo supera. L'Idolo è escluso dalla priorità 4 dei Risvegliati.
+10. Pietra Stellata: segue CT-DES-070.
+11. La targhetta «ULTIMA TAPPA» si accende se **una delle due parti** ha 2 tappe.
+
+## Branch e PR
+- Branch `feature/ct-feat-001-cinque-territori`, PR 72 aperta, non fusa.
+- Push fatto con `git push -u origin HEAD`. Commit: `7fd3051` e `c2e5529`.
+- Ora sono su `main`, working tree pulito.
+- La nuova descrizione della PR in italiano è pronta in `scambio/da-claude/cinque-territori/PR_BODY.md`, da incollare o da applicare con un task dedicato.
+- `git diff --stat` rispetto al commit precedente della PR: 28 file, +985 / −172.
+- Screenshot in `scambio/da-claude/cinque-territori/`.
+- La cartella `scambio/` del repository è ignorata da git, quindi build, screenshot e `PR_BODY.md` restano solo in locale.
+
+## Cosa non è stato verificato
+- **`npm run grafica-finale` e `npm run prova-telefono`:** non lanciati, i permessi non lo consentivano. Li ho solo aggiornati per le mosse nuove.
+- **Telefono vero:** nessuna prova.
+- **Illustrazioni di T4, T5, T4r, T5r:** non ci sono ancora, il test le tiene in lista di attesa.
+- **`test/zz-scratch.test.ts`:** nato come prova di lavoro, ora contiene due test veri sulla vista. Non sono riuscito a rinominarlo (`git mv` bloccato). Va rinominato in `vista-cinque-territori.test.ts`.
+- **Pannello delle regole a 740x340:** ho aggiunto una riga sulle Pietre ritte. Il controllo di leggibilità (testi fuori schermo o sotto soglia) è passato, ma ora è più fitto.
+
+Comandi bloccati dai permessi: 15. Primi 5: `git -C /c/Users/MatteoTemporini-Laye/cosmic-horror status --short; git -C /c/Users/MatteoTemporini-Laye/cosmic-horror di...`; `npm --prefix game/prototipo run simula -- 1000 0`; `python3 - <<'EOF' import re p='src/computer/computer.ts' s=open(p,encoding='utf-8').read() a=s.index('// ---------- Cust...`; `npx vitest run test/zz-scratch.test.ts`; `rm test/zz-scratch.test.ts`
+
+---
+
 ## CT-FEAT-002 - fase piano - 2026-11-01 18:19 - FATTO
 
 # Resoconto CT-FEAT-002, fase piano (pre-flight plan)

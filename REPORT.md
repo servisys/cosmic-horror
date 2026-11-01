@@ -1,5 +1,45 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-001 - fase piano - 2026-11-01 14:59 - FATTO
+
+**Resoconto CT-DEL-001, fase piano**
+
+**Richiesta eseguita:** controlli in sola lettura sulla PR 70. Non ho modificato nulla e non ho fuso.
+
+**Verifiche (tutte tornano):**
+- La PR 70 è aperta, non è draft, e va verso `main`.
+- La testa è `084d1d087bdf6d10c353ae724727346394be3854`, uguale allo sha del campo `fusioni`.
+- Lo stato è MERGEABLE e CLEAN.
+- I file toccati sono 12 e stanno tutti dentro `file_attesi_70`:
+  - `docs/00_MASTER_INDEX.md`
+  - `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md`
+  - `docs/CT_COWORK_CODE_PROTOCOL_V0.3.md`
+  - `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md`
+  - `strumenti/windows-scambio/LEGGIMI.md`
+  - `strumenti/windows-scambio/osserva-scambio.ps1`
+  - 6 file in `strumenti/windows-scambio/prove/deleghe/`
+- I documenti autorevoli sono APPROVED. Il V0.4 (v0.4.0) l'ho letto alla testa della PR. Il V0.2 (v0.2.0) l'ho letto su `main`.
+- Il repository di lavoro è su `main` ed è pulito.
+
+**Piano per la fase esecuzione:** nessuna modifica al repository. Ripeto gli stessi controlli e chiudo con esito FATTO. La fusione la fa lo script.
+
+**Rischi e domande aperte:** nessuno.
+
+**Branch e PR:** nessun branch creato e nessuna PR modificata. La PR 70 è su `planning/ct-doc-002-protocollo-v04`.
+
+**Non verificato:**
+- Non ho riletto il contenuto dei file del diff. Mi sono fermato all'elenco dei percorsi.
+- Non ho riletto la §3 del V0.4 in dettaglio. Ho controllato solo l'intestazione, cioè lo stato APPROVED.
+- Non ho eseguito le prove 5/5 e 2/2 citate nel task. Mi fido del resoconto di Cowork.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-DOC-002 - fase esecuzione - 2026-11-01 14:47 - FATTO
 
 ## Resoconto CT-DOC-002

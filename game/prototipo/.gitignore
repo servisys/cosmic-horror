@@ -1,3 +1,5 @@
 node_modules/
 dist/
 *.tsbuildinfo
+# immagini scritte dagli script di verifica (npm run leggibilita, sovrapposizioni, verifica-*...): non vanno nel repository
+screenshot-*/

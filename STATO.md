@@ -1,12 +1,12 @@
 ---
 id: CT-DEV-002
 fase: piano
-stato: IN_CORSO
-aggiornato: 2026-11-01 13:47:55
+stato: FATTO
+aggiornato: 2026-11-01 13:48:46
 ---
 
 # Stato dell'esecuzione automatica
 
 Questo file lo scrive solo lo script sul PC di Matteo (strumenti/windows-scambio/osserva-scambio.ps1).
 
-Avviato alle 13:47. Branch del repository all'avvio: main.
+Durata: 1 minuti. Branch del repository: prima main, dopo main. Cartella locale dell'esecuzione: C:\Users\MatteoTemporini-Laye\CosmicHorrorScambio\esecuzioni\20261101-134755-CT-DEV-002-piano

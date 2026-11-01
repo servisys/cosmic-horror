@@ -1,5 +1,103 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-002 - fase piano - 2026-11-01 13:48 - FATTO
+
+# Pre-flight plan CT-DEV-002 (fase piano)
+
+## Richiesta eseguita
+Letto TASK.md e i documenti indicati. Non ho modificato nulla.
+
+## Verifiche
+- `CT_COWORK_CODE_PROTOCOL_V0.2.md` è APPROVED 0.2.0. Ho letto §2.1, §3 e §8.
+- `00_MASTER_INDEX.md` ha l'ultima riga del changelog «0.5.0 APPROVED». Ho letto solo `grep` su questo file. Non ne ho letto il contenuto per intero.
+- Ho letto `osserva-scambio.ps1` per intero, e `LEGGIMI.md` solo da riga 40 in poi. Nella cartella `prove/` ci sono solo i test sul flusso (`controlla-prove.ps1` e i flussi di esempio). I test «sul repository finto per i permessi» citati nel task qui non ci sono.
+- Il task è pronto: non ho trovato blocchi.
+
+## Soluzione proposta per il punto 3: fa tutto lo script, a Code non si dà nessun comando
+Resta come oggi: `gh pr merge` e `gh pr close` sono in `$ToolVietati` e Code non li può usare. Le fusioni e le chiusure le esegue lo script, in una funzione `Esegui-Fusioni`.
+
+**Perché è più sicuro:**
+1. Le regole sono codice fisso. Code non può ottenere un comando aperto con un `gh` sbagliato (`--admin`, `--auto`, `--squash`).
+2. Lo script controlla prima di fondere. Con un permesso a Code non si potrebbe.
+3. Il comando è sempre `gh pr merge N --merge --match-head-commit SHA`. Gli argomenti sono passati come array, senza stringhe di shell.
+
+**Quando gira:** dopo l'esecuzione di Code, solo in fase `esecuzione` e solo se l'esito è FATTO. Se Code fallisce, non si fonde niente. Se mancano i campi, non cambia nulla rispetto a oggi. In fase `piano` i campi sono ignorati e il resoconto lo dice.
+
+**Controlli per ogni fusione (gh pr view --json):**
+- PR aperta e non bozza.
+- Base `main`.
+- `headRefOid` uguale allo sha del task (confronto sullo sha intero, 40 caratteri).
+- `mergeable` = MERGEABLE. Se è UNKNOWN, ritenta 3 volte a distanza di pochi secondi, poi ferma.
+- Se c'è `file_attesi`, i file toccati devono stare tutti dentro la lista. Controllo anche che il numero dei file letti sia uguale a `changedFiles`, perché il comando può troncare l'elenco sulle PR grandi. Se non torna, ferma.
+- Se un controllo fallisce, la PR è «fermata» con il motivo, e le altre proseguono.
+- Se la PR risulta già fusa con lo stesso sha, la riga dice «già fusa» e non è un errore. Così rilanciare con `-Riprova` è sicuro.
+
+**Controlli per ogni chiusura:**
+- PR aperta.
+- Motivo non vuoto, obbligatorio.
+- Il motivo non contiene `"` né backtick, perché PowerShell 5.1 li gestisce male nel passaggio dei parametri. Se li contiene, la chiusura è fermata.
+- Comando: `gh pr close N --comment "<motivo>"`, senza `--delete-branch`.
+
+**Resoconto:** lo script aggiunge una sezione «Fusioni e chiusure» con una riga per PR: fusa, chiusa, fermata o già fusa, più il motivo. Il testo viene aggiunto sotto il resoconto di Code.
+
+## Formato dei campi
+Il parser attuale (`Leggi-FrontMatter`) è piatto: una chiave per riga, e se una chiave si ripete resta l'ultima. Un YAML con liste annidate non funziona. Propongo chiavi piatte, leggibili in PowerShell 5.1 senza dipendenze:
+
+```yaml
+fusioni: 69@<sha40>, 71@<sha40>
+file_attesi_69: docs/a.md, docs/b.md        # facoltativo
+chiusure: 70
+motivo_70: "testo del commento"             # obbligatorio per ogni chiusura
+```
+
+Il parser già toglie le virgolette. Le righe di `motivo_*` vanno lette anche con `:` dentro il testo, e la regex attuale lo consente. Uno sha non di 40 caratteri esadecimali, o un numero non valido, ferma quella PR con una riga che lo spiega.
+
+## File toccati
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.3.md` (nuovo, DRAFT, con la dicitura «PROPOSTA DI COWORK, DA CONFERMARE DA MATTEO»). Cambiano solo §2.1, §3, §8 e il changelog. La V0.2 non si tocca.
+- `strumenti/windows-scambio/osserva-scambio.ps1`: nuove funzioni per leggere i campi, controllare, fondere e chiudere, e per la sezione del resoconto.
+- `strumenti/windows-scambio/LEGGIMI.md`: formato dei campi e come funzionano i controlli.
+- `strumenti/windows-scambio/prove/`: nuovo script di prova e relativi file attesi.
+
+## Prove proposte
+- Introduco `Invoke-Gh`, un unico punto da cui passano le chiamate a `gh`. Con `-GhFinto <cartella>` lo script legge i dati delle PR da file JSON e salta merge e close reali (esegue solo i controlli e registra la decisione).
+- Aggiungo `-ProvaFusioni <TASK.md>` per simulare tutto senza lanciare Code.
+- Il nuovo script `prove\controlla-fusioni.ps1` copre questi casi:
+  - fusione ok;
+  - sha diverso;
+  - PR non elencata;
+  - base non `main`;
+  - conflitti;
+  - file fuori da `file_attesi`;
+  - chiusura senza motivo;
+  - campi assenti (nessun cambiamento);
+  - fase `piano`.
+- In esecuzione lancio `git diff --stat` e tutte le prove. Nessuna fusione o chiusura reale viene eseguita su GitHub, e lo scriverò nel resoconto.
+- La prova con `gh` vero su una PR di test resta da fare a Matteo o a Code interattivo dopo l'installazione. Il comando sarà indicato nel resoconto.
+
+## Rischi residui
+1. **Chi scrive su `scambio` comanda le fusioni.** Lo script non può sapere se un `TASK.md` l'ha scritto davvero Cowork dopo un sì di Matteo. Chi ha il permesso di scrittura su quel branch (o un account compromesso) può farle partire. Le protezioni sono lo sha fisso, la lista di file e `main`. Il ruleset di `main` resta la difesa vera, ma è fuori scope.
+2. **Lo sha protegge dalla testa cambiata, non dal contenuto.** Se Cowork scrive uno sha sbagliato o già vecchio, la PR si ferma (bene). Se lo sha è giusto ma il contenuto non è quello che Matteo ha visto, passa.
+3. **Fusione senza controlli CI.** Il task non li chiede. Vedi domanda 2.
+4. **`mergeable` di GitHub a volte è UNKNOWN.** Mitigato col ritentare, ma una fusione può essere fermata e dover essere rilanciata.
+5. **Elenco file troncato sulle PR grandi.** Mitigato col controllo su `changedFiles`.
+6. **Il testo di `RegoleComuni` dice che le fusioni le autorizza solo Matteo in sessione interattiva.** Resta vero per Code: la delega passa dallo script, non da Code. Propongo di non toccarlo, e di chiarirlo nella V0.3.
+7. **Doppia esecuzione.** Lo script segna già il `TASK.md` come eseguito per hash del file. Un task con `-Riprova` ripete le fusioni, ma «già fusa» le rende innocue.
+
+## Domande per Matteo
+1. Ordine: ok fondere **dopo** Code, solo se l'esito è FATTO? In alternativa, prima di Code.
+2. Vuoi che lo script fermi la fusione se i controlli CI della PR non sono verdi? Oggi il repository non ha CI, quindi propongo di non controllarli finché non esiste.
+3. Il Master Index va aggiornato per citare la V0.3? Propongo di no finché Matteo non la approva, e di farlo nel task successivo (come già scritto nel task per la V0.2 e il suo `DEPRECATED`).
+4. Conferma sul formato a chiavi piatte (sopra). In alternativa serve un parser YAML più grosso.
+
+## Non verificato
+- Nessun comando `gh pr merge` o `gh pr close` è stato provato, nemmeno in simulazione.
+- Non ho controllato come si comporta `gh pr view --json files` sul tuo account, né se ha limiti di paginazione. È la prima cosa da provare in esecuzione.
+- Non ho letto `LEGGIMI.md` prima di riga 40, né `installa.ps1`.
+
+Comandi bloccati dai permessi: 0
+
+---
+
 ## CT-DEV-001 - fase esecuzione - 2026-11-01 13:31 - FATTO
 
 ## Resoconto CT-DEV-001

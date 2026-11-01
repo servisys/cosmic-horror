@@ -11,7 +11,7 @@ import { idImmagine, texturaSfondo } from './immagini.js';
 import { aloneLuce, anim } from './animazioni.js';
 import { disegnaTerritorio } from './scena-territorio.js';
 import { motivoTappa, passiTutorial, suggerimento } from './suggerimento.js';
-import { VERSIONE } from './versione.js';
+import { etichettaVersione } from './versione.js';
 
 export type { Area } from './disegno.js';
 
@@ -828,7 +828,7 @@ function pannelloRegole(d: Disegno, W: number, H: number, az: Azioni): void {
     'Custodi: poni tre Sigilli (territorio che controlli, instabilità 3 o meno). Risvegliati: completa tre riti (una presenza, forza almeno pari, instabilità 3 o più).',
     'Con la penultima tappa scatta il SEGNALE: l\'avversario ha un turno di avviso. Le tappe si possono togliere solo fino alla fine del turno successivo dell\'avversario.',
     'Fine partita: «Copia il registro» (icona in basso a destra) per mandarlo a chi analizza le partite. Tocca per chiudere.',
-    'Versione del gioco: ' + VERSIONE,
+    'Versione del gioco: ' + etichettaVersione(),
   ];
   let y = r.y + 8 * u;
   righe.forEach((riga, i) => {

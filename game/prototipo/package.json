@@ -21,7 +21,8 @@
     "leggibilita": "node scripts/leggibilita.mjs",
     "sovrapposizioni": "node scripts/sovrapposizioni.mjs",
     "verifica-pwa": "node scripts/verifica-pwa.mjs",
-    "pubblica": "node scripts/pubblica.mjs"
+    "pubblica": "node scripts/pubblica.mjs",
+    "prova-pubblica": "node scripts/prova-pubblica.mjs"
   },
   "dependencies": {
     "pixi.js": "8.6.6",

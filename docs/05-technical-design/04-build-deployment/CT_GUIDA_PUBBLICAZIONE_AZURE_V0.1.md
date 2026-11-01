@@ -1,6 +1,7 @@
 ---
 title: Cosmic Horror - Guida: pubblicare il gioco su Azure dal Mac mini e installarlo sul telefono
-status: DRAFT
+status: DEPRECATED
+superseded_by: CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md
 version: 0.1.0
 owner: Matteo
 prepared_by: Claude Code

@@ -5,6 +5,7 @@
     { "route": "/.auth/login/facebook", "statusCode": 404 },
     { "route": "/.auth/login/apple", "statusCode": 404 },
     { "route": "/accesso-negato.html", "allowedRoles": ["anonymous", "authenticated"], "headers": { "cache-control": "no-cache" } },
+    { "route": "/versione.json", "allowedRoles": ["anonymous", "authenticated"], "headers": { "cache-control": "no-cache" } },
     { "route": "/index.html", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },
     { "route": "/sw.js", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },
     { "route": "/manifest.webmanifest", "allowedRoles": ["giocatore"], "headers": { "cache-control": "no-cache" } },

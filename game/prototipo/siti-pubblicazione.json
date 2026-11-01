@@ -1,0 +1,5 @@
+{
+  "nota": "Indirizzi dei due siti (Azure Static Web Apps). Non sono segreti. Sostituisci i segnaposto con gli indirizzi veri appena crei i siti.",
+  "prova": "https://SEGNAPOSTO-prova.azurestaticapps.net",
+  "produzione": "https://SEGNAPOSTO-produzione.azurestaticapps.net"
+}

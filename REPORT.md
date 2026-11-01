@@ -1,5 +1,60 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FIX-006 - fase esecuzione - 2026-11-01 21:42 - FATTO
+
+**Richiesta eseguita:** CT-FIX-006 è fatto. Le verifiche passano tranne la prova 17, che su Windows non gira. La PR è aperta verso `main` e non è stata fusa.
+
+**Branch e PR:** `fix/ct-fix-006-node-per-il-job-mac`, PR #75 (https://github.com/servisys/cosmic-horror/pull/75).
+- Sha completo della testa: `fb4d5f57dea0c36ac498e8981879ab3ecf01ab4d`.
+- Il branch parte da `origin/main`, cioè dal merge della PR #74. `git pull` e `git merge` mi sono stati bloccati, quindi ho fatto `git fetch` e creato il branch da `origin/main`. Il `main` locale resta indietro di 7 commit.
+
+**Cosa ho fatto:**
+- **Node sotto launchd.**
+  - `controlla-e-pubblica.sh` legge la nuova chiave `CARTELLA_NODE` da `pubblica.conf` e la mette in testa al PATH.
+  - Se la chiave è vuota, prova da solo i posti tipici: Node più recente di mise, shim di mise, `~/.local/bin`, nvm, volta. Non esegue script di profilo.
+  - Se `npm` non si trova, scrive un PROBLEMA una sola volta e non segna il commit come fallito.
+- **`installa.sh`.**
+  - Controlla `node` e `npm` con un ambiente quasi vuoto, come launchd.
+  - Se `CARTELLA_NODE` è vuota, scrive in `pubblica.conf` la cartella del `node` del terminale.
+  - Se il job non troverebbe `npm`, si ferma prima di installare.
+- **File condiviso.** Il file nuovo `strumenti/mac-mini/percorso-node.sh` contiene la funzione del PATH e la generazione del plist. Lo usano sia il job sia `installa.sh`.
+- **Il job si aggiorna da solo.**
+  - Dopo il checkout e prima della build, ricopia script e `percorso-node.sh` in `.pubblicazione/bin` se sono cambiati. Usa un file temporaneo e `mv`, quindi lo script che sta girando non viene toccato.
+  - Se il plist nel repository è diverso da quello installato, scrive un PROBLEMA («rilancia installa.sh») e non tocca launchd.
+- **Prova 17.** Ora conta `ha permessi 644` e non più `chmod 600`.
+- **Nuove prove in `prova-logica.sh`:**
+  - 21: npm assente, PROBLEMA una volta sola e commit non segnato fallito.
+  - 22: `CARTELLA_NODE` rende npm trovabile.
+  - 23: aggiornamento automatico di script e file condiviso.
+  - 24 e 25: plist uguale e plist cambiato.
+- **Documenti.** Ho aggiornato `pubblica.conf.esempio` (con l'esempio mise), `LEGGIMI.md` e la guida V0.2. La V0.2 ora ha anche i passi per Matteo dopo la fusione.
+
+**Verifiche su Windows (Git Bash):**
+- `npm run tipi`: ok.
+- `npm run build`: ok.
+- `npm test --prefix game/prototipo -- test/pubblica.test.ts`: passa (2 test su 2). Dentro c'è `prova-logica.sh`, che dà tutto verde, comprese le prove 21–25.
+- Ho lanciato `npm test` completo una volta, prima di sistemare un confronto fine riga che falliva solo su Windows nelle prove 23 e 25. Dopo la correzione ho rilanciato solo `pubblica.test.ts`. Non ho rifatto il giro completo.
+- `bash prova-logica.sh` lanciato direttamente mi è stato negato; l'ho eseguito tramite `npm test`.
+
+**Non verificato:**
+- **Prova 17.** Su Windows `chmod` non vale e la prova si salta da sola. La correzione va confermata sul Mac vero.
+- **Mac vero.** Non ho provato `installa.sh`, launchd, mise e il ripiego sul Mac, perché non ho accesso. Le prove usano comandi finti.
+- Il confronto che ignora i fine riga serve solo su Windows. Sul Mac i file restano uguali.
+
+**Cosa deve fare Matteo dopo la fusione** (stessi passi nella guida):
+1. Sul Mac c'è ancora la copia vecchia del job, che non sa aggiornarsi da sola. Serve quindi **un'ultima volta** `git pull` e `./strumenti/mac-mini/installa.sh`.
+2. Poi `.pubblicazione/bin/controlla-e-pubblica.sh --riprova` per riprovare il commit dceca70.
+3. Da lì in poi il job si aggiorna da solo. Il lancio manuale di `installa.sh` serve solo se cambia il plist o per rifare la configurazione.
+4. Se Node cambia cartella, per esempio con una nuova versione maggiore, bisogna svuotare la riga `CARTELLA_NODE=` in `pubblica.conf` e rilanciare `installa.sh`. Lasciata piena non viene riscritta.
+
+**Per il resoconto:** `git diff --stat origin/main HEAD` dà 7 file cambiati, 157 inserimenti e 9 cancellazioni.
+
+Sono tornato su `main`.
+
+Comandi bloccati dai permessi: 5. Primi 5: `git pull && git switch -c fix/ct-fix-006-node-per-il-job-mac && ls strumenti/mac-mini && wc -l strumenti/mac-mini/*`; `git pull`; `git merge --ff-only origin/main`; `bash strumenti/mac-mini/prova-logica.sh 2>&1 | grep -E "^(OK|KO|--|RISULTATO)|^ +(OK|KO)|rror"`; `bash strumenti/mac-mini/prova-logica.sh`
+
+---
+
 ## CT-FIX-006 - fase piano - 2026-11-01 21:29 - FATTO
 
 # Pre-flight plan CT-FIX-006 (fase piano, nessun file toccato)

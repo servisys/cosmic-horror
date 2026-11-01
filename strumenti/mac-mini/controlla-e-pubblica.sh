@@ -27,6 +27,10 @@ HOME="${HOME:-$(eval echo ~"$USER")}"
 export USER HOME
 PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 export PATH
+# funzioni condivise con installa.sh (PATH di Node, plist); sta accanto a questo script
+QUI="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -f "$QUI/percorso-node.sh" ]; then echo "manca $QUI/percorso-node.sh: rilancia installa.sh" >&2; exit 1; fi
+. "$QUI/percorso-node.sh"
 
 CLONE="${CT_CLONE:-$HOME/dev-machine/progetti/cosmic-horror}"
 BASE="$CLONE/.pubblicazione"
@@ -40,6 +44,9 @@ FILE_TOKEN="$CLONE/.swa-token-prova"
 CMD_NPM_CI="${CT_NPM_CI:-npm ci}"
 CMD_PUBBLICA="${CT_PUBBLICA:-npm run pubblica -- prova}"
 CMD_PS="${CT_PS:-ps -axo command=}"
+CMD_NPM="${CT_NPM:-npm}" # solo il nome da cercare nel PATH: prova-logica.sh lo cambia per provare il caso «npm assente»
+BIN="$BASE/bin"
+PLIST="${CT_PLIST:-$HOME/Library/LaunchAgents/it.cosmichorror.pubblica.plist}"
 AMBIENTE=prova
 
 mkdir -p "$STATO" "$LOGDIR"
@@ -51,6 +58,9 @@ leggi_conf() {
 }
 LUCCHETTO_FOLK_LORE="${LUCCHETTO_FOLK_LORE:-$(leggi_conf LUCCHETTO_FOLK_LORE)}"
 CARTELLA_PROGETTI="${CARTELLA_PROGETTI:-$(leggi_conf CARTELLA_PROGETTI)}"
+CARTELLA_NODE="${CARTELLA_NODE:-$(leggi_conf CARTELLA_NODE)}"
+# Node deve essere trovabile anche sotto launchd (PATH minimo): senza toccare il sistema, solo il PATH di questo script
+imposta_path_node "$CARTELLA_NODE"
 [ -n "$LUCCHETTO_FOLK_LORE" ] || LUCCHETTO_FOLK_LORE="$HOME/dev-machine/progetti/mandi/.coda/batteria.lock"
 [ -n "$CARTELLA_PROGETTI" ] || CARTELLA_PROGETTI="$HOME/dev-machine/progetti"
 case "$LUCCHETTO_FOLK_LORE" in "~"*) LUCCHETTO_FOLK_LORE="$HOME${LUCCHETTO_FOLK_LORE#~}" ;; esac
@@ -110,6 +120,13 @@ ID="$SHA"
 [ "$ID" = "$(cat "$STATO/ultimo-pubblicato" 2>/dev/null)" ] && exit 0
 [ "$ID" = "$(cat "$STATO/ultimo-fallito" 2>/dev/null)" ] && exit 0 # gia' fallito: non si riprova all'infinito
 
+# --- Node: se npm non si trova e' un problema di configurazione, non della build: si scrive il problema e non si segna fallito ---
+if ! command -v "$CMD_NPM" >/dev/null 2>&1; then
+  problema node "non trovo $CMD_NPM col PATH del job ($PATH): scrivi in $CONF la riga CARTELLA_NODE=<cartella che contiene node, npm e npx> (per esempio CARTELLA_NODE=/Users/builder/.local/share/mise/installs/node/22/bin) oppure rilancia installa.sh"
+  exit 0
+fi
+nessun_problema node
+
 # --- il token del sito di prova (file con permessi 600, letto da pubblica.mjs) ---
 if [ ! -s "$FILE_TOKEN" ]; then
   problema token "manca il token del sito di prova: crea il file $FILE_TOKEN (solo il token, chmod 600) oppure lancia installa.sh --token"
@@ -156,6 +173,32 @@ rm -f "$STATO/attesa"
 
 # --- codice: fetch e checkout di main nel clone ---
 log "$AMBIENTE | $(echo "$SHA" | cut -c1-7) | INIZIO"
+# il job si aggiorna da solo: dopo il checkout, se lo script o il file condiviso del clone sono cambiati, si ricopiano in bin
+# (copia nuova + mv: lo script che gira tiene il suo vecchio file, il giro dopo parte da quello nuovo). Il plist non si tocca: si segnala soltanto.
+aggiorna_job() {
+  _src="$CLONE/strumenti/mac-mini"
+  [ -d "$_src" ] || return 0
+  mkdir -p "$BIN"
+  for _f in controlla-e-pubblica.sh percorso-node.sh; do
+    [ -f "$_src/$_f" ] || continue
+    if ! cmp -s "$_src/$_f" "$BIN/$_f"; then
+      if cp -f "$_src/$_f" "$BIN/$_f.nuovo" && chmod 700 "$BIN/$_f.nuovo" && mv -f "$BIN/$_f.nuovo" "$BIN/$_f"; then
+        log "$AMBIENTE | job aggiornato: $_f (vale dal giro dopo)"
+      else
+        rm -f "$BIN/$_f.nuovo"
+        problema aggiorna "non riesco ad aggiornare $BIN/$_f dalla copia nel clone: rilancia installa.sh"
+      fi
+    fi
+  done
+  if [ -f "$PLIST" ] && [ -f "$_src/it.cosmichorror.pubblica.plist.modello" ]; then
+    _atteso=$(genera_plist "$_src/it.cosmichorror.pubblica.plist.modello" "$BIN/controlla-e-pubblica.sh" "$BASE" "$HOME")
+    if [ "$_atteso" != "$(cat "$PLIST")" ]; then
+      problema plist "il plist di launchd e' cambiato nel repository (o non corrisponde a quello installato): rilancia installa.sh"
+    else
+      nessun_problema plist
+    fi
+  fi
+}
 preparazione() {
   cd "$CLONE" || return 1
   git fetch --quiet origin '+refs/heads/main:refs/remotes/origin/main' || return 1
@@ -165,6 +208,7 @@ preparazione() {
   git clean -fdq -e '.pubblicazione/' -e '.pubblicati/' -e '.swa-token-*'
   ID=$(git rev-parse HEAD)
   SHA="$ID"
+  aggiorna_job
 }
 costruisci() {
   cd "$CLONE/game/prototipo" || return 1

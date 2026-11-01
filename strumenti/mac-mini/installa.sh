@@ -51,12 +51,32 @@ if ! GIT_TERMINAL_PROMPT=0 git -C "$CLONE" fetch --quiet origin main </dev/null;
 fi
 
 mkdir -p "$BASE/bin" "$BASE/log" "$BASE/stato" "$HOME/Library/LaunchAgents"
-# il job parte da una copia dello script: cosi' un checkout nel clone non cambia lo script mentre gira (per aggiornarlo: rilancia installa.sh)
+# il job parte da una copia dello script: cosi' un checkout nel clone non cambia lo script mentre gira
+# (la copia si aggiorna da sola dopo ogni checkout del job; rilanciare installa.sh serve solo se cambia il plist o per la configurazione)
 cp -f "$QUI/controlla-e-pubblica.sh" "$BASE/bin/controlla-e-pubblica.sh"
-chmod 700 "$BASE/bin/controlla-e-pubblica.sh"
+cp -f "$QUI/percorso-node.sh" "$BASE/bin/percorso-node.sh"
+chmod 700 "$BASE/bin/controlla-e-pubblica.sh" "$BASE/bin/percorso-node.sh"
 if [ ! -f "$BASE/pubblica.conf" ]; then
   cp "$QUI/pubblica.conf.esempio" "$BASE/pubblica.conf"
   echo "Creato $BASE/pubblica.conf (i valori predefiniti di norma vanno bene)."
+fi
+
+# Node col PATH che avra' il job (launchd parte con un PATH minimo: il «node» del terminale non basta)
+. "$QUI/percorso-node.sh"
+CARTELLA_NODE=$(grep -E '^[[:space:]]*CARTELLA_NODE[[:space:]]*=' "$BASE/pubblica.conf" | tail -n 1 | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+\$//; s/^\"(.*)\"\$/\1/; s/^'(.*)'\$/\1/")
+if [ -z "$CARTELLA_NODE" ]; then
+  CARTELLA_NODE="$(dirname "$(command -v node)")"
+  TMP_CONF="$BASE/pubblica.conf.tmp"
+  awk -v v="$CARTELLA_NODE" '/^[ \t]*CARTELLA_NODE[ \t]*=/ { print "CARTELLA_NODE=" v; fatto = 1; next } { print } END { if (!fatto) print "CARTELLA_NODE=" v }' "$BASE/pubblica.conf" > "$TMP_CONF" && mv -f "$TMP_CONF" "$BASE/pubblica.conf"
+  echo "Scritto in $BASE/pubblica.conf: CARTELLA_NODE=$CARTELLA_NODE (se aggiorni Node, rilancia installa.sh dopo aver svuotato quella riga)."
+fi
+# prova con un ambiente quasi vuoto, come launchd
+if ! env -i HOME="$HOME" USER="$(id -un)" PATH="/usr/bin:/bin:/usr/sbin:/sbin" bash -c '. "$1"; imposta_path_node "$2"; command -v node >/dev/null && command -v npm >/dev/null' _ "$QUI/percorso-node.sh" "$CARTELLA_NODE"; then
+  echo
+  echo "ERRORE: col PATH del job non trovo node e npm (CARTELLA_NODE=$CARTELLA_NODE)."
+  echo "Scrivi in $BASE/pubblica.conf la riga CARTELLA_NODE=<cartella che contiene node, npm e npx> (la trovi con: dirname \"\$(command -v node)\") e rilancia."
+  echo "Il job NON e' stato installato."
+  exit 1
 fi
 
 if [ ! -s "$CLONE/.swa-token-prova" ]; then
@@ -64,7 +84,7 @@ if [ ! -s "$CLONE/.swa-token-prova" ]; then
   if [ -t 0 ]; then metti_token prova; else echo "Crealo (solo il token, chmod 600) o lancia ./installa.sh --token: finche' manca il job scrive PROBLEMA nel log e non pubblica."; fi
 fi
 
-sed -e "s#@SCRIPT@#$BASE/bin/controlla-e-pubblica.sh#g" -e "s#@BASE@#$BASE#g" -e "s#@HOME@#$HOME#g" "$QUI/it.cosmichorror.pubblica.plist.modello" > "$PLIST"
+genera_plist "$QUI/it.cosmichorror.pubblica.plist.modello" "$BASE/bin/controlla-e-pubblica.sh" "$BASE" "$HOME" > "$PLIST"
 plutil -lint "$PLIST" >/dev/null
 
 UID_N="$(id -u)"

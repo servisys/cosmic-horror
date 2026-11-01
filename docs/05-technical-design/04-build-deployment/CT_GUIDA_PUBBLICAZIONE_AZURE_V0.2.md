@@ -46,7 +46,11 @@ Il file `versione.json` (solo ambiente, commit e data) è pubblico apposta: serv
 - Nel clone **non si lavora a mano**: il job lo porta su `main` a ogni giro (modifiche non salvate andrebbero perse). I file ignorati da git (token, log, copie delle build) non si toccano mai.
 
 ### Aggiornare il clone
-Dopo la fusione di una PR che cambia questi strumenti: in `/Users/builder/dev-machine/progetti/cosmic-horror` basta `git pull`. Poi, se è cambiato qualcosa in `strumenti/mac-mini/`, rilancia `./installa.sh` (il job parte da una copia dello script, così un aggiornamento del clone non cambia lo script mentre gira).
+Dopo la fusione di una PR che cambia questi strumenti: in `/Users/builder/dev-machine/progetti/cosmic-horror` basta `git pull`. Il job si aggiorna da solo: dopo ogni checkout di un commit nuovo ricopia in `.pubblicazione/bin` lo script e `percorso-node.sh` se sono cambiati (vale dal giro dopo; la copia resta, così lo script non cambia mentre gira). Rilanciare `./installa.sh` serve solo se cambia il plist di launchd (il job lo scrive nel log come PROBLEMA «rilancia installa.sh», senza toccare launchd) o se vuoi rifare la configurazione.
+
+**Node sotto launchd.** Il job parte con un PATH minimo e non vede Node installato con mise (o nvm, volta). In `pubblica.conf` la chiave `CARTELLA_NODE` è la cartella che contiene `node`, `npm` e `npx`, messa in testa al PATH del job; per esempio con mise: `CARTELLA_NODE=/Users/builder/.local/share/mise/installs/node/22/bin`. `installa.sh` la compila da solo con la cartella del `node` del terminale e controlla che con il PATH del job `node` e `npm` si trovino (altrimenti si ferma). Se la chiave è vuota il job prova da solo i posti tipici dell'utente (mise, `~/.local/bin`, nvm, volta). Se npm non si trova il job scrive un PROBLEMA nel log (una volta sola) e non segna il commit come fallito. Se Node viene aggiornato e la cartella cambia: svuota la riga `CARTELLA_NODE=` in `pubblica.conf` e rilancia `./installa.sh`.
+
+**Dopo la fusione della correzione CT-FIX-006** (la copia vecchia del job non conosce ancora l'aggiornamento automatico): **un'ultima volta** `git pull`, `./strumenti/mac-mini/installa.sh`, poi, per riprovare il commit già fallito (dceca70), `.pubblicazione/bin/controlla-e-pubblica.sh --riprova`. Da lì in poi niente.
 
 ### I due file dei token
 Nella radice del clone, uno per sito, con **solo il token** dentro e permessi 600. Il modo più comodo, senza mostrare il token e senza lasciarlo nella cronologia del terminale:
@@ -119,6 +123,8 @@ Dopo il primo caricamento il gioco **funziona anche senza rete**. Quando esce un
 
 ## Se qualcosa non va
 - **Il log dice «manca il token del sito di prova»** o **«permessi …»**: crea il file `.swa-token-prova` (`./installa.sh --token prova`) o correggi con `chmod 600`. Appena a posto, il job pubblica da solo la versione in attesa.
+- **Il log dice «non trovo npm col PATH del job»**: scrivi in `.pubblicazione/pubblica.conf` la riga `CARTELLA_NODE=` con la cartella che contiene `node`, `npm` e `npx` (`dirname "$(command -v node)"` nel terminale) oppure rilancia `./installa.sh`. Non è un errore della build: il commit non è segnato come fallito e il job riprova da solo.
+- **Il log dice «il plist di launchd è cambiato»**: rilancia `./installa.sh`.
 - **«repository non raggiungibile»**: controlla la rete del Mac mini e `git -C /Users/builder/dev-machine/progetti/cosmic-horror remote -v` (HTTPS, repository pubblico).
 - **«IN ATTESA»** nel log: c'è un'altra build in corso (Folk Lore o altro): il job riprova da solo al giro dopo. Se resta in attesa per ore, controlla che `batteria.lock` non sia rimasto con un pid vecchio (se il processo non esiste più il job lo ignora; se il file è illeggibile lo ignora dopo 120 minuti).
 - **Il job non gira**: `launchctl list | grep cosmichorror` deve mostrare `it.cosmichorror.pubblica`; se manca, rilancia `./installa.sh`.
@@ -130,7 +136,7 @@ Dopo il primo caricamento il gioco **funziona anche senza rete**. Quando esce un
 ## Per chi sviluppa
 - `game/prototipo/scripts/pubblica.mjs` (`npm run pubblica -- prova|produzione`): in prova tipi, test, build, `versione.json`, poi `npx @azure/static-web-apps-cli@2.1.0 deploy` con il token di quel sito (solo nell'ambiente del processo di deploy, mai sulla riga di comando; coperto se compare nell'output) e la copia della build in `.pubblicati/<commit>`; in produzione i controlli e la pubblicazione della copia, senza ricostruire. `--prova` (opzione) = solo controlli e build, senza pubblicare. La logica sta in `scripts/pubblica-logica.mjs`. La prima volta la CLI scarica un suo programma di distribuzione in `~/.swa`.
 - `game/prototipo/siti-pubblicazione.json`: gli indirizzi dei due siti.
-- `strumenti/mac-mini/`: `controlla-e-pubblica.sh` (solo prova), `installa.sh`, `disinstalla.sh`, il file launchd (`it.cosmichorror.pubblica.plist.modello`), `pubblica.conf.esempio` e `prova-logica.sh`.
+- `strumenti/mac-mini/`: `controlla-e-pubblica.sh` (solo prova), `percorso-node.sh` (funzioni condivise), `installa.sh`, `disinstalla.sh`, il file launchd (`it.cosmichorror.pubblica.plist.modello`), `pubblica.conf.esempio` e `prova-logica.sh`.
 - Prove senza rete: `scripts/prova-pubblica.mjs` (ambiente, token per sito, produzione solo per un commit in prova, potatura delle copie) e `strumenti/mac-mini/prova-logica.sh` (job, blocchi, attesa di Folk Lore); girano dentro `npm test` (`test/pubblica.test.ts`).
 - `game/prototipo/public/staticwebapp.config.json`: ruolo `giocatore` su tutte le rotte (tranne `versione.json`), login Microsoft (e GitHub), altri provider disattivati, cache lunga per i file con impronta e nessuna cache per `index.html`, `sw.js` e il manifest.
 - `game/prototipo/vite-plugin-sw.ts` genera `sw.js` (tutta la build in cache); `src/ui/pwa.ts` registra il service worker e mostra l'avviso; `src/ui/versione.ts` legge `versione.json` per mostrare l'ambiente.
@@ -139,5 +145,5 @@ Dopo il primo caricamento il gioco **funziona anche senza rete**. Quando esce un
 
 | Versione | Stato | Modifica |
 |---|---|---|
-| 0.2.0 | DRAFT | Due siti (prova automatica, produzione a mano con lo stesso commit), un token per sito in file 600, utente `builder` e clone esistente (niente deploy key, niente Portachiavi, niente modalità «versioni»), una build alla volta con Folk Lore, ambiente nella versione del gioco. Sostituisce la V0.1 (DEPRECATED). |
+| 0.2.0 | DRAFT | (CT-FIX-006) `CARTELLA_NODE` e ripiego sui posti tipici (mise, nvm, volta) perché il job trovi Node sotto launchd; il job si aggiorna da solo dopo il checkout (plist cambiato: PROBLEMA nel log). Due siti (prova automatica, produzione a mano con lo stesso commit), un token per sito in file 600, utente `builder` e clone esistente (niente deploy key, niente Portachiavi, niente modalità «versioni»), una build alla volta con Folk Lore, ambiente nella versione del gioco. Sostituisce la V0.1 (DEPRECATED). |
 | 0.1.0 | DEPRECATED | Prima stesura di Claude Code (pubblicazione dal Mac mini, senza GitHub Actions). |

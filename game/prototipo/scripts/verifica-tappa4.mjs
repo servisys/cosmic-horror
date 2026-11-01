@@ -33,12 +33,13 @@ for (const vista of VISTE) {
       scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight] };
   });
   const clic = async (id) => {
+    await page.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined);
     const a = await page.evaluate((i) => window.__ct.aree()[i] ?? null, id);
     if (!a) throw new Error(`area ${id} non trovata`);
     await page.mouse.click(a.x + a.w / 2, a.y + a.h / 2);
     await page.waitForTimeout(150);
   };
-  const esiste = (id) => page.evaluate((i) => !!window.__ct.aree()[i], id);
+  const esiste = async (id) => { await page.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined); return page.evaluate((i) => !!window.__ct.aree()[i], id); };
   const chiudiGrande = async () => { await clic('grande:chiudi'); await page.mouse.move(2, 2); await page.waitForTimeout(120); };
   const altoTesto = () => page.evaluate(() => window.__ct.fuori().length);
 

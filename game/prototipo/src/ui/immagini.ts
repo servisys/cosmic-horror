@@ -7,6 +7,10 @@ for (const [percorso, url] of Object.entries(urls)) perId.set(percorso.split('/'
 
 const texture = new Map<string, Texture>();
 
+// Sfondo della plancia (due misure: lato lungo 1920 e 1280). Si sceglie in base alla larghezza dello schermo in pixel reali.
+const sfondi = import.meta.glob('../assets/plancia/pozzo_*.webp', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+let texturaPlancia: Texture | undefined;
+
 /** Id dell'immagine di una carta: la versione cosmica ha la propria (id + "c"). */
 export function idImmagine(id: string, trasformata: boolean): string {
   return trasformata ? `${id}c` : id;
@@ -31,6 +35,22 @@ export async function caricaImmagini(): Promise<void> {
   );
   // se per qualche motivo il caricamento si blocca, il gioco parte lo stesso (senza le immagini non arrivate)
   await Promise.race([tutte, new Promise<void>((r) => setTimeout(r, 10000))]);
+}
+
+export async function caricaSfondo(): Promise<void> {
+  const pixel = Math.max(window.innerWidth, window.innerHeight) * Math.max(1, window.devicePixelRatio || 1);
+  const scelta = pixel > 1500 ? 'pozzo_1920' : 'pozzo_1280';
+  const url = Object.entries(sfondi).find(([p]) => p.includes(scelta))?.[1];
+  if (!url) return;
+  try {
+    texturaPlancia = await Promise.race([Assets.load<Texture>(url), new Promise<undefined>((r) => setTimeout(() => r(undefined), 8000))]);
+  } catch {
+    // senza sfondo la scena usa il colore pieno
+  }
+}
+
+export function texturaSfondo(): Texture | undefined {
+  return texturaPlancia;
 }
 
 export function texturaDi(id: string): Texture | undefined {

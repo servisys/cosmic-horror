@@ -7,7 +7,7 @@ import { join, extname } from 'node:path';
 const RADICE = process.argv[2];
 const PORTA = Number(process.argv[3] ?? 5190);
 const PREFISSO = '/x/y/';
-const TIPI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.webp': 'image/webp', '.css': 'text/css', '.json': 'application/json' };
+const TIPI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.webp': 'image/webp', '.css': 'text/css', '.json': 'application/json', '.woff2': 'font/woff2' };
 http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
   if (!u.startsWith(PREFISSO)) { res.writeHead(404); return res.end('fuori dalla sottocartella: ' + u); }

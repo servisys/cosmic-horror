@@ -4,17 +4,19 @@ import type { FazioneId } from '../dati/tipi.js';
 import { sceglieMossa } from '../computer/computer.js';
 import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
-import { caricaImmagini, numeroTexture } from './immagini.js';
+import { caricaImmagini, caricaSfondo, numeroTexture } from './immagini.js';
+import { caricaFont } from './tipografia.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
+import { SETTORI } from './config-plancia.js';
 import { motivoCartaNonGiocabile, suggerimento } from './suggerimento.js';
-import { disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
+import { disegnaAnteprima, disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
 const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del computer (ms)
 const PAUSA_EVENTO = Number(parametri.get('pausaEvento') ?? 4500); // l'evento si chiude da solo dopo questo tempo
 
 const ctrl = new Controller(datiDelBuild());
-const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '' };
+const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '', manoAlzata: false };
 // Tutorial: parte alla prima partita (o se richiesto dal bottone «Come si gioca»), al primo turno del giocatore
 let tutorialPendente = false;
 let tutorialRichiesto = false;
@@ -25,6 +27,7 @@ let ridisegnoInCoda = false;
 let ciclo = false;
 let mosseComputer = 0; // mosse del computer giocate (per i test)
 let timerEvento: number | undefined;
+let ultimoDisegno = 0;
 let ultimoPuntatore: { x: number; y: number } | null = null;
 
 function controllaIngrandimento(): void {
@@ -33,8 +36,15 @@ function controllaIngrandimento(): void {
   if (!sotto || sotto.label !== 'zoomable') {
     ui.zoom = null;
     ui.zoomTerr = null;
-    ridisegna();
+    disegnaAnteprima(app, ctrl, ui);
   }
+}
+
+/** Ridisegna la scena e ricorda quando (i test automatici aspettano che la scena sia ferma prima di toccare). */
+function disegna(): Record<string, Area> {
+  const r = disegnaScena(app, ctrl, ui, azioni);
+  ultimoDisegno = performance.now();
+  return r;
 }
 
 function ridisegna(): void {
@@ -46,7 +56,7 @@ function ridisegna(): void {
       tutorialPendente = false;
       ui.tutorial = { passo: 0 };
     }
-    aree = disegnaScena(app, ctrl, ui, azioni);
+    aree = disegna();
     void avviaCicloSeServe();
     setTimeout(controllaIngrandimento, 40);
   }, 0);
@@ -65,7 +75,7 @@ async function avviaCicloSeServe(): Promise<void> {
       if (!ctrl.tocca_al_computer) break;
       ctrl.passoComputer();
       mosseComputer++;
-      aree = disegnaScena(app, ctrl, ui, azioni);
+      aree = disegna();
       if (ctrl.evento) {
         clearTimeout(timerEvento);
         timerEvento = window.setTimeout(() => azioni.chiudiEvento(), PAUSA_EVENTO);
@@ -81,7 +91,7 @@ const azioni: Azioni = {
   rerender: ridisegna,
   zoom(z: ZoomInfo | null) {
     ui.zoom = z;
-    ridisegna();
+    disegnaAnteprima(app, ctrl, ui);
   },
   grande(g) {
     ui.grande = g;
@@ -91,7 +101,7 @@ const azioni: Azioni = {
   },
   zoomTerritorio(t) {
     ui.zoomTerr = t;
-    ridisegna();
+    disegnaAnteprima(app, ctrl, ui);
   },
   async copia() {
     const testo = ctrl.registroTesto();
@@ -139,6 +149,19 @@ const azioni: Azioni = {
     timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3500);
     ridisegna();
   },
+  alzaMano() {
+    ui.manoAlzata = !ui.manoAlzata;
+    ridisegna();
+  },
+  settore(id) {
+    // prima della scena 3D (prossima PR): i territori in gioco mostrano la scheda, gli altri dicono che non sono ancora in gioco
+    const terr = ctrl.cat.dati.territori.findIndex((t) => SETTORI.find((x) => x.id === id)?.territorioId === t.id);
+    if (terr >= 0) { ui.grande = { tipo: 'terr', i: terr }; ridisegna(); return; }
+    ui.toast = 'Non ancora in gioco';
+    clearTimeout(timerToast);
+    timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3000);
+    ridisegna();
+  },
   chiudiEvento() {
     clearTimeout(timerEvento);
     ctrl.chiudiEvento();
@@ -175,6 +198,7 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.grande = null;
   ui.ordine = [];
   ui.toast = '';
+  ui.manoAlzata = false;
   ui.tutorial = null;
   tutorialPendente = parametri.get('tutorial') === '0' ? false : tutorialRichiesto || parametri.get('tutorial') === '1' || !tutorialVisto();
   ctrl.nuova(fazione, seme);
@@ -188,7 +212,8 @@ async function avvia(): Promise<void> {
     resolution: Math.max(1, window.devicePixelRatio || 1), autoDensity: true,
   });
   document.getElementById('gioco')!.appendChild(app.canvas);
-  await caricaImmagini();
+  await caricaFont();
+  await Promise.all([caricaImmagini(), caricaSfondo()]);
   window.addEventListener('resize', ridisegna);
   // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
   // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
@@ -213,6 +238,7 @@ async function avvia(): Promise<void> {
   // collegamenti per i test automatici (non fanno parte del gioco)
   (window as unknown as Record<string, unknown>).__ct = {
     aree: () => aree,
+    sotto: (x: number, y: number) => { const rb = app.renderer.events.rootBoundary; rb.rootTarget ??= app.stage; const o = rb.hitTest(x, y); if (!o) return null; const b = o.getBounds(); return `${o.constructor.name}:${o.label ?? ''}@${Math.round(b.x)},${Math.round(b.y)},${Math.round(b.width)},${Math.round(b.height)}`; },
     ctrl,
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
@@ -222,6 +248,8 @@ async function avvia(): Promise<void> {
     tutorialAttivo: () => ui.tutorial?.passo ?? -1,
     toast: () => ui.toast,
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
+    // la scena e' ferma: nessun ridisegno in coda e l'ultimo e' di almeno 120 ms fa
+    stabile: () => !ridisegnoInCoda && performance.now() - ultimoDisegno > 120,
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)
     suggerisci: () => sceglieMossa(ctrl.vista(), ctrl.cat),

@@ -50,7 +50,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\CosmicHorr
 ```
 
 - Log: `%USERPROFILE%\CosmicHorrorScambio\log\scambio.log`.
-- Ogni esecuzione: `%USERPROFILE%\CosmicHorrorScambio\esecuzioni\<data>-<id>-<fase>\` (task, resoconto, errori).
+- Ogni esecuzione: `%USERPROFILE%\CosmicHorrorScambio\esecuzioni\<data>-<id>-<fase>\` (task, errori e due file solo sul PC, mai su GitHub):
+  - `flusso.jsonl`: il flusso completo di Code (stream-json), un evento per riga;
+  - `comandi.txt`: ogni comando che Code ha provato, con esito (eseguito / BLOCCATO dai permessi / ERRORE). Token e chiavi sono coperti con `[COPERTO]`.
+- In fondo a ogni resoconto pubblicato su `REPORT.md` c'è una riga con il numero di comandi bloccati e i primi 5.
+- Prova dell'estrazione senza lanciare Code: `osserva-scambio.ps1 -Prova prove\flusso-esempio.jsonl` (stampa resoconto, `comandi.txt` e riga dei bloccati).
+- I vecchi flussi non vengono cancellati in automatico.
 
 ## Quando non parte
 

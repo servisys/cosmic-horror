@@ -1,6 +1,6 @@
 ---
 id: CT-FIX-007
-fase: piano
+fase: esecuzione
 pronto: si
 branch: fix/ct-fix-007-schermo-pieno-e-barra-di-stato
 scritto_da: Cowork (chat Claude del progetto)
@@ -33,3 +33,19 @@ Bilanciamento, regole, carte. Nessuna fusione o chiusura.
 
 ## Output
 Pre-flight plan in italiano semplice, con file toccati, rischi, test e domande.
+
+## Via di Matteo per la fase esecuzione (2026-11-02, in chat a Cowork)
+Matteo ha risposto alle domande e Cowork aveva detto che con quelle risposte si partiva.
+
+**Prima di cominciare:** il tuo `main` locale è indietro. Su `origin/main` ci sono `docs/00-project-overview/02-roadmap/CT_PROTOTYPE_SCOPE_V0.3.md` (quello autorevole) e `game/prototipo/scripts/verifica-cinque-territori.mjs` (è la «vista cinque territori»: va rilanciata). Fai `git fetch` e crea il branch da `origin/main`.
+
+Risposte:
+1. **Telefono: iPhone** (app aggiunta alla Home da Safari). Quindi: niente API Fullscreen (su iOS non c'è; `display: fullscreen` del manifest ricade su `standalone`), la parte «richiedi di nuovo il tutto schermo» vale solo per Android e non deve dare errori su iOS. Su iOS conta: `black-translucent` + `viewport-fit=cover`, safe area (`env(safe-area-inset-*)`, la barra dei gesti in basso e la tacca/Dynamic Island di lato in orizzontale), l'altezza reale (`100dvh` / `visualViewport.height`) e il ridimensionamento al ritorno (`visibilitychange`, `pageshow`, `visualViewport.resize`, `orientationchange`). **Zoom:** su iOS `user-scalable=no` è ignorato; blocca lo zoom anche con `touch-action: manipulation` (o `none` sul canvas, già c'è) su `html, body` e impedendo `gesturestart`/`gesturechange` e il doppio tocco, e al ritorno riporta la scala a 1 se `visualViewport.scale !== 1` (best effort).
+2. **Barra:** contenuto del pannello ENERGIA di oggi (energia, Sigilli/Riti x/3, Esposizione x/10, Mazzo, RIDUCI), niente di nuovo. Sì.
+3. **Avversario in basso:** no, resta nella barra in alto.
+4. **Vista cinque territori:** è `scripts/verifica-cinque-territori.mjs` (rilanciala), oltre a `grafica-finale.mjs`.
+5. **Screenshot della fascia vuota:** non c'è; Matteo ha mandato due foto del gioco a schermo intero su iPhone 2000×921 circa (orizzontale): in basso il pannello ENERGIA occupa da sinistra fino a ~20% della larghezza e l'altezza dal ~69% al fondo; la mano è un ventaglio dal ~20% all'~80%, in basso; a destra il medaglione FINE TURNO e le icone. Procedi con la correzione del punto 1 e la safe area; la fascia la verificherà Matteo dopo.
+6. **Meno altezza alla mano per la barra:** sì, con la barra più bassa possibile.
+7. **Scope:** usa la V0.3 (vedi sopra).
+
+Nessuna fusione: PR verso `main` e fermati.

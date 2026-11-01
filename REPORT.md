@@ -1,5 +1,34 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-005 - fase esecuzione - 2026-11-01 23:17 - FATTO
+
+FATTO. Ho controllato la PR 75 in sola lettura. Tutti i controlli del task tornano, quindi non c'è motivo di bloccare la fusione.
+
+**Richiesta eseguita:** CT-DEL-005, controlli sulla PR 75 prima della fusione.
+
+**Verifiche (da `gh pr view 75`):**
+- La PR è aperta (`OPEN`).
+- La base è `main`.
+- La testa è `fb4d5f57dea0c36ac498e8981879ab3ecf01ab4d`, uguale allo sha indicato in `fusioni`.
+- È fondibile: `MERGEABLE`, stato `CLEAN`.
+- Tutti i 7 file stanno dentro i percorsi attesi:
+  - `docs/05-technical-design/04-build-deployment/CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md`
+  - sei file in `strumenti/mac-mini/`: `LEGGIMI.md`, `controlla-e-pubblica.sh`, `installa.sh`, `percorso-node.sh`, `prova-logica.sh`, `pubblica.conf.esempio`
+
+**Cosa è stato fatto:** niente. Nessuna modifica, commit, branch, push o PR. Ho solo letto lo stato della PR.
+
+**Branch e PR:** nessun branch creato. La PR 75 non è stata fusa da me, la fusione spetta allo script.
+
+**Non verificato:** non ho letto il contenuto del diff. Mi sono fermato ai controlli richiesti dal task: stato, base, sha, fondibilità e percorsi dei file.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- PR #75: FUSA (merge commit, testa fb4d5f57dea0c36ac498e8981879ab3ecf01ab4d).
+
+---
+
 ## CT-DEL-005 - fase piano - 2026-11-01 23:12 - FATTO
 
 **Resoconto CT-DEL-005, fase piano**

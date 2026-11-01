@@ -1,11 +1,12 @@
 ---
 title: Cosmic Horror - Protocollo di lavoro Cowork e Claude Code
-status: APPROVED
+status: DEPRECATED
 version: 0.2.0
 owner: Matteo
 prepared_by: chat Claude del progetto
 last_reviewed: 2026-11-01
 supersedes: CT_COWORK_CODE_PROTOCOL_V0.1.md
+superseded_by: CT_COWORK_CODE_PROTOCOL_V0.4.md
 project_prefix: CT_
 ---
 

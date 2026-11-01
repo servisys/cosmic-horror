@@ -1,0 +1,2 @@
+- Errore di formato nel task: il task ha fusioni/chiusure ma non dichiara tipo: deleghe (le deleghe valgono solo in un task dedicato)
+- Nessuna fusione o chiusura eseguita (un errore di formato ferma tutto).

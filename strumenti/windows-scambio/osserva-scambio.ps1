@@ -249,10 +249,12 @@ function Riga-Bloccati($info) {
 #
 # Campi piatti nel front matter di TASK.md (scritti da Cowork solo dopo il si' di Matteo in chat per quella PR):
 #   fusioni: 69@<sha40>, 71@<sha40>     numero@sha completo (40 caratteri minuscoli) della testa della PR
-#   file_attesi_69: docs/a.md, docs/b/  facoltativo: file che la PR puo' toccare (percorso esatto, o cartella che finisce con /)
+#   tipo: deleghe                       obbligatorio se ci sono fusioni o chiusure: dichiara il task dedicato a fusioni e chiusure
+#   file_attesi_69: docs/a.md, docs/b/  obbligatorio per ogni fusione: file che la PR puo' toccare (percorso esatto, o cartella che finisce con /)
 #   chiusure: 70, 72                    numeri delle PR da chiudere
 #   motivo_70: testo del commento       obbligatorio per ogni chiusura
-# Qualsiasi errore di formato = non si esegue niente. Senza questi campi nulla cambia: fusioni e chiusure restano bloccate.
+# Qualsiasi errore di formato (compresi fusione senza file_attesi e deleghe senza tipo: deleghe) = non si esegue niente.
+# Senza questi campi nulla cambia: fusioni e chiusure restano bloccate.
 
 function Leggi-Deleghe($fm) {
   $fusioni = New-Object System.Collections.ArrayList
@@ -271,6 +273,7 @@ function Leggi-Deleghe($fm) {
         $visti[$n] = $true
         $attesi = @()
         if ($fm["file_attesi_$n"]) { $attesi = @(($fm["file_attesi_$n"] -split ',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
+        if ($attesi.Count -eq 0) { [void]$errori.Add("fusione della PR $n senza file_attesi_$n"); continue }
         [void]$fusioni.Add(@{ Pr = $n; Sha = $sha; Attesi = $attesi })
       } else { [void]$errori.Add("voce di fusioni non valida '$v' (serve numero@sha di 40 caratteri minuscoli)") }
     }
@@ -290,6 +293,7 @@ function Leggi-Deleghe($fm) {
     }
   }
   if ($presente -and $fusioni.Count -eq 0 -and $chiusure.Count -eq 0 -and $errori.Count -eq 0) { [void]$errori.Add('campi fusioni/chiusure vuoti') }
+  if ($presente -and $fm['tipo'] -ne 'deleghe') { [void]$errori.Add('il task ha fusioni/chiusure ma non dichiara tipo: deleghe (le deleghe valgono solo in un task dedicato)') }
   return @{ Presente = $presente; Fusioni = @($fusioni); Chiusure = @($chiusure); Errori = @($errori) }
 }
 
@@ -354,7 +358,7 @@ function Esegui-Deleghe($dl, [bool]$simula) {
     elseif ($p.Testa -cne $f.Sha) { $stop = "la testa e' $($p.Testa), non $($f.Sha)" }
     elseif ($p.Fondibile -ne 'MERGEABLE') { $stop = "la PR non e' fondibile senza conflitti (stato $($p.Fondibile))" }
     elseif ($p.File.Count -eq 0) { $stop = 'la PR non tocca nessun file' }
-    elseif ($f.Attesi.Count -gt 0) {
+    else {
       $fuori = @($p.File | Where-Object {
         $x = $_
         -not (@($f.Attesi | Where-Object { ($_ -ceq $x) -or ($_.EndsWith('/') -and $x.StartsWith($_)) }).Count -gt 0)

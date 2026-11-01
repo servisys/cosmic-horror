@@ -1,6 +1,6 @@
 ---
 id: CT-DEV-001
-fase: piano
+fase: esecuzione
 pronto: si
 branch: fix/ct-dev-001-log-comandi
 scritto_da: Cowork (chat Claude del progetto)
@@ -14,6 +14,13 @@ data: 2026-11-01
 - `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md` (APPROVED, stessa nota) — §2.1 canale automatico.
 - `strumenti/windows-scambio/LEGGIMI.md` e `osserva-scambio.ps1`.
 - Richiesta di Matteo in chat a Cowork il 2026-11-01: «facciamo anche il 2» (proposta di Code nel resoconto del 2026-11-01: salvare il flusso json di Code).
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («vai»). Le PR del canale automatico e delle approvazioni sono fuse: base `main`. Risposte:
+1. Sì al parametro `-Prova <file.jsonl>`.
+2. Nessuna pulizia automatica dei vecchi flussi per ora.
+3. `comandi.txt` con tutti i comandi e il loro esito (eseguiti, bloccati, errori).
+Segui il pre-flight plan che hai scritto. Nel resoconto: elenco esplicito delle cose non eseguite davvero (funzione di estrazione, formato reale di stream-json).
 
 ## Obiettivo
 Oggi il log di un'esecuzione contiene solo il testo finale di Code: quando un comando viene bloccato non si vede quale. Lo script deve salvare il flusso completo dell'esecuzione, così si capisce subito cosa è successo.

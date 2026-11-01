@@ -89,6 +89,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   if (ui.scena) {
     disegnaTerritorio(d, c, ui, az, W, H);
   } else {
+    misure0 = { fissi: [], quadri: [] };
     d.rett(0, 0, W, H, COL.sfondo, { r: 0 });
     sfondo(d, W, H);
   luciPlancia(d, W, H);
@@ -163,23 +164,21 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     {
       const sug = c.tuoTurno && !c.decisione && !c.finita ? suggerimento(v) : null;
       const nascosta = ui.suggerimentoNascosto && !ui.toast;
-      const hS = (nascosta ? 20 : 40) * u;
       const testoS = ui.toast || (sug ? sug.testo : c.finita ? '' : c.tuoTurno ? '' : 'Turno di Lui: aspetta, poi tocca a te.');
+      // il consiglio sta nella meta' sinistra dello schermo, sopra la mano: la meta' destra e' dei quadri in basso (Landa) e dei bottoni
+      const xS = (LARGH_ENERGIA + 22) * u;
+      const wS = Math.max(170 * u, W / 2 - 8 * u - xS);
+      const testoMostrato = nascosta ? 'Consiglio nascosto: tocca per mostrarlo' : ui.toast ? testoS : testoS ? `Consiglio: ${testoS}` : '';
+      const hTesto = testoMostrato ? Math.min(d.altezza(testoMostrato, 13.5, wS - 20 * u), 96 * u) : 0;
+      const hS = Math.max((nascosta ? 22 : 32) * u, hTesto + 12 * u);
       const urgente = !ui.toast && sug?.tipo === 'avversario-un-passo';
-      const wS = Math.min(540 * u, W - 2 * (LARGH_ENERGIA + 24) * u);
-      const xS = (W - wS) / 2;
       const yS = mano.yAlto - hS - 6 * u;
-      ostacoli.push({ x: xS, y: H - 126 * u - 10 * u - hS - 6 * u - 12 * u, w: wS, h: hS + 24 * u });
+      ostacoli.push({ x: xS, y: yS - 6 * u, w: wS, h: hS + 12 * u });
+      misura('fisso', 'consiglio', { x: xS, y: yS, w: wS, h: hS });
       d.rett(xS, yS, wS, hS, ui.toast ? 0x3a2a14 : urgente ? 0x4a1f1a : 0x0e1a26, {
-        stroke: ui.toast ? COL.oro : urgente ? COL.pericolo : 0x3f78b5, id: 'suggerimento', tap: () => az.suggerimento(), r: hS / 2, alpha: 0.92,
+        stroke: ui.toast ? COL.oro : urgente ? COL.pericolo : 0x3f78b5, id: 'suggerimento', tap: () => az.suggerimento(), r: Math.min(hS / 2, 12 * u), alpha: 0.94,
       });
-      if (nascosta) d.testo('Consiglio nascosto: tocca per mostrarlo', W / 2, yS + hS / 2, 12, COL.tenue, { anchorX: 0.5, anchorY: 0.5 }).y = yS + hS / 2;
-      else if (testoS) {
-        const et = d.testo(ui.toast ? '!' : 'Consiglio:', xS + 12 * u, yS + hS / 2, 13, COL.oroChiaro, { titoli: true, bold: true, anchorY: 0.5 });
-        et.y = yS + hS / 2;
-        const x0t = et.x + et.width + 8 * u;
-        d.adatta(testoS, x0t, yS + 2 * u, xS + wS - 12 * u - x0t, hS - 4 * u, 13.5, 12, 0xffffff, false, 'left');
-      }
+      if (testoMostrato) d.adatta(testoMostrato, xS + 10 * u, yS + 6 * u, wS - 20 * u, hS - 10 * u, 13.5, 12, nascosta ? COL.tenue : 0xffffff, false, 'left');
     }
 
     // ---------- energia, fine turno, regole e registro ----------
@@ -238,6 +237,19 @@ export function disegnaAnteprima(app: Application, c: Controller, ui: UiStato): 
   const d = new Disegno(sopra, Math.max(0.7, Math.min(W / 956, H / 440)));
   if (ui.zoom) zoomCarta(d, c, ui.zoom, W, H, 30 * d.u);
   else zoomCarta(d, c, null, W, H, 30 * d.u, ui.zoomTerr);
+}
+
+/** Rettangoli toccabili dell'ultimo disegno della plancia: fissi (energia, Fine turno, icone, consiglio, mano) e dei quadri (targhetta, bottone, miniature). Serve alla verifica delle sovrapposizioni. */
+export interface Misure {
+  fissi: Array<{ nome: string; r: Area }>;
+  quadri: Array<{ nome: string; r: Area }>;
+}
+let misure0: Misure = { fissi: [], quadri: [] };
+export function misureUltimoDisegno(): Misure {
+  return misure0;
+}
+function misura(tipo: 'fisso' | 'quadro', nome: string, r: Area): void {
+  (tipo === 'fisso' ? misure0.fissi : misure0.quadri).push({ nome, r });
 }
 
 let ultimiPunti: Record<string, { x: number; y: number }> = {};
@@ -339,7 +351,7 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const wp = 10 * u + wNome + 10 * u + wNum + 6 * u + wPip + 6 * u + wNum + (wDischi ? 6 * u : 0) + wDischi + 10 * u;
   const xp = st.lato === 'sx' ? vis.x + 8 * u : vis.x + vis.w - 8 * u - wp;
   const xpc = Math.max(4 * u, Math.min(W - 4 * u - wp, xp));
-  const yp = Math.max(vis.y + 14 * u, hBar + (v.eventiVisti.length ? 18 * u : 0)) + 5 * u;
+  const yp = Math.max(vis.y, hBar + (v.eventiVisti.length ? 18 * u : 0)) + 5 * u;
   d.rett(xpc, yp, wp, alt, 0, {
     r: 5 * u, tex: texturaGradiente([[0, 'rgba(28,20,12,0.95)'], [1, 'rgba(14,10,6,0.95)']], true), stroke: COL.oroScuro, sw: 1,
     id: `terrnome:${i}`, tap: () => az.grande({ tipo: 'terr', i }),
@@ -369,13 +381,93 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   let y = yp + alt + 4 * u;
   let xMin = xpc;
   let xMax = xpc + wp;
-  // tappe non ancora al sicuro: in piccolo, quando servono
+  misura('quadro', `targhetta:${i}`, { x: xpc, y: yp, w: wp, h: alt });
+  const basso = st.zona.y > 0.4;
+  // bottone dorato subito sotto la targhetta, in alto nel quadro: solo quando l'azione e' possibile (spento solo nel tutorial)
+  const puo = c.puoTappa(i);
+  const nomeBtn = v.fazione === 'custodi' ? 'PONI SIGILLO' : 'COMPLETA RITO';
+  const hBtn = Math.max(34 * u, 32);
+  const bottone = (et: string, abilitata: boolean, tap: () => void, wMax: number): void => {
+    const wb = Math.min(wMax, d.larghezza(et, 12.5, { titoli: true, bold: true, ls: 0.5 }) + 30 * u);
+    const xb = st.lato === 'sx' ? xpc : xpc + wp - wb;
+    d.pillolaOro(`btn:tappa:${i}`, et, xb, y, hBtn, tap, 12.5, abilitata);
+    misura('quadro', `bottone:${i}`, { x: xb, y, w: wb, h: hBtn });
+    xMin = Math.min(xMin, xb);
+    xMax = Math.max(xMax, xb + wb);
+    y += hBtn + 4 * u;
+  };
+  if (puo) bottone(`${nomeBtn} · ${t.costoTappa}`, true, () => { c.tappa(i); az.rerender(); }, wp + 60 * u);
+  else if (ui.tutorial?.passo === 4) {
+    const motivo = motivoTappa(v, t);
+    bottone(motivo ? `${nomeBtn}: ${motivo}` : nomeBtn, false, () => undefined, wp + 60 * u);
+  }
+  // miniature delle carte giocate (circa 50x70): Lui (verde) e Tu (blu) nella stessa fila, dentro il quadro; se sono tante si sovrappongono a ventaglio
+  const mw = 50 * u;
+  const mh = 70 * u;
+  const gap = 4 * u;
+  const sep = 12 * u;
+  const nL = t.loro.length;
+  const nT = t.mie.length;
+  const maxW = Math.max(mw, vis.w * (basso ? 0.8 : 0.66));
+  // spazio per ciascun gruppo, in proporzione alle carte
+  const spazio = (n: number): number => Math.max(mw, ((maxW - (nL && nT ? sep : 0)) * n) / Math.max(1, nL + nT));
+  const passoDi = (n: number): number => (n > 1 ? Math.min(mw + gap, (spazio(n) - mw) / (n - 1)) : 0);
+  const larghGruppo = (n: number): number => (n ? passoDi(n) * (n - 1) + mw : 0);
+  const totale = larghGruppo(nL) + (nL && nT ? sep : 0) + larghGruppo(nT);
+  if (nL + nT > 0) {
+    let xm = st.lato === 'sx' ? xpc : xpc + wp - totale;
+    // in basso a destra c'e' il medaglione di Fine turno: le carte non ci vanno sotto
+    if (y + mh > H - 112 * u) xm = Math.min(xm, W - 104 * u - totale);
+    const xInizio = xm;
+    xMin = Math.min(xMin, xm);
+    xMax = Math.max(xMax, xm + totale);
+    const fila = (lista: VistaPresenza[], mio: boolean): void => {
+      const n = lista.length;
+      const passo = passoDi(n);
+      lista.forEach((p, k) => {
+        const bersaglio = opz.pres.includes(p.uid);
+        const filo = mio ? 0x6aa8f0 : 0x5fb878;
+        const apri = (): void => az.grande({ tipo: 'carta', id: p.id, trasformata: p.trasformata });
+        if (bersaglio) d.alone(xm, y, mw, mh, COL.selezione, 1, 12, 3);
+        d.rett(xm - 1.5 * u, y - 1.5 * u, mw + 3 * u, mh + 3 * u, 0x000000, { r: 3 * u, alpha: 0.9 });
+        if (!d.immagine(idImmagine(p.id, p.trasformata), xm, y, mw, mh, 1, 3)) d.rett(xm, y, mw, mh, colori(p.id).scuro, { r: 3 * u });
+        const g = d.rett(xm, y, mw, mh, 0xffffff, {
+          alpha: 0.001, r: 3 * u, stroke: bersaglio ? COL.selezione : filo, sw: bersaglio ? 2.8 : 1.8, id: `pres:${p.uid}`,
+          tap: () => {
+            if (pressioneRecente()) return;
+            const o = c.opzioni();
+            // una miniatura e' dentro il quadro: se la carta scelta si gioca sul territorio (e non su questa presenza) il tocco la gioca li'
+            if (o.pres.includes(p.uid)) { c.scegliPresenza(p.uid); az.rerender(); } else if (o.terr.includes(i)) { c.scegliTerritorio(i); az.rerender(); } else apri();
+          },
+          over: () => az.zoom({ id: p.id, trasformata: p.trasformata }), out: () => az.zoom(null),
+        });
+        pressioneLunga(g, apri);
+        misura('quadro', `miniatura:${p.uid}`, { x: xm, y, w: mw, h: mh });
+        // il riquadro della forza sta in basso a sinistra: nel ventaglio la parte destra e' coperta dalla carta vicina
+        const fw = 25 * u;
+        const fh = 18 * u;
+        d.rett(xm, y + mh - fh, fw, fh, 0x000000, { alpha: 0.88, r: 3 * u });
+        d.testo(String(p.forza), xm + fw / 2, y + mh - fh / 2, 13, mio ? 0xcfe4ff : 0xbff0cc, { titoli: true, bold: true, anchorX: 0.5, anchorY: 0.5 }).y = y + mh - fh / 2;
+        if (p.trasformata) d.testo('✦', xm + mw - 3 * u, y + 1 * u, 13, 0xd08cff, { bold: true, anchorX: 1 });
+        // punto di tocco per i test: la parte della carta che resta scoperta
+        d.aree[`pres:${p.uid}`] = { x: xm, y: y + 4 * u, w: k < n - 1 ? Math.max(passo, 6 * u) : mw, h: mh - fh - 6 * u };
+        xm += passo;
+      });
+    };
+    fila(t.loro, false);
+    xm = xInizio + larghGruppo(nL) + (nL ? sep : 0);
+    fila(t.mie, true);
+    y += mh + 4 * u;
+  }
+  // tappe non ancora al sicuro: in piccolo, solo se c'e' posto (nei quadri in basso la fila delle carte e il bottone arrivano gia' fin sopra la mano)
   const sigAvv = v.fazioneAvv === 'custodi' ? 'Sigillo' : 'Rito';
   const sigMio = v.fazione === 'custodi' ? 'Sigillo' : 'Rito';
   const righe: string[] = [];
   if (hanLui && t.loroTappaTogliibile) righe.push(`${sigAvv} di Lui: al sicuro dopo il tuo turno`);
   if (hanMio && t.mioTappaTogliibile) righe.push(`${sigMio} tuo: al sicuro dopo il turno di Lui`);
+  const limite = basso ? H - 66 * u : vis.y + vis.h;
   for (const r of righe) {
+    if (y + 18 * u > limite) break;
     const wr = Math.min(wp + 40 * u, d.larghezza(r, 12, { corsivo: true }) + 14 * u);
     const xr = st.lato === 'sx' ? xpc : xpc + wp - wr;
     xMin = Math.min(xMin, xr);
@@ -383,74 +475,6 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
     d.rett(xr, y, wr, 18 * u, 0x0a0704, { alpha: 0.85, r: 9 * u });
     d.testo(r, xr + wr / 2, y + 9 * u, 12, COL.oroChiaro, { corsivo: true, anchorX: 0.5, anchorY: 0.5 }).y = y + 9 * u;
     y += 20 * u;
-  }
-  // miniature delle carte giocate (circa 50x70): Lui (verde) in una fila, Tu (blu) in un'altra, dentro il quadro; se sono tante si sovrappongono a ventaglio
-  const mw = 50 * u;
-  const mh = 70 * u;
-  const gap = 4 * u;
-  const maxW = Math.max(mw, vis.w * 0.62);
-  const fila = (lista: VistaPresenza[], mio: boolean): void => {
-    const n = lista.length;
-    if (!n) return;
-    const passo = n > 1 ? Math.min(mw + gap, (maxW - mw) / (n - 1)) : 0;
-    const totale = passo * (n - 1) + mw;
-    let xm = st.lato === 'sx' ? xpc : xpc + wp - totale;
-    // in basso a destra c'e' il medaglione di Fine turno: le carte non ci vanno sotto
-    if (y + mh > H - 112 * u) xm = Math.min(xm, W - 104 * u - totale);
-    xMin = Math.min(xMin, xm);
-    xMax = Math.max(xMax, xm + totale);
-    lista.forEach((p, k) => {
-      const bersaglio = opz.pres.includes(p.uid);
-      const filo = mio ? 0x6aa8f0 : 0x5fb878;
-      const apri = (): void => az.grande({ tipo: 'carta', id: p.id, trasformata: p.trasformata });
-      if (bersaglio) d.alone(xm, y, mw, mh, COL.selezione, 1, 12, 3);
-      d.rett(xm - 1.5 * u, y - 1.5 * u, mw + 3 * u, mh + 3 * u, 0x000000, { r: 3 * u, alpha: 0.9 });
-      if (!d.immagine(idImmagine(p.id, p.trasformata), xm, y, mw, mh, 1, 3)) d.rett(xm, y, mw, mh, colori(p.id).scuro, { r: 3 * u });
-      const g = d.rett(xm, y, mw, mh, 0xffffff, {
-        alpha: 0.001, r: 3 * u, stroke: bersaglio ? COL.selezione : filo, sw: bersaglio ? 2.8 : 1.8, id: `pres:${p.uid}`,
-        tap: () => {
-          if (pressioneRecente()) return;
-          const o = c.opzioni();
-          // una miniatura e' dentro il quadro: se la carta scelta si gioca sul territorio (e non su questa presenza) il tocco la gioca li'
-          if (o.pres.includes(p.uid)) { c.scegliPresenza(p.uid); az.rerender(); } else if (o.terr.includes(i)) { c.scegliTerritorio(i); az.rerender(); } else apri();
-        },
-        over: () => az.zoom({ id: p.id, trasformata: p.trasformata }), out: () => az.zoom(null),
-      });
-      pressioneLunga(g, apri);
-      // il riquadro della forza sta in basso a sinistra: nel ventaglio la parte destra e' coperta dalla carta vicina
-      const fw = 25 * u;
-      const fh = 18 * u;
-      d.rett(xm, y + mh - fh, fw, fh, 0x000000, { alpha: 0.88, r: 3 * u });
-      d.testo(String(p.forza), xm + fw / 2, y + mh - fh / 2, 13, mio ? 0xcfe4ff : 0xbff0cc, { titoli: true, bold: true, anchorX: 0.5, anchorY: 0.5 }).y = y + mh - fh / 2;
-      if (p.trasformata) d.testo('✦', xm + mw - 3 * u, y + 1 * u, 13, 0xd08cff, { bold: true, anchorX: 1 });
-      // punto di tocco per i test: la parte della carta che resta scoperta
-      d.aree[`pres:${p.uid}`] = { x: xm, y: y + 4 * u, w: k < n - 1 ? Math.max(passo, 6 * u) : mw, h: mh - fh - 6 * u };
-      xm += passo;
-    });
-    y += mh + 4 * u;
-  };
-  fila(t.loro, false);
-  fila(t.mie, true);
-  if (t.loro.length + t.mie.length > 0) y += 2 * u;
-  // bottone dorato: solo quando l'azione e' possibile
-  const puo = c.puoTappa(i);
-  const nomeBtn = v.fazione === 'custodi' ? 'PONI SIGILLO' : 'COMPLETA RITO';
-  if (puo) {
-    const et = `${nomeBtn} · ${t.costoTappa}`;
-    const wb = d.larghezza(et, 12, { titoli: true, bold: true, ls: 0.5 }) + 26 * u;
-    const xb = st.lato === 'sx' ? xpc : xpc + wp - wb;
-    d.pillolaOro(`btn:tappa:${i}`, et, xb, y, 30 * u, () => { c.tappa(i); az.rerender(); });
-    xMin = Math.min(xMin, xb);
-    xMax = Math.max(xMax, xb + wb);
-    y += 30 * u;
-  } else if (ui.tutorial?.passo === 4) {
-    // durante il tutorial del Sigillo/rito il bottone si vede anche spento, con il motivo
-    const motivo = motivoTappa(v, t);
-    const et = motivo ? `${nomeBtn}: ${motivo}` : nomeBtn;
-    const wb = Math.min(wp + 40 * u, d.larghezza(et, 12, { titoli: true, bold: true }) + 26 * u);
-    const xb = st.lato === 'sx' ? xpc : xpc + wp - wb;
-    d.pillolaOro(`btn:tappa:${i}`, et, xb, y, 30 * u, () => undefined, 12, false);
-    y += 30 * u;
   }
   return { x: xMin - 4 * u, y: yp - 4 * u, w: xMax - xMin + 8 * u, h: y - yp + 8 * u };
 }
@@ -513,6 +537,7 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
   const zw = Math.max(totale, 160 * u) + 24 * u;
   d.rett(zx, yAlto - 10 * u, zw, H - yAlto + 10 * u, 0xffffff, { alpha: 0.001, r: 0, tap: () => { if (!pressioneRecente()) az.alzaMano(); } });
   d.aree['mano:tutta'] = { x: zx, y: yAlto - 4 * u, w: zw, h: H - yAlto + 4 * u };
+  misura('fisso', 'mano', { x: zx, y: yAlto - 4 * u, w: zw, h: H - yAlto + 4 * u });
   if (sel.carta === undefined) anim.rimbalzo(null);
   v.mano.forEach((cd, k) => {
     const scelta = sel.carta === cd.uid;
@@ -567,6 +592,7 @@ function controlli(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const py = H - ph - 10 * u;
   d.rett(px, py, pw, ph, 0x070503, { alpha: 0.9, stroke: COL.oroScuro, sw: 1.2, r: 8 * u });
   d.aree['pannello:energia'] = { x: px, y: py, w: pw, h: 66 * u };
+  misura('fisso', 'energia', { x: px, y: py, w: pw, h: ph });
   ingombri.push({ x: px, y: py, w: pw, h: ph });
   const gx = px + 38 * u;
   const gy = py + 37 * u;
@@ -608,6 +634,7 @@ function controlli(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
     if (attivo) g.on('pointertap', tap);
     d.s.addChild(g);
     d.aree[id] = { x: cx - r, y: cy - r, w: 2 * r, h: 2 * r };
+    misura('fisso', id, { x: cx - r, y: cy - r, w: 2 * r, h: 2 * r });
     ingombri.push({ x: cx - r - 8 * u, y: cy - r - 8 * u, w: 2 * r + 16 * u, h: 2 * r + 16 * u });
     d.testo(riga1, cx, riga2 ? cy - 7 * u : cy, 13, attivo ? 0xfff2d0 : 0x8a8270, { titoli: true, bold: true, peso: '900', ls: 0.4, anchorX: 0.5, anchorY: 0.5 }).y = riga2 ? cy - 7 * u : cy;
     if (riga2) d.testo(riga2, cx, cy + 8 * u, 13, attivo ? 0xfff2d0 : 0x8a8270, { titoli: true, bold: true, peso: '900', ls: 0.4, anchorX: 0.5, anchorY: 0.5 }).y = cy + 8 * u;
@@ -622,6 +649,7 @@ function controlli(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const yi = H - 10 * u - ic;
   const icona = (id: string, tap: () => void, disegna: (g: Graphics, ox: number, oy: number) => void): void => {
     d.rett(xi, yi, ic, ic, 0x0a0704, { r: ic / 2, alpha: 0.9, stroke: COL.oroScuro, sw: 1.2, id, tap });
+    misura('fisso', id, { x: xi, y: yi, w: ic, h: ic });
     const g = new Graphics();
     disegna(g, xi + ic / 2, yi + ic / 2);
     d.s.addChild(g);

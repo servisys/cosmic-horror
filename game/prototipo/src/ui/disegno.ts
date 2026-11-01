@@ -311,12 +311,12 @@ export class Disegno {
   /** Pillola dorata (azioni possibili sulla plancia). Ritorna la larghezza. */
   pillolaOro(id: string, etichetta: string, x: number, y: number, h: number, tap: () => void, size = 12, abilitata = true): number {
     const w = this.larghezza(etichetta, size, { titoli: true, bold: true, ls: 0.5 }) + 26 * this.u;
-    if (abilitata) this.alone(x, y, w, h, COL.oroChiaro, 0.6, 12, h / (2 * this.u));
+    if (abilitata) this.alone(x, y, w, h, 0xffd25a, 0.95, 14, h / (2 * this.u));
     this.rett(x, y, w, h, 0, {
-      r: h / 2, tex: abilitata ? texturaGradiente([[0, '#e6c46a'], [1, '#a47c26']], true) : texturaGradiente([[0, '#3a3428'], [1, '#221e16']], true),
-      stroke: abilitata ? 0xffe29a : 0x4a4332, sw: 1, id, tap: abilitata ? tap : undefined,
+      r: h / 2, tex: abilitata ? texturaGradiente([[0, '#ffe58a'], [0.55, '#f2c34c'], [1, '#c98f1c']], true) : texturaGradiente([[0, '#3b3b3b'], [1, '#222222']], true),
+      stroke: abilitata ? 0x3a2606 : 0x5a5648, sw: abilitata ? 1.6 : 1, id, tap: abilitata ? tap : undefined,
     });
-    const t = this.testo(etichetta, x + w / 2, y + h / 2, size, abilitata ? COL.pillola : 0x7a7260, { titoli: true, bold: true, ls: 0.5, anchorX: 0.5, anchorY: 0.5 });
+    const t = this.testo(etichetta, x + w / 2, y + h / 2, size, abilitata ? 0x1a1104 : 0xd9d2bd, { titoli: true, bold: true, ls: 0.5, anchorX: 0.5, anchorY: 0.5 });
     t.y = y + h / 2;
     return w;
   }

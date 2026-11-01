@@ -10,7 +10,7 @@ import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { anim, type FotoStato } from './animazioni.js';
 import { SETTORI, inSchermo } from './config-plancia.js';
 import { motivoCartaNonGiocabile, suggerimento } from './suggerimento.js';
-import { disegnaAnteprima, disegnaScena, puntiUltimoDisegno, testiFuoriSchermo, testiPiccoli, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
+import { disegnaAnteprima, disegnaScena, puntiUltimoDisegno, testiFuoriSchermo, misureUltimoDisegno, testiPiccoli, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
 const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del computer (ms)
@@ -371,6 +371,7 @@ async function avvia(): Promise<void> {
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
     piccoli: () => testiPiccoli(),
+    misure: () => misureUltimoDisegno(),
     zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,
     immagini: () => numeroTexture(),
     suggerimento: () => suggerimento(ctrl.vista()),

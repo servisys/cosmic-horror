@@ -118,6 +118,14 @@ export class Controller {
     return this.tuoTurno && !this.decisione && this.mossePerCarta(uid).length > 0;
   }
 
+  /** Carte della mano che si possono giocare nel territorio i (come bersaglio oppure su una presenza che sta li'); lo dice il motore. */
+  carteGiocabiliIn(i: number): number[] {
+    if (!this.tuoTurno || this.decisione) return [];
+    const v = this.vista();
+    const qui = new Set([...v.territori[i].mie, ...v.territori[i].loro].map((p) => p.uid));
+    return v.mano.filter((cd) => this.mossePerCarta(cd.uid).some((m) => m.terr === i || (m.pres !== undefined && qui.has(m.pres)))).map((cd) => cd.uid);
+  }
+
   opzioni(): Opzioni {
     const c = this.candidate();
     const terr = new Set<number>();

@@ -4,7 +4,7 @@ import type { FazioneId } from '../dati/tipi.js';
 import { sceglieMossa } from '../computer/computer.js';
 import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
-import { caricaImmagini, caricaSfondo, numeroTexture } from './immagini.js';
+import { alCaricarsiDiUnaScena, caricaImmagini, caricaScene, caricaSfondo, numeroTexture } from './immagini.js';
 import { caricaFont } from './tipografia.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { SETTORI } from './config-plancia.js';
@@ -16,7 +16,7 @@ const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del c
 const PAUSA_EVENTO = Number(parametri.get('pausaEvento') ?? 4500); // l'evento si chiude da solo dopo questo tempo
 
 const ctrl = new Controller(datiDelBuild());
-const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '', manoAlzata: false };
+const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '', manoAlzata: false, scena: null, manoQui: false };
 // Tutorial: parte alla prima partita (o se richiesto dal bottone «Come si gioca»), al primo turno del giocatore
 let tutorialPendente = false;
 let tutorialRichiesto = false;
@@ -154,12 +154,45 @@ const azioni: Azioni = {
     ridisegna();
   },
   settore(id) {
-    // prima della scena 3D (prossima PR): i territori in gioco mostrano la scheda, gli altri dicono che non sono ancora in gioco
-    const terr = ctrl.cat.dati.territori.findIndex((t) => SETTORI.find((x) => x.id === id)?.territorioId === t.id);
-    if (terr >= 0) { ui.grande = { tipo: 'terr', i: terr }; ridisegna(); return; }
-    ui.toast = 'Non ancora in gioco';
-    clearTimeout(timerToast);
-    timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3000);
+    // un quadro (o il pozzo) toccato senza una carta da giocare: si entra nella sua scena 3D. Dunwich e R'lyeh non sono in gioco: solo da guardare.
+    const st = SETTORI.find((x) => x.id === id);
+    ui.scena = id;
+    ui.manoQui = false;
+    ui.zoom = null;
+    ui.zoomTerr = null;
+    if (st && st.territorioId === null) {
+      ui.toast = 'Non ancora in gioco';
+      clearTimeout(timerToast);
+      timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3000);
+    }
+    ridisegna();
+  },
+  esci() {
+    ui.scena = null;
+    ui.manoQui = false;
+    ui.toast = '';
+    ridisegna();
+  },
+  vicino(dir) {
+    if (!ui.scena) return;
+    const k = SETTORI.findIndex((x) => x.id === ui.scena) + dir;
+    if (k < 0 || k >= SETTORI.length) return;
+    ui.scena = SETTORI[k].id;
+    ui.manoQui = false;
+    ui.toast = '';
+    ctrl.annulla();
+    ridisegna();
+  },
+  manoQui(aperta) {
+    ui.manoQui = aperta;
+    ridisegna();
+  },
+  giocaQui(uid) {
+    const st = SETTORI.find((x) => x.id === ui.scena);
+    const i = ctrl.cat.dati.territori.findIndex((t) => t.id === st?.territorioId);
+    ui.manoQui = false;
+    ctrl.scegliCarta(uid);
+    if (i >= 0 && ctrl.opzioni().terr.includes(i)) ctrl.scegliTerritorio(i);
     ridisegna();
   },
   chiudiEvento() {
@@ -186,6 +219,45 @@ const azioni: Azioni = {
   },
 };
 
+/** Scorrere (a destra o a sinistra) passa al luogo vicino; allargare con due dita torna alla plancia. */
+function gesti(): void {
+  const punti = new Map<number, { x: number; y: number }>();
+  let inizio: { x: number; y: number } | null = null;
+  let dist0 = 0;
+  let pizzicato = false;
+  const dist = (): number => {
+    const [a, b] = [...punti.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+  app.canvas.addEventListener('pointerdown', (e) => {
+    punti.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
+    if (punti.size === 1) { inizio = { x: e.offsetX, y: e.offsetY }; pizzicato = false; }
+    if (punti.size === 2) dist0 = dist();
+  });
+  app.canvas.addEventListener('pointermove', (e) => {
+    if (!punti.has(e.pointerId)) return;
+    punti.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
+    if (punti.size === 2 && ui.scena && !pizzicato && dist0 > 0 && dist() > dist0 * 1.35) {
+      pizzicato = true;
+      azioni.esci();
+    }
+  });
+  const fine = (e: PointerEvent): void => {
+    if (!punti.has(e.pointerId)) return;
+    const solo = punti.size === 1;
+    punti.delete(e.pointerId);
+    if (solo && inizio && ui.scena && !pizzicato) {
+      const dx = e.offsetX - inizio.x;
+      const dy = e.offsetY - inizio.y;
+      const u = Math.max(0.7, Math.min(app.screen.width / 956, app.screen.height / 440));
+      if (Math.abs(dx) > 70 * u && Math.abs(dy) < 60 * u) azioni.vicino(dx < 0 ? 1 : -1);
+    }
+    if (!punti.size) inizio = null;
+  };
+  app.canvas.addEventListener('pointerup', fine);
+  app.canvas.addEventListener('pointercancel', fine);
+}
+
 function mostraInizio(): void {
   document.getElementById('inizio')!.style.display = 'flex';
 }
@@ -199,6 +271,8 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.ordine = [];
   ui.toast = '';
   ui.manoAlzata = false;
+  ui.scena = null;
+  ui.manoQui = false;
   ui.tutorial = null;
   tutorialPendente = parametri.get('tutorial') === '0' ? false : tutorialRichiesto || parametri.get('tutorial') === '1' || !tutorialVisto();
   ctrl.nuova(fazione, seme);
@@ -215,6 +289,10 @@ async function avvia(): Promise<void> {
   await caricaFont();
   await Promise.all([caricaImmagini(), caricaSfondo()]);
   window.addEventListener('resize', ridisegna);
+  // scene 3D dei luoghi: si caricano in background dopo la partenza (poche centinaia di KB), la scena si ridisegna quando arrivano
+  alCaricarsiDiUnaScena(() => { if (ui.scena) ridisegna(); });
+  void caricaScene(SETTORI.map((x) => x.scena));
+  gesti();
   // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
   // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
   app.canvas.addEventListener('pointermove', (e) => {
@@ -249,6 +327,7 @@ async function avvia(): Promise<void> {
     toast: () => ui.toast,
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
     // la scena e' ferma: nessun ridisegno in coda e l'ultimo e' di almeno 120 ms fa
+    scena: () => ui.scena,
     stabile: () => !ridisegnoInCoda && performance.now() - ultimoDisegno > 120,
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)

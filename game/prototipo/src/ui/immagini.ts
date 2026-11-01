@@ -49,6 +49,34 @@ export async function caricaSfondo(): Promise<void> {
   }
 }
 
+// Scene 3D dei territori (dentro un territorio): due misure come lo sfondo, caricate in background dopo la partenza
+const fileScene = import.meta.glob('../assets/scene/*.webp', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+const texScene = new Map<string, Texture>();
+let suScenaCaricata: (() => void) | undefined;
+
+export function alCaricarsiDiUnaScena(cb: () => void): void {
+  suScenaCaricata = cb;
+}
+
+export async function caricaScene(nomi: string[]): Promise<void> {
+  const pixel = Math.max(window.innerWidth, window.innerHeight) * Math.max(1, window.devicePixelRatio || 1);
+  const misura = pixel > 1500 ? '1920' : '1280';
+  for (const nome of nomi) {
+    const url = Object.entries(fileScene).find(([p]) => p.includes(`/${nome}_${misura}.webp`))?.[1];
+    if (!url) continue;
+    try {
+      texScene.set(nome, await Assets.load<Texture>(url));
+      suScenaCaricata?.();
+    } catch {
+      // senza la scena resta lo sfondo scuro
+    }
+  }
+}
+
+export function texturaScena(nome: string): Texture | undefined {
+  return texScene.get(nome);
+}
+
 export function texturaSfondo(): Texture | undefined {
   return texturaPlancia;
 }

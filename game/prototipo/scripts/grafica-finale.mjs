@@ -96,6 +96,87 @@ for (const vista of VISTE) {
     await p.close();
     return { ok: giocate >= 1 && evento, dettaglio: JSON.stringify({ giocate, evento }) };
   });
+
+  await prova(`${vista.nome}: ingresso nei cinque luoghi, scorrimento, pizzico, «Gioca una carta qui»`, async () => {
+    const p = await apri('?fazione=custodi&seme=21&pausa=60&pausaEvento=60000&tutorial=0');
+    await turno(p);
+    const scena = () => p.evaluate(() => window.__ct.scena());
+    const ordine = ['innsmouth', 'biblioteca', 'dunwich', 'landa', 'rlyeh'];
+    // 1. tocco sui cinque quadri della plancia: si entra nella scena giusta, indietro torna alla plancia
+    const quadri = await p.evaluate(() => {
+      const a = window.__ct.aree();
+      return { innsmouth: 'terr:0', biblioteca: 'terr:1', landa: 'terr:2', dunwich: 'settore:dunwich', rlyeh: 'settore:rlyeh' };
+    });
+    for (const id of ordine) {
+      await tap(p, quadri[id]);
+      await p.waitForTimeout(500);
+      if ((await scena()) !== id) return { ok: false, dettaglio: `tocco su ${quadri[id]}: scena ${await scena()} invece di ${id}` };
+      await foto(p, `scena_${id}`);
+      const fuori = await p.evaluate(() => window.__ct.fuori());
+      if (fuori.length) return { ok: false, dettaglio: `testi fuori schermo in ${id}: ${fuori.join(', ')}` };
+      await tap(p, 'scena:indietro');
+      if ((await scena()) !== null) return { ok: false, dettaglio: `indietro da ${id} non torna alla plancia` };
+    }
+    // 2. scorrimento con il dito (da destra a sinistra = luogo successivo, e viceversa)
+    await tap(p, quadri.innsmouth);
+    const scorri = async (da, a) => {
+      await ferma(p);
+      await p.mouse.move(da, vista.h * 0.6);
+      await p.mouse.down();
+      await p.mouse.move((da + a) / 2, vista.h * 0.6, { steps: 4 });
+      await p.mouse.move(a, vista.h * 0.6, { steps: 4 });
+      await p.mouse.up();
+      await p.waitForTimeout(350);
+    };
+    await scorri(vista.w * 0.75, vista.w * 0.3);
+    if ((await scena()) !== 'biblioteca') return { ok: false, dettaglio: `scorrimento a sinistra: scena ${await scena()}` };
+    await scorri(vista.w * 0.75, vista.w * 0.3);
+    await scorri(vista.w * 0.3, vista.w * 0.75);
+    if ((await scena()) !== 'biblioteca') return { ok: false, dettaglio: `scorrimento avanti e indietro: scena ${await scena()}` };
+    // frecce
+    await tap(p, 'scena:vicino:1');
+    if ((await scena()) !== 'dunwich') return { ok: false, dettaglio: `freccia avanti: scena ${await scena()}` };
+    // 3. pizzico: due dita che si allargano tornano alla plancia
+    await ferma(p);
+    await p.evaluate(({ w, h }) => {
+      const cv = document.querySelector('canvas');
+      const r = cv.getBoundingClientRect();
+      const ev = (tipo, id, x, y) => cv.dispatchEvent(new PointerEvent(tipo, { pointerId: id, pointerType: 'touch', clientX: r.left + x, clientY: r.top + y, bubbles: true, isPrimary: id === 1 }));
+      ev('pointerdown', 1, w * 0.45, h * 0.5); ev('pointerdown', 2, w * 0.55, h * 0.5);
+      for (let k = 1; k <= 6; k++) { ev('pointermove', 1, w * (0.45 - k * 0.04), h * 0.5); ev('pointermove', 2, w * (0.55 + k * 0.04), h * 0.5); }
+      ev('pointerup', 1, w * 0.2, h * 0.5); ev('pointerup', 2, w * 0.8, h * 0.5);
+    }, { w: vista.w, h: vista.h });
+    await p.waitForTimeout(300);
+    if ((await scena()) !== null) return { ok: false, dettaglio: `pizzico: scena ${await scena()}` };
+    // 4. «Gioca una carta qui»: si apre la mano con le sole carte valide e la carta si gioca
+    let giocata = false;
+    for (let k = 0; k < 80 && !giocata; k++) {
+      await turno(p);
+      const m = await p.evaluate(() => window.__ct.suggerisci());
+      if (m.t !== 'gioca' || m.terr === undefined) { await tap(p, 'btn:fine'); continue; }
+      const id = ['innsmouth', 'biblioteca', 'landa'][m.terr];
+      await tap(p, `terr:${m.terr}`); // nessuna carta scelta: entra nella scena
+      if ((await scena()) !== id) return { ok: false, dettaglio: `scena ${await scena()} invece di ${id}` };
+      const n0 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
+      await tap(p, 'scena:gioca-qui');
+      await foto(p, 'scena_mano_qui');
+      const validi = await p.evaluate((t) => window.__ct.ctrl.carteGiocabiliIn(t), m.terr);
+      if (!validi.length) return { ok: false, dettaglio: 'nessuna carta valida in un territorio dove il computer ne giocherebbe una' };
+      await tap(p, `mano:${validi[0]}`);
+      await ferma(p);
+      if (await p.evaluate(() => !!window.__ct.aree()['btn:gioca'])) await tap(p, 'btn:gioca');
+      await foto(p, 'scena_dopo_carta');
+      const n1 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
+      giocata = n1 > n0;
+      if (!giocata) {
+        const dbg = await p.evaluate(() => ({ sel: window.__ct.ctrl.selezione, opz: window.__ct.ctrl.opzioni() }));
+        return { ok: false, dettaglio: 'la carta scelta dalla scena non è stata giocata ' + JSON.stringify(dbg) };
+      }
+      await tap(p, 'scena:indietro');
+    }
+    await p.close();
+    return { ok: giocata, dettaglio: 'cinque scene, scorrimento, frecce, pizzico, carta giocata dalla scena' };
+  });
   await ctx.close();
 }
 await browser.close();

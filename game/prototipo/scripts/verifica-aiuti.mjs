@@ -21,12 +21,13 @@ const prova = async (nome, fn) => {
 };
 const aiuti = (p) => {
   const tap = async (id) => {
+    await p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined);
     const a = await p.evaluate((i) => window.__ct.aree()[i] ?? null, id);
     if (!a) throw new Error('area ' + id + ' non trovata');
     await p.touchscreen.tap(a.x + a.w / 2, a.y + a.h / 2);
     await p.waitForTimeout(220);
   };
-  const ha = (id) => p.evaluate((i) => !!window.__ct.aree()[i], id);
+  const ha = async (id) => { await p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined); return p.evaluate((i) => !!window.__ct.aree()[i], id); };
   const tutorial = () => p.evaluate(() => window.__ct.tutorialAttivo());
   const attendi = async (cond, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await cond()) return true; await p.waitForTimeout(150); } return false; };
   return { tap, ha, tutorial, attendi };
@@ -109,7 +110,7 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
     for (let k = 0; k < 400; k++) {
       const st = await p.evaluate(() => { const c = window.__ct.ctrl; return { fine: c.finita, tuo: c.tuoTurno, dec: !!c.decisione, ev: !!c.evento }; });
       if (st.fine) break;
-      if (st.ev) { await a.tap('evento:chiudi'); continue; }
+      if (st.ev) { await a.tap('evento:chiudi').catch(() => undefined); continue; } // con pausaEvento breve si chiude anche da solo
       if (st.dec) { await a.tap('btn:tieni'); continue; }
       if (!st.tuo) { await p.waitForTimeout(80); continue; }
       const sug = await p.evaluate(() => window.__ct.suggerimento());
@@ -156,7 +157,7 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
         if (await a.ha('btn:gioca')) await a.tap('btn:gioca');
       }
       const n1 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
-      if (n1 <= n0) { await ctx.close(); return { ok: false, dettaglio: 'mossa senza effetto: ' + JSON.stringify(m) }; }
+      if (n1 <= n0) { const dbg = await p.evaluate(() => ({ sel: window.__ct.ctrl.selezione, opz: window.__ct.ctrl.opzioni(), grande: !!window.__ct.aree()['grande:chiudi'], tut: window.__ct.tutorialAttivo() })); await p.screenshot({ path: `${OUT}/_errore.png` }); await ctx.close(); return { ok: false, dettaglio: 'mossa senza effetto: ' + JSON.stringify(m) + ' ' + JSON.stringify(dbg) }; }
     }
     await ctx.close();
   }

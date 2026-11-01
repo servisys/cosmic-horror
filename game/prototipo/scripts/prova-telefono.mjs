@@ -67,7 +67,9 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
   await p.goto(`${URL}?fazione=custodi&seme=21&pausa=120&tutorial=0`);
   await p.waitForFunction(() => window.__ct && window.__ct.ctrl.g);
   await p.waitForTimeout(800);
+  const stabile = () => p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined);
   const tap = async (id) => {
+    await p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 5000 }).catch(() => undefined);
     const a = await p.evaluate((i) => window.__ct.aree()[i] ?? null, id);
     if (!a) throw new Error('area ' + id + ' non trovata');
     await p.touchscreen.tap(a.x + a.w / 2, a.y + a.h / 2);
@@ -83,9 +85,9 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
     await tap(`mano:${m.carta}`);
     if (await p.evaluate(() => window.__ct.zoomAttivo())) return { ok: false, dettaglio: 'anteprima aperta dopo il tocco su una carta' };
     if (m.terr !== undefined) await tap(`terr:${m.terr}`);
-    if (m.pres !== undefined && (await p.evaluate((i) => !!window.__ct.aree()[i], `pres:${m.pres}`))) await tap(`pres:${m.pres}`);
+    if (m.pres !== undefined && (await stabile().then(() => p.evaluate((i) => !!window.__ct.aree()[i], `pres:${m.pres}`)))) await tap(`pres:${m.pres}`);
     if (m.cerca !== undefined) await tap(`cerca:${m.cerca}`);
-    if (await p.evaluate(() => !!window.__ct.aree()['btn:gioca'])) await tap('btn:gioca');
+    if (await stabile().then(() => p.evaluate(() => !!window.__ct.aree()['btn:gioca']))) await tap('btn:gioca');
     const n1 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
     if (n1 <= n0) return { ok: false, dettaglio: `la carta non e' stata giocata: ${JSON.stringify(m)}` };
     giocate++;

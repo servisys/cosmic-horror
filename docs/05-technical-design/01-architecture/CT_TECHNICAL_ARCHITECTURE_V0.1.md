@@ -82,6 +82,7 @@ Da `game/prototipo/`, dopo `npm install`:
 
 | Libreria | Versione | Uso |
 |---|---|---|
+| 0.1.6 | DRAFT | Aggiunto il paragrafo 12 sulla grafica finale (plancia, carte, caratteri); l'elenco delle ambiguità diventa il 13. |
 | yaml | 2.8.1 | lettura dei file dati |
 | typescript | 5.9.3 | linguaggio |
 | vitest | 3.2.4 | test |
@@ -128,7 +129,16 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Tutorial:** 6 passi (`passiTutorial`) con riquadro evidenziato e «Avanti»/«Salta»; parte al primo turno della prima partita, ricordato in `localStorage` (`src/ui/memoria.ts`, con try/catch), e si rivede con «Come si gioca» nella schermata iniziale. `?tutorial=0` lo disattiva (usato dalle verifiche), `?tutorial=1` lo forza.
 - **Verifica:** `npm run verifica-aiuti -- <url>` (Playwright, 956x440, `hasTouch` + `isMobile`).
 
-## 12. Elenco delle ambiguità
+## 12. Grafica finale (plancia, carte, caratteri)
+
+- **Plancia:** lo sfondo `src/assets/plancia/pozzo_*.webp` (pozzo_v3, lato lungo 1920 e 1280, scelto in base ai pixel reali dello schermo) si mostra a tutto schermo (`cover`). Tutto cio' che e' posizionato sullo sfondo sta in **un file di configurazione**, `src/ui/config-plancia.ts`: i cinque settori (Innsmouth, Biblioteca, Dunwich, Landa, R'lyeh) con la zona toccabile in frazioni dell'immagine, il lato della targhetta e la scena. `territorioId` dice quale territorio dei dati sta in quel quadro; `null` = visibile ma non in gioco (Dunwich e R'lyeh: scuriti, nessuna targhetta, al tocco «Non ancora in gioco»). Passare a 5 territori in gioco = scrivere gli id in questo file. Il test `config-plancia.test.ts` controlla la corrispondenza con i dati.
+- **Interfaccia sulla plancia** (`src/ui/scena.ts`): barra dell'avversario in alto; per ogni territorio in gioco una targhetta (nome, forza di Lui verde e tua blu, pallini dell'instabilita', dischi delle tappe: pieno = al sicuro, contorno = ancora togliibile, con la riga «al sicuro dopo…»), le miniature delle carte giocate con la forza e, solo quando si puo', il bottone dorato Sigillo/rito. I quadri toccabili per la carta selezionata hanno un alone dorato. Mano in basso, a ventaglio, con le carte che sbucano dal bordo: un tocco sulla zona la alza; con una carta selezionata e' sempre alzata; le carte non giocabili sono sbiadite. Energia in basso a sinistra (con esposizione, mazzo e «Riduci»), Fine turno in basso a destra, icone Regole, Registro e Annulla.
+- **Carte** (`src/ui/carte.ts`): cornice con bordo sfumato nel colore della fazione (Custodi argento-blu, Risvegliati verde abisso, Eventi viola, riserva e territori ottone), barra del nome con gemma del costo, illustrazione, barra del tipo, riquadro chiaro con effetto, citazione e fonte (e l'originale inglese, piu' piccolo), riquadro della forza. Tre misure: scheda grande (sostituisce la precedente), media e ridotta (mano).
+- **Caratteri:** Cinzel (titoli e numeri) e Crimson Text (testi), licenza SIL OFL, come file WOFF2 in `src/assets/font/` con i file di licenza; si caricano con `FontFace` prima del primo disegno (`src/ui/tipografia.ts`, con tempo massimo).
+- **Anteprima al mouse:** sta in un livello a parte sopra la scena (`disegnaAnteprima`): mostrarla non ricostruisce la scena, quindi non fa perdere un clic.
+- **Verifica:** `npm run grafica-finale -- <url>` (screenshot a 956x440 con tocco e a 1280x800) in aggiunta alle verifiche precedenti. Le verifiche aspettano che la scena sia ferma (`window.__ct.stabile()`) prima di toccare: la scena si ricostruisce dopo ogni cambiamento di stato e un tocco nei pochi millisecondi prima del ridisegno colpirebbe la scena vecchia.
+
+## 13. Elenco delle ambiguità
 
 L'elenco delle ambiguità trovate nelle regole, nelle carte e negli eventi è nel resoconto di Code (`scambio/da-code.md`) e nella descrizione della PR; ogni punto è stato risolto nel modo più letterale possibile, senza modificare regole, carte o eventi.
 

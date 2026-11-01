@@ -141,15 +141,15 @@ export function passiTutorial(fazione: 'custodi' | 'risvegliati'): PassoTutorial
         ? 'Vinci ponendo 3 Sigilli, uno per territorio. Su un territorio puoi porre il Sigillo se lo controlli (hai più forza di Lui) e l\'instabilità è 3 o meno.'
         : 'Vinci completando 3 riti, uno per territorio. Su un territorio puoi completare il rito se hai una tua presenza, almeno tanta forza quanto Lui e l\'instabilità è 3 o più.',
     },
-    { area: 'pannello:energia', titolo: 'L\'energia', testo: 'Questa è l\'energia che puoi spendere in questo turno. Ogni carta costa energia (il numero nel cerchio in alto a sinistra). Quella non spesa si perde.' },
-    { area: 'mano:tutta', titolo: 'La mano', testo: 'Tocca una carta, poi un territorio evidenziato in verde per giocarla. La lente serve solo a leggere la carta ingrandita.' },
-    { area: 'territori:tutti', titolo: 'I territori', testo: 'Per ogni territorio vedi la forza di Lui e la tua: controlla chi ne ha di più. I quadratini sono l\'instabilità: a 3 cambia chi può fare cosa, a 4 le presenze perdono forza, a 5 scatta un effetto cosmico.' },
+    { area: 'pannello:energia', titolo: 'L\'energia', testo: 'Questa è l\'energia che puoi spendere in questo turno. Ogni carta costa energia (il numero nella gemma blu in alto a destra della carta). Quella non spesa si perde.' },
+    { area: 'mano:tutta', titolo: 'La mano', testo: 'Tocca una carta (la mano si alza), poi il quadro che si illumina d\'oro per giocarla. La lente serve solo a leggere la carta ingrandita.' },
+    { area: 'territori:tutti', titolo: 'I territori', testo: 'Ogni targhetta mostra la forza di Lui (verde) e la tua (blu): controlla chi ne ha di più. I pallini sono l\'instabilità: a 3 cambia chi può fare cosa, a 4 le presenze perdono forza, a 5 scatta un effetto cosmico.' },
     {
       area: 'btn:tappa:1',
       titolo: c ? 'Il Sigillo' : 'Il rito',
       testo: c
-        ? 'Quando il bottone «Poni Sigillo» si illumina puoi usarlo (costa 2 energia). Se è spento, in piccolo c\'è il motivo. Una tappa si può togliere finché non è «al sicuro»: lo diventa dopo il prossimo turno di Lui.'
-        : 'Quando il bottone «Completa rito» si illumina puoi usarlo (costa 2 energia). Se è spento, in piccolo c\'è il motivo. Una tappa si può togliere finché non è «al sicuro»: lo diventa dopo il prossimo turno di Lui.',
+        ? 'Quando compare il bottone dorato «Poni Sigillo» puoi usarlo (costa 2 energia). Una tappa si può togliere finché non è «al sicuro»: lo diventa dopo il prossimo turno di Lui.'
+        : 'Quando compare il bottone dorato «Completa rito» puoi usarlo (costa 2 energia). Una tappa si può togliere finché non è «al sicuro»: lo diventa dopo il prossimo turno di Lui.',
     },
     { area: 'btn:fine', titolo: 'Fine turno', testo: 'Quando hai finito, tocca «Fine turno»: gioca Lui, poi agisce la forza cosmica con un evento. La riga di suggerimento in alto ti dice la prossima cosa utile; toccala per nasconderla.' },
   ];

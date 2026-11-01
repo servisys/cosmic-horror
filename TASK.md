@@ -1,6 +1,6 @@
 ---
 id: CT-DEL-003
-fase: piano
+fase: esecuzione
 pronto: si
 tipo: deleghe
 branch: nessuno
@@ -15,6 +15,9 @@ file_attesi_72: docs/00_MASTER_INDEX.md, docs/00-project-overview/02-roadmap/, d
 ## Documenti autorevoli
 - `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` §3 (APPROVED).
 - Matteo in chat a Cowork il 2026-11-01: «ok procediamo», in risposta alla proposta di fondere la PR 72 con un task dedicato. Cowork chiederà a Matteo la conferma esplicita «fondi la 72» prima della fase esecuzione. Cowork ha letto l'elenco dei file della PR su GitHub: 51 file, solo nelle cartelle di `file_attesi_72`.
+
+## Via di Matteo
+Matteo ha confermato in chat a Cowork il 2026-11-01: «fondi pr72», dopo il piano con tutti i controlli positivi.
 
 ## Obiettivo
 Fondere la PR 72 tramite lo script. Task dedicato: nessun lavoro nuovo.

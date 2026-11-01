@@ -1,5 +1,39 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-005 - fase piano - 2026-11-01 23:12 - FATTO
+
+**Resoconto CT-DEL-005, fase piano**
+
+**Richiesta eseguita:** controlli in sola lettura sulla PR 75. Non ho modificato nulla.
+
+**Verifiche** (da `gh pr view 75`):
+- La PR è aperta (`OPEN`) e non è draft.
+- Il branch di destinazione è `main`.
+- La testa è `fb4d5f57dea0c36ac498e8981879ab3ecf01ab4d`, uguale allo sha indicato in `fusioni`.
+- Lo stato è `MERGEABLE` / `CLEAN`.
+- I file sono 7. Uno è in `docs/05-technical-design/04-build-deployment/` (`CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md`). Sei sono in `strumenti/mac-mini/` (`LEGGIMI.md`, `controlla-e-pubblica.sh`, `installa.sh`, `percorso-node.sh`, `prova-logica.sh`, `pubblica.conf.esempio`). Tutti rientrano in `file_attesi_75`.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` ha `status: APPROVED`. Nella tabella versioni la V0.4.0 risulta `APPROVED`, approvata da Matteo il 2026-11-01.
+- Il task ha `tipo: deleghe` e `file_attesi_75` compilato, come chiede il protocollo.
+
+**Cosa è stato fatto:** niente commit, branch, push o PR. Non ho fuso né chiuso nulla. La fusione la esegue lo script.
+
+**Esito:** FATTO. Tutti i controlli del task tornano e non ci sono rischi né domande aperte.
+
+**Branch e PR:** nessun branch creato. PR 75 non toccata.
+
+**Non verificato:**
+- Non ho letto il contenuto del diff. Il task dice che l'ha già letto Cowork.
+- Non ho riverificato il «sì» di Matteo in chat. Mi baso su quanto scritto nel task.
+- Non ho controllato nel protocollo la protezione di `main`, cioè se servono approvazioni o controlli obbligatori. GitHub dà la PR `CLEAN`.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-FIX-006 - fase esecuzione - 2026-11-01 21:42 - FATTO
 
 **Richiesta eseguita:** CT-FIX-006 è fatto. Le verifiche passano tranne la prova 17, che su Windows non gira. La PR è aperta verso `main` e non è stata fusa.

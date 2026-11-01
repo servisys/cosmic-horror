@@ -1,5 +1,128 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FEAT-002 - fase piano - 2026-11-01 18:19 - FATTO
+
+# Resoconto CT-FEAT-002, fase piano (pre-flight plan)
+
+## Richiesta eseguita
+Ho letto TASK.md e i documenti autorevoli e ho preparato il pre-flight plan. Non ho modificato file, non ho fatto commit né push.
+
+## Verifica dei documenti autorevoli
+- **Regole V0.13:** `APPROVED`. Le interpretazioni 26-28 del §13 sono scritte nel documento come regole.
+- **Specifica prototipo V0.3:** `APPROVED`.
+- **Master Index 0.7.0 e Protocollo V0.4:** `APPROVED`.
+- **Dati carte V0.7:** non l'ho aperto. Il task lo chiama autorevole e la PR 72 lo aggiunge.
+- **Decision Log CT-DES-069…074:** le sei voci sono `REGISTRATA`, ma l'intestazione del file dice `status: DRAFT`. Il Log stesso scrive che la registrazione vale con il merge in `main`.
+- **PR 72:** aperta, non fusa, branch `feature/ct-feat-001-cinque-territori`. Il branch locale e quello remoto sono allo stesso commit (8658a42).
+- **Nota sul percorso:** nel task le Regole V0.13 sono indicate senza cartella. Sul branch stanno in `docs/01-game-design/01-core-rules/`.
+
+Non trovo ostacoli bloccanti. Il task è pronto, salvo le domande qui sotto.
+
+## Punto 7: stesso branch o branch nuovo
+
+**Opzione A: stesso branch della PR 72 (la mia raccomandazione).**
+- Pro:
+  - La PR resta una sola e si fonde una volta sola.
+  - `main` resta giocabile, come Matteo ha chiesto.
+  - Nessun rischio di fondere per sbaglio solo metà del lavoro.
+  - Nessuna PR "a catena".
+- Contro:
+  - La PR cresce e Matteo la rilegge tutta insieme.
+  - Il Decision Log e il motore (PR 1) si rivedono insieme alla grafica.
+  - Se un controllo fallisce, blocca tutta la PR.
+  - Il commit del motore è già pubblicato, quindi non si riscrive la storia.
+
+**Opzione B: branch nuovo creato da quello, con una PR che punta a quel branch.**
+- Pro:
+  - La revisione è divisa: motore da una parte, interfaccia dall'altra.
+  - Il diff della PR 2 è piccolo e leggibile.
+- Contro:
+  - Due PR da fondere in ordine, con più rischio di errore.
+  - Se si fonde la PR 72 per prima, la PR 2 si riaggancia a `main`.
+  - Il merge automatico non ha il via libera di Matteo.
+
+Procedo con A, a meno che Matteo non scelga B.
+
+## Passi e file toccati
+Percorsi sotto `game/prototipo/`. Ho letto i file sul branch e su `main`, ma non ho ancora verificato i dettagli UI.
+
+1. **Computer.** In `src/computer/computer.ts` il codice oggi conosce solo 3 territori e le regole V0.9 (CT-DES-065/067).
+   - Va riscritto secondo la tabella CT-DES-074, senza id o indici di territorio scritti nel codice. Per Dunwich e R'lyeh si usano le costanti `TERR` di `regole.ts` e le funzioni `idTerr` e `indiceTerr`, già nel motore della PR 72.
+   - Gli id delle carte restano in tabelle come oggi (per esempio `ID_CUSTODI`).
+   - Nuove mosse da gestire:
+     - `pietre` (Pietre ritte). Il motore della PR 72 ha già il tipo `{ t: 'pietre', terr, segno }`.
+     - Pietra Incisa e Idolo di Cthulhu, con la scelta del segno, che sta in `segno` della mossa `gioca`.
+   - Nel codice attuale `T1r/T2r/T3r` sono scritti a mano. Vanno resi robusti ai nuovi id `T4r` e `T5r`.
+   - Va aggiornata anche la logica di `sceglieMossa`, perché con la terza tappa solo a R'lyeh cambiano i minacciati e le tappe posabili.
+2. **Interfaccia.**
+   - `src/ui/config-plancia.ts`: `territorioId` di Dunwich diventa `'T4'` e quello di R'lyeh `'T5'`.
+   - `src/ui/main.ts` e `src/ui/scena-territorio.ts`: tolgo i rami "non in gioco".
+   - `src/ui/scena.ts`:
+     - Righe 112 e 316 (quadro scurito e pozzo "non in gioco"). Cambiano.
+     - Riga 828 e dintorni (testo delle regole: «poni tre Sigilli…»). Diventa «due Sigilli sui territori esterni, il terzo a R'lyeh».
+     - Aggiungo il bottone Pietre ritte accanto a «RIDUCI · 2». Oggi in `scena.ts` è alle righe 618-619.
+   - `src/ui/controller.ts`: nuovi metodi `puoPietre`, `pietre(terr, segno)` e scelta del segno, sul modello di `riduci` e `tappa`.
+   - `src/ui/suggerimento.ts`: consigli per R'lyeh e le Pietre ritte.
+3. **Segnaposto illustrazioni.** In `src/ui/immagini.ts` e `src/ui/carte.ts`: un'unica immagine di ripiego, riconoscibile, per T4, T5, T4r, T5r. Il file immagine reale arriva dopo.
+4. **Dati e simulazione.** I file visti sulla PR 72 hanno già `NUM_TERR = 5`.
+   - `src/dati/controllo.ts` sulla PR 72 accetta già 5 territori.
+   - `src/simulazione/simula.ts` sulla PR 72 è aggiornato solo in parte. La media «dei 3 territori» è scritta a mano e va portata a 5.
+   - Aggiungo le statistiche richieste: uso di Pietre ritte, Pietra Incisa, Idolo di Cthulhu, Cthulhu si agita, Orrore di Dunwich.
+5. **Verifiche.**
+   - Nuovo `scripts/verifica-cinque-territori.mjs`, con riga in `package.json`.
+   - Controllo a 956x440, 844x390 e 740x340 con `npm run leggibilita` e `npm run sovrapposizioni` (se i controlli chiedono altre misure, le aggiorno).
+   - Le verifiche Playwright esistenti (`verifica-tappa3`, `verifica-tappa4`, `prova-telefono`, `verifica-aiuti`, `verifica-animazioni`, `verifica-pwa`) vanno rilette: alcune presuppongono 3 territori.
+   - Alcuni test in `test/` possono dipendere dal computer vecchio, e vanno adattati senza cambiare le regole.
+6. **Build.** `npm run build`, copia in `scambio/da-claude/tappa5/dist/` con `ELENCO_FILE.txt`, prova da sottocartella con `scripts/serve-sottocartella.mjs`.
+7. **PR.** Aggiorno la descrizione della PR 72 in italiano. Il push avviene con `git push -u origin HEAD`, poi `git switch main`.
+
+## Come R'lyeh fa capire che è l'ultima tappa
+- Una targhetta «ULTIMA TAPPA» sul pozzo, colore verde come il suo bordo (`0x6fe0a8`). Resta visibile ma spenta finché il giocatore ha meno di 2 tappe.
+- Quando il giocatore arriva a 2 tappe, la targhetta si accende e pulsa. Il pozzo si evidenzia.
+- Il consiglio (`suggerimento.ts`) dice «La terza tappa si fa solo a R'lyeh» e, a 2 tappe, «Ora vai a R'lyeh».
+- Nella scena di R'lyeh (`scena-territorio.ts`) il titolo riporta «Luogo dell'ultima tappa».
+- Il testo delle regole (`scena.ts`, riga 828) dice «due fuori e l'ultimo a R'lyeh».
+- Il computer avvisa con la frase della sua mossa quando prepara R'lyeh.
+
+## Bottone Pietre ritte sul telefono
+- Il bottone «PIETRE · 1» sta accanto a «RIDUCI · 2», con lo stesso stile. È attivo solo se il giocatore controlla Dunwich, ha 1 energia e non l'ha già usato nel turno. Altrimenti è spento, come «RIDUCI».
+- Tocco sul bottone: si apre una piccola finestra con il territorio da scegliere (T1, T2, T3, T5, con instabilità attuale) e due bottoni grandi «+1» e «−1».
+- Le combinazioni che non cambiano nulla (instabilità già a 5 o a 0) sono spente. Il motore le esclude già.
+- Con tocco singolo e bersagli ampi, per leggere bene a 740x340.
+- Pietra Incisa: dopo il tocco sulla carta e sul territorio, compaiono +1 e −1 nella stessa finestra.
+- Da verificare con `npm run leggibilita` e `npm run sovrapposizioni`.
+
+## Rischi
+- **Il computer a 5 territori può sbilanciare le simulazioni.** Il task dice di non correggere. Riporto i numeri e le proposte, senza toccare carte o regole.
+- **Tabella CT-DES-074 con zone grigie:** «esterno più conteso», «controllo contestato» e «tiene R'lyeh a 3 o meno» vanno tradotti in codice. Documenterò nel resoconto ogni interpretazione, senza cambiare la tabella.
+- **Verifiche Playwright vecchie:** possono rompersi con il quinto quadro. Le adatto solo nella parte tecnica.
+- **Quinto quadro e leggibilità:** a 740x340 lo spazio è poco. Se un controllo non passa e la soluzione richiede di cambiare il layout, lo segnalo.
+- **File scritti dai controlli:** non li committo, salvo quelli già tracciati.
+- **Confronto con la PR 1:** servono i numeri «925/75/0, 5,75 giri» e gli stessi semi (0-999). Li ricalcolo e li confronto con quelli del task.
+- **Confronto con 3 territori (`main`):** non so ancora se i numeri di `main` sono già salvati da qualche parte. Altrimenti li rigenero con un checkout temporaneo in una cartella separata. Lo decido in esecuzione.
+
+## Domande per Matteo
+1. Conferma opzione A (stesso branch, PR 72 unica)?
+2. Il Decision Log ha `status: DRAFT` nell'intestazione, anche se le voci sono `REGISTRATA`. Va bene lasciarlo così, o deve cambiare con il merge?
+3. Targhetta «ULTIMA TAPPA»: va bene sempre visibile (spenta o accesa), o solo da 2 tappe in su?
+4. Segnaposto T4/T5/T4r/T5r: un unico segnaposto con il nome del territorio scritto sopra, va bene?
+5. Pietre ritte: nel computer, se più bersagli sono equivalenti, scelgo quello con indice più basso. Va bene, o preferisci altro?
+
+## Cosa non ho verificato
+- Non ho eseguito `npm run tipi`, test, build o simulazioni: la fase piano è in sola lettura.
+- Non ho letto `CT_CARTE_PROTOTIPO_V0.7.yaml`, `scena-territorio.ts`, `main.ts`, `suggerimento.ts`, `immagini.ts` e gli script di verifica. I rami "non in gioco" e le zone che vanno cambiate sono dedotti dal `grep` e dal TASK.
+- Non ho controllato che Playwright sia installato.
+- Non so se `main` ha già una simulazione a 3 territori salvata.
+
+## Branch e PR
+Nessun branch nuovo. La PR 72 (aperta) non è stata toccata. Nessun commit.
+
+`git diff --stat`: vuoto, fase piano.
+
+Comandi bloccati dai permessi: 8. Primi 5: `git ls-tree -r --name-only origin/feature/ct-feat-001-cinque-territori | grep -E "src/|CT_CORE|CT_CARTE|SCOPE|DECISION_L...`; `git ls-tree -r --name-only origin/feature/ct-feat-001-cinque-territori game docs/01-game-design docs/00-project-overview...`; `git ls-tree -r --name-only origin/feature/ct-feat-001-cinque-territori`; `B=origin/feature/ct-feat-001-cinque-territori; git show $B:docs/01-game-design/01-core-rules/CT_CORE_RULES_V0.13.md`; `B=origin/feature/ct-feat-001-cinque-territori; git show $B:docs/00-project-overview/03-decisions-changelog/CT_DECISION_L...`
+
+---
+
 ## CT-FEAT-001 - fase esecuzione - 2026-11-01 16:46 - FATTO
 
 Quelle note sul "file cambiato su disco" sono solo il ritorno su `main`: i file sono tornati alla versione senza le mie modifiche, che stanno nel branch.

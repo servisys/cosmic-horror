@@ -1,5 +1,36 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DOC-002 - fase esecuzione - 2026-11-01 14:47 - FATTO
+
+## Resoconto CT-DOC-002
+
+**Richiesta eseguita:** protocollo V0.4 APPROVED con le due regole di sicurezza, Master Index 0.6.0, script e prove allineati. Seguito il pre-flight plan e le risposte di Matteo (`tipo: deleghe`, strada V0.4, riferimenti alla V0.1 non toccati).
+
+**Branch e PR:** `planning/ct-doc-002-protocollo-v04`, commit `084d1d0`, PR #70 verso `main`. Sono tornato su `main`. Le note «file cambiato su disco» che compaiono dopo il ritorno su `main` sono solo il ripristino dei file del branch precedente.
+
+**Cosa è stato fatto:**
+- **Protocollo:** creata `CT_COWORK_CODE_PROTOCOL_V0.4.md` (APPROVED), copia della V0.3 più:
+  - `file_attesi_<numero>` obbligatorio per ogni fusione;
+  - fusioni e chiusure solo in un task dedicato con `tipo: deleghe`;
+  - §8 aggiornato: la protezione di `main` esiste (ruleset con PR obbligatoria, niente force push né cancellazione);
+  - riga di changelog.
+- **V0.3 e V0.2:** passano a `DEPRECATED` con `superseded_by`, cambiando solo il front matter come già fatto per la V0.1.
+- **Master Index:** versione 0.6.0, due riferimenti al protocollo portati alla V0.4, riga di changelog.
+- **Script `osserva-scambio.ps1`:** un errore di formato ferma tutto con il motivo. Ora sono errori anche una fusione senza `file_attesi_<n>` e fusioni o chiusure in un task senza `tipo: deleghe`. Il controllo sui file attesi vale per ogni fusione. I task senza deleghe non cambiano.
+- **Prove:** `task-ok` e `task-errori` aggiornati perché restino validi. Nuovi casi `task-senza-file-attesi` e `task-senza-tipo`, ciascuno con il suo file atteso. LEGGIMI aggiornato.
+
+**`git diff --stat`:** 12 file, 170 aggiunte e 12 rimozioni. Solo `docs/` e `strumenti/windows-scambio/`.
+
+**Non verificato:** le prove non sono state lanciate, perché PowerShell era bloccato. Ho scritto i file attesi ragionando sul codice, quindi un file atteso potrebbe non combaciare con l'uscita reale. Comando da lanciare in sessione interattiva prima della fusione:
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File strumenti\windows-scambio\prove\controlla-deleghe.ps1`
+
+Non ho fuso né chiuso nulla. Resta fuori scope il riferimento alla V0.1 in README e Vision.
+
+Comandi bloccati dai permessi: 0
+
+---
+
 ## CT-DOC-002 - fase piano - 2026-11-01 14:27 - FATTO
 
 # Pre-flight plan CT-DOC-002 (fase piano, nessun file modificato)

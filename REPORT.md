@@ -1,5 +1,42 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DOC-003 - fase esecuzione - 2026-11-01 15:59 - FATTO
+
+**Resoconto CT-DOC-003**
+
+**Richiesta eseguita:** README e Vision ora puntano al protocollo V0.4. Ho seguito le risposte di Matteo: Vision strada B (stesso file V0.11) e nota nel changelog.
+
+**Cosa ho fatto:**
+- `README.md` riga 10: link cambiato da V0.1 a V0.4.
+- Vision V0.11:
+  - Ho aggiornato i due riferimenti a V0.4, in `related_documents` e nel §1.
+  - Ho aggiunto una riga nel changelog (§19): «0.11.0 (nota del 2026-11-01)», che dice che sono stati aggiornati solo i riferimenti.
+  - `version` resta 0.11.0.
+- `git diff --stat`: 2 file, 4 inserzioni, 3 cancellazioni. Il diff completo è nella PR.
+
+**Branch e PR:**
+- Branch: `planning/ct-doc-003-riferimenti-protocollo`, un commit.
+- PR #71 verso `main`: https://github.com/servisys/cosmic-horror/pull/71
+- Sono tornato su `main`.
+
+**Verifiche:**
+- Ho cercato in tutto il repository i riferimenti a V0.1, V0.2 e V0.3 del protocollo.
+- Restano solo in documenti storici o DEPRECATED, che il task dice di non correggere:
+  - i protocolli V0.1–V0.3 (campi `supersedes` e `superseded_by`);
+  - `CT_COPILOT_CLAUDE_PROTOCOL.md`, che cita ancora la V0.1 (DEPRECATED);
+  - le righe di changelog 0.3.0 e 0.5.0 del Master Index.
+- La riga 0.3.0 e la riga 0.5.0 del Master Index sono storiche, quindi non le ho toccate. Segnalo solo che `CT_COPILOT_CLAUDE_PROTOCOL.md` punta a un protocollo ormai superato.
+
+**Non verificato:**
+- Non ho aperto `scambio/` né `reference/`, come da scope.
+- La ricerca guarda solo nomi di file del tipo `PROTOCOL_V0.x`. Una citazione scritta in altra forma (per esempio «protocollo V0.1» a parole) potrebbe esserle sfuggita.
+- La prima creazione della PR è fallita per un errore del comando. L'ho rifatta e ora la PR esiste.
+- Non ho fuso né chiuso nulla.
+
+Comandi bloccati dai permessi: 1. Primi 1: `gh pr create --base main --title "CT-DOC-003: README e Vision puntano al protocollo V0.4" --body "## Cosa cambia - READM...`
+
+---
+
 ## CT-DOC-003 - fase piano - 2026-11-01 15:51 - FATTO
 
 # Pre-flight plan CT-DOC-003 (fase piano, nessun file modificato)

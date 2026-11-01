@@ -1,6 +1,6 @@
 ---
 title: Cosmic Horror - Protocollo di lavoro Cowork e Claude Code
-status: DRAFT
+status: APPROVED
 version: 0.2.0
 owner: Matteo
 prepared_by: chat Claude del progetto
@@ -10,8 +10,6 @@ project_prefix: CT_
 ---
 
 # Cosmic Horror - Protocollo di lavoro Cowork e Claude Code
-
-> **PROPOSTA DELLA CHAT CLAUDE DEL PROGETTO, DA CONFERMARE DA MATTEO.** Rispetto alla V0.1 aggiunge il canale automatico su GitHub (branch `scambio`), richiesto da Matteo il 1 novembre 2026 per parlare solo con la chat. Il canale manuale della V0.1 resta valido.
 
 ## 1. Ruoli
 
@@ -101,3 +99,4 @@ Ogni resoconto riporta: la richiesta eseguita, le verifiche prima, cosa è stato
 |---|---|---|
 | 0.1.0 | DRAFT | Prima stesura da parte di Cowork, sul modo di lavorare usato dal 30 ottobre 2026. |
 | 0.2.0 | DRAFT | Canale automatico sul branch `scambio` con esecuzione da PC Windows (sezione 2.1); delega solo in sessione interattiva. |
+| 0.2.0 | APPROVED | Approvato da Matteo il 2026-11-01. Nessun'altra modifica al testo. |

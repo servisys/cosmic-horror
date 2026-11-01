@@ -1,5 +1,99 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FIX-007 - fase piano - 2026-11-02 00:36 - FATTO
+
+# Pre-flight plan CT-FIX-007 (fase piano, nessuna modifica fatta)
+
+## Documenti
+- `docs/00_MASTER_INDEX.md` e `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` sono APPROVED.
+- **`CT_PROTOTYPE_SCOPE_V0.3.md` non esiste nel repo.** Ci sono solo la V0.1 e la V0.2 (la V0.2 è APPROVED, approvata il 2026-10-31). Il Master Index cita solo `CT_PROTOTYPE_SCOPE.md` come APPROVED. Per questo task basta la V0.2, ma Matteo deve dirmi se la V0.3 esiste altrove.
+- Il codice sta in `game/prototipo/`, non nella radice. Il task cita percorsi senza questo prefisso.
+- Il task è pronto. Mancano solo le risposte alle domande in fondo e uno screenshot dell'app installata sul telefono.
+
+## Cosa ho letto
+Ho letto `game/prototipo/index.html`, `src/ui/main.ts`, `pwa.ts`, `immagini.ts`, `misure.ts`, `config-plancia.ts`, `public/manifest.webmanifest` e le parti di `scena.ts` su mano, energia e controlli. Ho letto anche l'intestazione degli script `sovrapposizioni.mjs` e `leggibilita.mjs`. Non ho eseguito nulla.
+
+## 1. Ritorno dal background: diagnosi (dal codice)
+Fatti letti nel codice:
+- **Unico ridimensionamento.** In `main.ts` il ridisegno parte solo da `window.addEventListener('resize', ridisegna)`. Non c'è nessun ascolto di `visibilitychange`, `pageshow`, `orientationchange`, `fullscreenchange` o `visualViewport.resize`.
+- **Canvas.** Pixi usa `resizeTo: #gioco`, che è `position: fixed; inset: 0`. Pixi aggiorna il canvas solo quando riceve `resize`.
+- **Tutto schermo.** `tuttoSchermoAlPrimoTocco` esce subito se l'app è installata (`display-mode: fullscreen` o `standalone`). Il listener è `{ once: true }`, quindi non richiede mai più il tutto schermo dopo il ritorno.
+- **Sfondo.** `caricaSfondo` e `caricaScene` leggono `innerWidth` e `innerHeight` una volta sola, all'avvio. Questo cambia solo la risoluzione della texture, non la geometria.
+- **Zoom.** Il viewport ha `user-scalable=no, maximum-scale=1`, ma Android e iOS a volte ignorano questi vincoli.
+
+Ipotesi, da verificare:
+- **Ipotesi principale:** al ritorno `resize` non arriva, oppure arriva quando il layout ha ancora le misure vecchie. Il canvas e `app.screen` restano a una dimensione diversa da quella visibile. Questo spiega la plancia «molto più grande dello schermo» con la barra in alto a posto, che è ancorata in alto.
+- **Ipotesi secondaria:** su Android l'app esce dal tutto schermo in background. Al ritorno le barre di sistema riducono o spostano l'area visibile e nessuno richiede di nuovo il tutto schermo.
+- **iOS (`black-translucent` + `viewport-fit=cover`):** non è confermabile da codice. Servono lo screenshot e il modello di telefono.
+
+Correzione proposta (un solo posto in `main.ts`, più qualche riga in `pwa.ts`):
+- Una funzione `riassesta()` che chiama `app.resize()` e poi `ridisegna()`. Parte su `visibilitychange` (quando visibile), `pageshow`, `orientationchange`, `fullscreenchange`, `visualViewport.resize` e `resize`.
+- Ripetuta a 100, 300 e 800 ms, per intercettare il layout che si assesta. La logica del ridisegno resta quella di oggi.
+- Cancellare i timer precedenti a ogni nuovo evento, per non accumularli.
+- Richiedere di nuovo il tutto schermo al primo tocco dopo ogni ritorno dal background, se l'app non è già a tutto schermo. Il listener non sarà più `once` ma riarmato a ogni `visibilitychange` visibile. Vale solo dove l'API Fullscreen è disponibile (non su iOS).
+- Azzerare lo zoom: dopo il ritorno, se `visualViewport.scale !== 1`, rimettere il viewport con `maximum-scale=1`. Il rimedio è best effort e non è garantito su tutti i browser.
+
+## 2. Spazio sprecato in basso
+Dal codice non trovo una fascia fissa. Lo sfondo è «cover» (immagine 1600×736, proporzione 2,17) e riempie sempre tutto il canvas, tagliando i lati se serve. Candidate:
+- **Lo stesso bug del punto 1:** altezza del canvas non aggiornata, o `100%` e `inset:0` diversi dall'altezza reale con le barre di sistema.
+- **Safe area:** `viewport-fit=cover` è attivo, ma il codice non usa mai `env(safe-area-inset-*)`. I controlli in basso (energia, medaglione, icone) stanno a 10·u dal bordo e su telefoni con tacche o barra gesti possono essere coperti o lasciare vuoto.
+- **Mano abbassata:** la mano sta a `H − 58u`, in una fascia stretta in basso. È l'unica fascia che può sembrare «vuota».
+
+Senza uno screenshot dell'app installata non posso dire quale. Se la causa è il punto 1, si risolve con la correzione sopra. In più, il canvas userà `height: 100dvh` o `visualViewport.height`, e la barra di stato userà il padding con `env(safe-area-inset-bottom)`.
+
+## 3. Barra di stato in basso
+Il riquadro in basso a sinistra non è dei «punti di un giocatore»: è il pannello **ENERGIA**. Sta in `controlli()` (`scena.ts:586`, 178×126·u) e contiene l'energia, Sigilli/Riti x/3, Esposizione, Mazzo e il bottone «RIDUCI · 2». Copre Dunwich (zona `y 0.489–0.978`, `x 0.025–0.466`). Non c'è un riquadro equivalente per l'altro giocatore: le sue statistiche sono già nella barra in alto («I CUSTODI · Esposizione · Mano · Mazzo · Sigilli»). Quindi **la barra in basso sarebbe del giocatore umano** e quella in alto resta dell'avversario.
+
+Proposta:
+- **Contenuto:** gemma con l'energia, `Sigilli/Riti x/3`, `Esposizione x/10`, `Mazzo n`, e il bottone RIDUCI. Il resto resta com'è.
+- **Layout:** barra sottile a tutta larghezza, in basso, con fondo scuro come la barra in alto, alta circa 30–34·u più la safe area. La mano abbassata si sposta sopra la barra. Medaglione Fine turno e icone (copia, regole, annulla) restano a destra, ma sopra la barra.
+- **Leggibilità:** testi a 13 px come oggi (soglia dei test 12 px a 956×440, 11 a 740×340). La soglia non cambia.
+- **Costo:** si perdono circa 34·u di altezza alle carte della mano e ai quadri in basso (Dunwich e Landa). Con 440 px di altezza è un compromesso da valutare con una prova a schermo. Per Dunwich e Landa questo costo non è nuovo: la barra sostituisce il riquadro che già copriva il quadro.
+- **Test che cambiano:**
+  - `npm run sovrapposizioni`: nei rettangoli fissi `energia` diventa `barra-stato`. Il controllo «niente interseca» resta uguale, ma la nuova barra a tutta larghezza può toccare le targhette dei quadri in basso. Va verificato con 0, 3 e 6 carte per lato, nelle tre misure e per entrambe le fazioni.
+  - `npm run leggibilita`: nessun cambio di soglia. Il controllo dei testi piccoli si applica anche alla nuova barra.
+  - `grafica-finale.mjs` (cinque luoghi): da riprovare, perché cambia lo spazio della plancia.
+  - **«Vista cinque territori»:** nel repo non esiste uno script con questo nome. Il più vicino è `grafica-finale.mjs` («cinque luoghi»). Chiedo conferma a Matteo (domanda 4).
+- **File toccati (previsti):** `src/ui/scena.ts` (`controlli`, `disegnaMano`, ostacoli e posizioni in basso), `src/ui/main.ts` (riassesta e ascolti), `src/ui/pwa.ts` (tutto schermo dopo il ritorno), `game/prototipo/index.html` (altezza e safe area, eventuale viewport) e i tre script di test. Forse `src/ui/misure.ts`.
+
+## 4. Come verificherò
+**Su Windows (Playwright, già usato negli script):**
+- Viste telefono in orizzontale: 956×440, 844×390, 740×340. Aggiungo una vista con proporzione più larga, per esempio 915×412.
+- Simulazione del ritorno dal background: cambio la dimensione del viewport con `page.setViewportSize` per simulare le barre di sistema che compaiono e scompaiono, poi emetto `visibilitychange` (con `document.visibilityState` forzato), `pageshow` e `fullscreenchange`. Controllo che `app.screen` coincida con le dimensioni reali, che `misure()` e `fuori()` non segnalino nulla e che non ci siano sovrapposizioni.
+- Un test nuovo in `scripts/` per il ritorno dal background.
+- `npm run tipi`, `npm test`, `npm run sovrapposizioni`, `npm run leggibilita`, `npm run grafica-finale`, `npm run verifica-pwa`.
+
+**Cosa resta da verificare sul telefono di Matteo:**
+- Il comportamento vero del background e del tutto schermo (Android o iOS): Playwright non lo riproduce.
+- Lo zoom che «non si riesce a togliere».
+- Le barre di sistema e la safe area reali.
+- Quanto la barra bassa pesa sulla leggibilità di Dunwich e Landa.
+
+## Rischi
+- **Non riproducibile su Windows:** la correzione è ragionata, ma non è provata sul fenomeno reale.
+- **Poca altezza:** la barra toglie spazio a mano e quadri in basso su schermi da 340–390 px. Può far fallire `sovrapposizioni` e richiedere ritocchi alle posizioni (tutto in `scena.ts`).
+- **Ridisegni ripetuti:** vanno limitati con timer cancellabili, per non disturbare le animazioni e il turno del computer.
+- **Tutto schermo al tocco:** su Android a volte fa uscire dal gioco al primo tocco; vale solo dove l'API esiste.
+- **Fuori perimetro, non toccati:** regole, bilanciamento, carte.
+
+## Domande per Matteo (con proposta)
+1. **Che telefono è?** È un Android o un iPhone? Proposta: Android, perché c'è `display: fullscreen`. Mi serve per scegliere i rimedi.
+2. **Cosa va nella barra?** Proposta: energia, Sigilli/Riti x/3, Esposizione x/10, Mazzo, RIDUCI. Niente di nuovo.
+3. **Mostrare anche l'altro giocatore in basso?** Proposta: no. Resta nella barra in alto, e quella in basso è del giocatore umano.
+4. **Cos'è la «vista cinque territori»?** Proposta: la considero `grafica-finale.mjs` (cinque luoghi). Se intendevi altro, dimmelo.
+5. **Posso avere uno screenshot dell'app installata (con la fascia vuota in basso) e il modello del telefono?** Mi serve per capire se la fascia è un bug o la mano abbassata.
+6. **La barra a tutta larghezza può togliere un po' di altezza alla mano. Va bene?** Proposta: sì, con altezza minima.
+7. **`CT_PROTOTYPE_SCOPE_V0.3.md` esiste?** Nel repo c'è solo la V0.2. Proposta: procedo con la V0.2, ma se la V0.3 è l'autorevole va aggiunta al repo.
+
+## Non verificato
+Non ho eseguito app, test o build. La causa del ritorno dal background è un'ipotesi dal codice. Non so se la «fascia vuota» sia un difetto vero o la mano abbassata. Non ho visto lo screenshot citato nel task.
+
+**Branch e PR:** nessuno, in fase piano non ho creato nulla.
+
+Comandi bloccati dai permessi: 2. Primi 2: `find . -name "CT_PROTOTYPE_SCOPE*" -not -path "*/node_modules/*"; grep -m2 -i "status" $(find . -name "CT_PROTOTYPE_SCOP...`; `cd /c/Users/MatteoTemporini-Laye/cosmic-horror/game/prototipo; sed -n 524,585p src/ui/scena.ts; grep -rn -i "cinque\|5 t...`
+
+---
+
 ## CT-DEL-005 - fase esecuzione - 2026-11-01 23:17 - FATTO
 
 FATTO. Ho controllato la PR 75 in sola lettura. Tutti i controlli del task tornano, quindi non c'è motivo di bloccare la fusione.

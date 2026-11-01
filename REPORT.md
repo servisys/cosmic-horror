@@ -1,5 +1,76 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DOC-003 - fase piano - 2026-11-01 15:51 - FATTO
+
+# Pre-flight plan CT-DOC-003 (fase piano, nessun file modificato)
+
+## Richiesta eseguita
+Letto TASK.md e verificate le fonti. Piano prodotto. Task pronto, con una scelta e due domande per Matteo.
+
+## Verifiche
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` e Master Index 0.6.0 risultano APPROVED. L'ho letto dai log recenti e dalla riga 117 del protocollo, non ho riaperto il front matter del Master Index.
+- §5 del protocollo: non si sovrascrive un file, si crea una nuova versione. Nome del file e `version` devono coincidere.
+- Ricerca in tutto il repo, con `scambio/` e `reference/` esclusi, di `CT_COWORK_CODE_PROTOCOL_V0.1`, `V0.2` e `V0.3`.
+
+## Riferimenti trovati
+
+**Da correggere (nello scope):**
+1. `README.md:10`: link alla V0.1.
+2. `CT_VISION_AND_PILLARS_V0.11_BOZZA.md:13`: `related_documents`, V0.1.
+3. `CT_VISION_AND_PILLARS_V0.11_BOZZA.md:53`: testo, V0.1.
+
+**Da non toccare (storici o DEPRECATED, vanno solo segnalati):**
+- `CT_COWORK_CODE_PROTOCOL_V0.1.md`, `V0.2.md` e `V0.3.md`. Citano le versioni vicine nei campi `superseded_by` e `supersedes` e nel changelog.
+- `CT_COPILOT_CLAUDE_PROTOCOL.md` (righe 5 e 11): DEPRECATED, punta alla V0.1.
+- `00_MASTER_INDEX.md:293` e `:295`: righe di changelog che citano V0.1 e V0.2. Sono storia già registrata, quindi restano.
+
+Nessun altro riferimento trovato. Il Master Index non ha altri link al protocollo oltre al changelog.
+
+## Scelta del punto 2: la Vision
+Due strade:
+
+- **A. Nuova versione V0.12, con la V0.11 DEPRECATED.**
+  - Pro: rispetta alla lettera la regola «non si sovrascrive».
+  - Contro: serve un nuovo file grande, la V0.11 diventa storica. Ogni riferimento alla V0.11 va ripuntato: la V0.11 compare in 2 decision log, nel file DEPRECATED della prima bozza e probabilmente nel Master Index. Quei riferimenti puntano a un file DEPRECATED o a decision log già registrati, che non si possono toccare. Si crea molto lavoro e molta confusione per correggere un link.
+- **B. Aggiornare solo i due riferimenti nello stesso file.**
+  - Pro: diff minimo, nessun effetto a catena.
+  - Contro: tecnicamente è una modifica a un file versionato. Il file è DRAFT, quindi il rischio è basso, ma la regola dice di creare una nuova versione.
+
+**Consiglio: B**, con una riga nel testo che dica che la modifica riguarda solo i riferimenti. Il file è ancora DRAFT, non approvato. Un cambio di link non altera il contenuto di design. Scelgo A solo se Matteo vuole la regola applicata alla lettera.
+
+## Passi (esecuzione, solo dopo nuovo via)
+1. Branch `planning/ct-doc-003-riferimenti-protocollo` da `main`.
+2. Cambiare `V0.1` in `V0.4` nelle 3 righe indicate sopra.
+3. Se Matteo sceglie B, aggiungere una riga di nota nel front matter o in fondo al file, nel formato che il file già usa per le note. Non ho verificato se il file ha un changelog.
+4. Ripetere la ricerca finale: devono restare solo i riferimenti storici elencati sopra.
+5. `git diff --stat` e diff completo nel resoconto.
+6. Commit con la firma Co-Authored-By, `git push -u origin HEAD`, poi `git switch main`.
+7. PR verso `main` con descrizione in italiano. Nessuna fusione.
+
+## File toccati
+- Con B: `README.md` e `CT_VISION_AND_PILLARS_V0.11_BOZZA.md`.
+- Con A: `README.md`, il nuovo `V0.12`, la V0.11 (DEPRECATED), più eventuali riferimenti da riallineare.
+
+## Rischi
+- Basso. Sono solo link.
+- Verificare che il percorso relativo `../../CT_COWORK_CODE_PROTOCOL_V0.4.md` nel front matter resti valido. Lo è, perché la cartella non cambia.
+
+## Domande per Matteo
+1. Vision: strada B (consigliata) o A?
+2. Con B, vuoi una nota di modifica nel file, o i soli link cambiati?
+
+## Non verificato
+- Il front matter completo del Master Index, riaperto per intero.
+- Se la V0.11 ha una sezione changelog dove mettere la nota.
+- Link nel resto del repo con formati diversi dal nome file, per esempio riferimenti scritti a parole.
+
+## Branch e PR
+Nessun branch, commit o PR creato in questa fase.
+
+Comandi bloccati dai permessi: 0
+
+---
+
 ## CT-DEL-001 - fase esecuzione - 2026-11-01 15:23 - FATTO
 
 **Resoconto CT-DEL-001 (fase esecuzione): FATTO**

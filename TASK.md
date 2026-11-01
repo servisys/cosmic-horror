@@ -1,6 +1,6 @@
 ---
 id: CT-DEL-005
-fase: piano
+fase: esecuzione
 pronto: si
 tipo: deleghe
 branch: nessuno
@@ -27,3 +27,6 @@ Qualsiasi modifica, commit, branch, push o PR.
 
 ## Criteri di accettazione
 Lo script scrive «FUSA» per la PR 75.
+
+## Esito del piano
+Controlli tutti positivi (resoconto CT-DEL-005 fase piano, 23:12). Si passa a esecuzione con il via di Matteo già dato («sì vai»).

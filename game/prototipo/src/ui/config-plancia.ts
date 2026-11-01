@@ -12,6 +12,15 @@ export interface Rett01 {
   h: number;
 }
 
+export interface LuceFissa {
+  /** Posizione, in frazioni dell'immagine. */
+  x: number;
+  y: number;
+  /** Diametro dell'alone in frazioni della larghezza dell'immagine. */
+  d: number;
+  tipo: 'candela' | 'viola' | 'verde';
+}
+
 export interface Settore {
   id: 'innsmouth' | 'biblioteca' | 'dunwich' | 'landa' | 'rlyeh';
   nome: string;
@@ -22,18 +31,29 @@ export interface Settore {
   ellisse?: boolean;
   /** Lato su cui sta la targhetta, nell'angolo alto del suo quadro. */
   lato: 'sx' | 'dx';
+  /** Candele, lanterne e bagliori che si animano nella scena 3D (frazioni dell'immagine della scena). */
+  luci?: LuceFissa[];
   /** Nome del file della scena 3D (senza estensione) nella cartella delle scene. */
   scena: string;
   /** Colore del bordo della targhetta e del titolo della scena. */
   colore: number;
 }
 
+/** Candele e bagliori della plancia (frazioni dell'immagine pozzo_v3). Il pozzo di R'lyeh pulsa a parte (zona del settore). */
+export const LUCI_PLANCIA: LuceFissa[] = [
+  { x: 0.61, y: 0.136, d: 0.035, tipo: 'candela' },
+  { x: 0.678, y: 0.197, d: 0.035, tipo: 'candela' },
+  { x: 0.78, y: 0.272, d: 0.035, tipo: 'candela' },
+  { x: 0.866, y: 0.387, d: 0.035, tipo: 'candela' },
+  { x: 0.866, y: 0.6, d: 0.07, tipo: 'viola' },
+];
+
 export const SETTORI: Settore[] = [
-  { id: 'innsmouth', nome: 'Innsmouth', territorioId: 'T1', zona: { x: 0.031, y: 0.054, w: 0.439, h: 0.424 }, lato: 'sx', scena: 'innsmouth_v1', colore: 0xa8823c },
-  { id: 'biblioteca', nome: 'La Biblioteca della Miskatonic', territorioId: 'T2', zona: { x: 0.5, y: 0.04, w: 0.45, h: 0.438 }, lato: 'dx', scena: 'biblioteca_v1', colore: 0xa8823c },
-  { id: 'dunwich', nome: 'Dunwich', territorioId: null, zona: { x: 0.025, y: 0.489, w: 0.441, h: 0.489 }, lato: 'sx', scena: 'dunwich_v2', colore: 0xa8823c },
-  { id: 'landa', nome: 'La Landa Maledetta', territorioId: 'T3', zona: { x: 0.503, y: 0.482, w: 0.469, h: 0.496 }, lato: 'dx', scena: 'landa_v1', colore: 0xa8823c },
-  { id: 'rlyeh', nome: "R'lyeh", territorioId: null, zona: { x: 0.299, y: 0.264, w: 0.364, h: 0.455 }, ellisse: true, lato: 'sx', scena: 'rlyeh_v2', colore: 0x6fe0a8 },
+  { id: 'innsmouth', nome: 'Innsmouth', territorioId: 'T1', zona: { x: 0.031, y: 0.054, w: 0.439, h: 0.424 }, lato: 'sx', scena: 'innsmouth_v1', luci: [{ x: 0.332, y: 0.619, d: 0.05, tipo: 'candela' }, { x: 0.766, y: 0.3, d: 0.06, tipo: 'candela' }], colore: 0xa8823c },
+  { id: 'biblioteca', nome: 'La Biblioteca della Miskatonic', territorioId: 'T2', zona: { x: 0.5, y: 0.04, w: 0.45, h: 0.438 }, lato: 'dx', scena: 'biblioteca_v1', luci: [{ x: 0.28, y: 0.62, d: 0.045, tipo: 'candela' }, { x: 0.353, y: 0.665, d: 0.045, tipo: 'candela' }, { x: 0.43, y: 0.76, d: 0.045, tipo: 'candela' }, { x: 0.55, y: 0.9, d: 0.045, tipo: 'candela' }, { x: 0.69, y: 0.78, d: 0.045, tipo: 'candela' }, { x: 0.753, y: 0.83, d: 0.045, tipo: 'candela' }, { x: 0.287, y: 0.33, d: 0.04, tipo: 'candela' }, { x: 0.473, y: 0.233, d: 0.04, tipo: 'candela' }, { x: 0.678, y: 0.415, d: 0.04, tipo: 'candela' }], colore: 0xa8823c },
+  { id: 'dunwich', nome: 'Dunwich', territorioId: null, zona: { x: 0.025, y: 0.489, w: 0.441, h: 0.489 }, lato: 'sx', scena: 'dunwich_v2', luci: [{ x: 0.94, y: 0.222, d: 0.06, tipo: 'candela' }], colore: 0xa8823c },
+  { id: 'landa', nome: 'La Landa Maledetta', territorioId: 'T3', zona: { x: 0.503, y: 0.482, w: 0.469, h: 0.496 }, lato: 'dx', scena: 'landa_v1', luci: [{ x: 0.66, y: 0.54, d: 0.12, tipo: 'viola' }], colore: 0xa8823c },
+  { id: 'rlyeh', nome: "R'lyeh", territorioId: null, zona: { x: 0.299, y: 0.264, w: 0.364, h: 0.455 }, ellisse: true, lato: 'sx', scena: 'rlyeh_v2', luci: [{ x: 0.93, y: 0.28, d: 0.06, tipo: 'candela' }, { x: 0.45, y: 0.62, d: 0.2, tipo: 'verde' }], colore: 0x6fe0a8 },
 ];
 
 /** Posizione sullo schermo di un rettangolo dell'immagine, con lo sfondo a tutto schermo (cover). */

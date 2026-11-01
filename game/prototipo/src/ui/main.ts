@@ -7,9 +7,10 @@ import { datiDelBuild } from './dati-build.js';
 import { alCaricarsiDiUnaScena, caricaImmagini, caricaScene, caricaSfondo, numeroTexture } from './immagini.js';
 import { caricaFont } from './tipografia.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
-import { SETTORI } from './config-plancia.js';
+import { anim, type FotoStato } from './animazioni.js';
+import { SETTORI, inSchermo } from './config-plancia.js';
 import { motivoCartaNonGiocabile, suggerimento } from './suggerimento.js';
-import { disegnaAnteprima, disegnaScena, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
+import { disegnaAnteprima, disegnaScena, puntiUltimoDisegno, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
 const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del computer (ms)
@@ -44,7 +45,40 @@ function controllaIngrandimento(): void {
 function disegna(): Record<string, Area> {
   const r = disegnaScena(app, ctrl, ui, azioni);
   ultimoDisegno = performance.now();
+  const W = app.screen.width;
+  const H = app.screen.height;
+  const v = ctrl.vista();
+  anim.dopoDisegno(fotoStato(r), r, puntiUltimoDisegno(), W, H, Math.max(0.7, Math.min(W / 956, H / 440)), !!ctrl.evento, ctrl.finita, v.fazione, v.fazioneAvv);
   return r;
+}
+
+/** Cio' che serve alle animazioni per capire cosa e' cambiato fra un disegno e il successivo. */
+function fotoStato(a: Record<string, Area>): FotoStato {
+  const v = ctrl.vista();
+  const presenze: FotoStato['presenze'] = new Map();
+  const tappe = new Set<string>();
+  v.territori.forEach((t, i) => {
+    for (const p of t.mie) presenze.set(p.uid, { terr: i, mio: true, id: p.id, trasformata: p.trasformata });
+    for (const p of t.loro) presenze.set(p.uid, { terr: i, mio: false, id: p.id, trasformata: p.trasformata });
+    if (t.mioTappa) tappe.add(`${i}:mio`);
+    if (t.loroTappa) tappe.add(`${i}:loro`);
+  });
+  const mano: FotoStato['mano'] = new Map();
+  for (const cd of v.mano) {
+    const r = a[`mano:${cd.uid}`];
+    if (r) mano.set(cd.uid, { id: cd.id, x: r.x + r.w / 2, y: r.y + r.h / 2 });
+  }
+  return { presenze, mano, tappe, tuo: ctrl.tuoTurno, evento: !!ctrl.evento };
+}
+
+/** Centro dello schermo del quadro di un settore (per l'avvicinamento nelle transizioni). */
+function centroSettore(id: string | null): { cx: number; cy: number } {
+  const W = app.screen.width;
+  const H = app.screen.height;
+  const st = SETTORI.find((x) => x.id === id);
+  if (!st) return { cx: W / 2, cy: H / 2 };
+  const r = inSchermo(st.zona, W, H);
+  return { cx: r.x + r.w / 2, cy: r.y + r.h / 2 };
 }
 
 function ridisegna(): void {
@@ -156,6 +190,8 @@ const azioni: Azioni = {
   settore(id) {
     // un quadro (o il pozzo) toccato senza una carta da giocare: si entra nella sua scena 3D. Dunwich e R'lyeh non sono in gioco: solo da guardare.
     const st = SETTORI.find((x) => x.id === id);
+    const c0 = centroSettore(id);
+    anim.entra(c0.cx, c0.cy, app.screen.width, app.screen.height);
     ui.scena = id;
     ui.manoQui = false;
     ui.zoom = null;
@@ -168,6 +204,8 @@ const azioni: Azioni = {
     ridisegna();
   },
   esci() {
+    const c0 = centroSettore(ui.scena);
+    anim.esce(c0.cx, c0.cy, app.screen.width, app.screen.height);
     ui.scena = null;
     ui.manoQui = false;
     ui.toast = '';
@@ -177,6 +215,7 @@ const azioni: Azioni = {
     if (!ui.scena) return;
     const k = SETTORI.findIndex((x) => x.id === ui.scena) + dir;
     if (k < 0 || k >= SETTORI.length) return;
+    anim.scorre(dir, app.screen.width, app.screen.height);
     ui.scena = SETTORI[k].id;
     ui.manoQui = false;
     ui.toast = '';
@@ -197,6 +236,8 @@ const azioni: Azioni = {
   },
   chiudiEvento() {
     clearTimeout(timerEvento);
+    anim.dissolviGruppo('evento', app.screen.width, app.screen.height);
+    anim.gruppoChiuso('evento');
     ctrl.chiudiEvento();
     ridisegna();
   },
@@ -274,6 +315,7 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.scena = null;
   ui.manoQui = false;
   ui.tutorial = null;
+  anim.azzera();
   tutorialPendente = parametri.get('tutorial') === '0' ? false : tutorialRichiesto || parametri.get('tutorial') === '1' || !tutorialVisto();
   ctrl.nuova(fazione, seme);
   ridisegna();
@@ -293,6 +335,7 @@ async function avvia(): Promise<void> {
   alCaricarsiDiUnaScena(() => { if (ui.scena) ridisegna(); });
   void caricaScene(SETTORI.map((x) => x.scena));
   gesti();
+  anim.suFine = ridisegna;
   // La scena si ricostruisce a ogni cambiamento: l'oggetto sotto il puntatore sparisce senza mandare «pointerout».
   // Si tiene l'ultima posizione del puntatore e, dopo ogni ridisegno, si toglie l'ingrandimento al passaggio se sotto non c'e' piu' una carta.
   app.canvas.addEventListener('pointermove', (e) => {
@@ -328,7 +371,8 @@ async function avvia(): Promise<void> {
     occupato: () => ctrl.tocca_al_computer || !!ctrl.evento || ciclo,
     // la scena e' ferma: nessun ridisegno in coda e l'ultimo e' di almeno 120 ms fa
     scena: () => ui.scena,
-    stabile: () => !ridisegnoInCoda && performance.now() - ultimoDisegno > 120,
+    stabile: () => !ridisegnoInCoda && performance.now() - ultimoDisegno > 120 && anim.attive() === 0,
+    animazioni: () => ({ ridotto: anim.ridotto, attive: anim.attive(), ...anim.conteggi }),
     avvia: (f: FazioneId, seme: number) => iniziaPartita(f, seme),
     // solo per i test: la mossa che il computer farebbe al posto del giocatore umano (poi la si esegue cliccando)
     suggerisci: () => sceglieMossa(ctrl.vista(), ctrl.cat),

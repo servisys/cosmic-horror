@@ -4,10 +4,11 @@ import { Container, Graphics, Rectangle, Sprite, Text, type Application } from '
 import { carta } from '../motore/catalogo.js';
 import type { Vista, VistaPresenza, VistaTerritorio } from '../motore/vista.js';
 import { altezzaCarta, cartaGrande, cartaRidotta, datiDaCarta, datiEvento, datiTerritorio, type DatiCarta, tavolozza } from './carte.js';
-import { IMG_H, IMG_W, SETTORI, coverTrasformazione, inSchermo, settoreDelTerritorio, type Settore } from './config-plancia.js';
+import { IMG_H, IMG_W, LUCI_PLANCIA, SETTORI, coverTrasformazione, inSchermo, settoreDelTerritorio, type Settore } from './config-plancia.js';
 import type { Controller } from './controller.js';
 import { COL, colori, Disegno, texturaGradiente, type Area } from './disegno.js';
 import { idImmagine, texturaSfondo } from './immagini.js';
+import { aloneLuce, anim } from './animazioni.js';
 import { disegnaTerritorio } from './scena-territorio.js';
 import { motivoTappa, passiTutorial, suggerimento } from './suggerimento.js';
 
@@ -75,7 +76,9 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   const { radice: s, sopra } = livelli(app);
   for (const ch of s.removeChildren()) ch.destroy({ children: true });
   void sopra;
+  anim.iniziaDisegno();
   const d = new Disegno(s, u);
+  ultimiPunti = d.punti;
   const v: Vista = c.vista();
   const opz = c.opzioni();
   const sel = c.selezione;
@@ -86,6 +89,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   } else {
     d.rett(0, 0, W, H, COL.sfondo, { r: 0 });
     sfondo(d, W, H);
+  luciPlancia(d, W, H);
 
     // ---------- quadri della plancia ----------
     const terrDelSettore = (st: Settore): number => (st.territorioId ? c.cat.dati.territori.findIndex((t) => t.id === st.territorioId) : -1);
@@ -180,7 +184,6 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
   }
 
   // ---------- sovrapposizioni ----------
-  const modale = opz.cerca.length > 0 || !!c.decisione || !!c.evento || ui.regole || c.finita || !!ui.grande;
   if (opz.cerca.length) sceltaCerca(d, c, opz.cerca, W, H, az);
   const dec = c.decisione;
   if (dec) riordinoBiblioteca(d, c, dec.uids, ui, W, H, az);
@@ -204,12 +207,15 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
 // cosi' mostrarla o toglierla non ricostruisce la scena (e non fa perdere un clic in corso).
 let livelloScena: Container | undefined;
 let livelloAnteprima: Container | undefined;
+let livelloFx: Container | undefined;
 function livelli(app: Application): { radice: Container; sopra: Container } {
   if (!livelloScena || livelloScena.destroyed) {
     livelloScena = new Container();
     livelloAnteprima = new Container();
     livelloAnteprima.eventMode = 'none';
-    app.stage.addChild(livelloScena, livelloAnteprima);
+    livelloFx = new Container();
+    app.stage.addChild(livelloScena, livelloAnteprima, livelloFx);
+    anim.avvia(app, livelloFx, livelloScena);
   }
   return { radice: livelloScena, sopra: livelloAnteprima! };
 }
@@ -226,6 +232,12 @@ export function disegnaAnteprima(app: Application, c: Controller, ui: UiStato): 
   const d = new Disegno(sopra, Math.max(0.7, Math.min(W / 956, H / 440)));
   if (ui.zoom) zoomCarta(d, c, ui.zoom, W, H, 30 * d.u);
   else zoomCarta(d, c, null, W, H, 30 * d.u, ui.zoomTerr);
+}
+
+let ultimiPunti: Record<string, { x: number; y: number }> = {};
+/** Punti notevoli dell'ultimo disegno (centro dei dischi delle tappe...): servono alle animazioni. */
+export function puntiUltimoDisegno(): Record<string, { x: number; y: number }> {
+  return ultimiPunti;
 }
 
 let fuori: string[] = [];
@@ -248,7 +260,22 @@ function sfondo(d: Disegno, W: number, H: number): void {
 }
 
 function glowQuadro(d: Disegno, vis: Area): void {
-  d.alone(vis.x + 5 * d.u, vis.y + 5 * d.u, vis.w - 10 * d.u, vis.h - 10 * d.u, COL.oroChiaro, 0.85, 22, 10);
+  anim.luce(d.alone(vis.x + 5 * d.u, vis.y + 5 * d.u, vis.w - 10 * d.u, vis.h - 10 * d.u, COL.oroChiaro, 0.85, 22, 10), 'pulsa', { min: 0.45, max: 1, periodo: 1500, fase: 0 });
+}
+
+const COLORE_LUCE = { candela: 0xffa040, viola: 0xb070ff, verde: 0x40ffa8 } as const;
+
+function luciPlancia(d: Disegno, W: number, H: number): void {
+  const { k, ox, oy } = coverTrasformazione(W, H);
+  for (const l of LUCI_PLANCIA) {
+    const dd = l.d * IMG_W * k;
+    const sp = aloneLuce(d, ox + l.x * IMG_W * k, oy + l.y * IMG_H * k, dd, dd, COLORE_LUCE[l.tipo]);
+    anim.luce(sp, l.tipo === 'candela' ? 'candela' : 'pulsa', { min: l.tipo === 'candela' ? 0.25 : 0.18, max: l.tipo === 'candela' ? 0.75 : 0.5 });
+  }
+  // il pozzo di R'lyeh: la luce verde pulsa piano
+  const pz = inSchermo(SETTORI.find((x) => x.id === 'rlyeh')!.zona, W, H);
+  const sp = aloneLuce(d, pz.x + pz.w / 2, pz.y + pz.h / 2, pz.w * 0.95, pz.h * 0.95, 0x2dffa0);
+  anim.luce(sp, 'pulsa', { min: 0.08, max: 0.4, periodo: 3600, fase: 0 });
 }
 
 /** Il pozzo di R'lyeh: ellisse toccabile al centro; visibile ma non in gioco. */
@@ -298,7 +325,9 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const cy = yp + alt / 2;
   d.testo(nome, x, cy, 12.5, COL.inciso, { titoli: true, bold: true, anchorY: 0.5 }).y = cy;
   x += wNome + 10 * u;
-  d.testo(String(t.forzaLoro), x + wNum / 2, cy, 16, COL.lui, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = cy;
+  const nLui = d.testo(String(t.forzaLoro), x + wNum / 2, cy, 16, COL.lui, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 });
+  nLui.y = cy;
+  anim.numero(`t${i}:lui`, t.forzaLoro, nLui);
   x += wNum + 8 * u;
   for (let k = 1; k <= 5; k++) {
     const pieno = k <= t.inst;
@@ -308,10 +337,12 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
     x += 8.5 * u;
   }
   x += 8 * u;
-  d.testo(String(t.forzaMia), x + wNum / 2, cy, 16, COL.tu, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = cy;
+  const nMia = d.testo(String(t.forzaMia), x + wNum / 2, cy, 16, COL.tu, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 });
+  nMia.y = cy;
+  anim.numero(`t${i}:mia`, t.forzaMia, nMia);
   x += wNum + 8 * u;
-  if (hanLui) { disco(d, x + 7 * u, cy, 6 * u, v.fazioneAvv, t.loroTappaTogliibile); x += 19 * u; }
-  if (hanMio) { disco(d, x + 7 * u, cy, 6 * u, v.fazione, t.mioTappaTogliibile); x += 19 * u; }
+  if (hanLui) { disco(d, x + 7 * u, cy, 6 * u, v.fazioneAvv, t.loroTappaTogliibile); d.punti[`disco:${i}:loro`] = { x: x + 7 * u, y: cy }; x += 19 * u; }
+  if (hanMio) { disco(d, x + 7 * u, cy, 6 * u, v.fazione, t.mioTappaTogliibile); d.punti[`disco:${i}:mio`] = { x: x + 7 * u, y: cy }; x += 19 * u; }
   let y = yp + alt + 3 * u;
   let xMin = xpc;
   let xMax = xpc + wp;
@@ -443,6 +474,7 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
   const zw = Math.max(totale, 160 * u) + 24 * u;
   d.rett(zx, yAlto - 10 * u, zw, H - yAlto + 10 * u, 0xffffff, { alpha: 0.001, r: 0, tap: () => az.alzaMano() });
   d.aree['mano:tutta'] = { x: zx, y: yAlto - 4 * u, w: zw, h: H - yAlto + 4 * u };
+  if (sel.carta === undefined) anim.rimbalzo(null);
   v.mano.forEach((cd, k) => {
     const scelta = sel.carta === cd.uid;
     const giocabile = c.giocabile(cd.uid);
@@ -452,6 +484,7 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
     cont.pivot.set(cw / 2, ch * 1.15);
     cont.position.set(cx, yTop + ch * 1.15);
     cont.rotation = ((k - (n - 1) / 2) * 3 * Math.PI) / 180;
+    if (scelta) anim.rimbalzo(cd.uid, cont);
     cont.alpha = giocabile || scelta ? 1 : 0.55;
     d.s.addChild(cont);
     const dati = datiDaCarta(c, cd.id, cd.trasformata);
@@ -469,7 +502,13 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
     cont.on('pointerover', (e) => { if (e.pointerType === 'mouse') az.zoom({ id: cd.id, trasformata: cd.trasformata }); });
     cont.on('pointerout', (e) => { if (e.pointerType === 'mouse') az.zoom(null); });
     // punto di tocco: nella parte sinistra dell'illustrazione (la destra puo' essere coperta dalla carta vicina, aperta a ventaglio)
-    const pt = cont.toGlobal({ x: cw * 0.28, y: 30 * u });
+    // posizioni sullo schermo calcolate a mano (non con toGlobal: durante le transizioni la scena e' ingrandita)
+    const sulloSchermo = (lx: number, ly: number): { x: number; y: number } => {
+      const dx = lx - cw / 2;
+      const dy = ly - ch * 1.15;
+      return { x: cx + dx * Math.cos(cont.rotation) - dy * Math.sin(cont.rotation), y: yTop + ch * 1.15 + dx * Math.sin(cont.rotation) + dy * Math.cos(cont.rotation) };
+    };
+    const pt = sulloSchermo(cw * 0.28, 30 * u);
     d.aree[`mano:${cd.uid}`] = { x: pt.x - 10 * u, y: pt.y - 8 * u, w: 20 * u, h: 16 * u };
     // lente
     const lente = new Graphics();
@@ -478,7 +517,7 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
     lente.cursor = 'pointer';
     lente.on('pointertap', (e) => { e.stopPropagation(); az.grande({ tipo: 'carta', id: cd.id, trasformata: cd.trasformata }); });
     cont.addChild(lente);
-    const gp = cont.toGlobal({ x: ris.lente.x, y: ris.lente.y });
+    const gp = sulloSchermo(ris.lente.x, ris.lente.y);
     d.aree[`lente:${cd.uid}`] = { x: gp.x, y: gp.y, w: ris.lente.w, h: ris.lente.h };
   });
   return { yAlto, zona: { x: Math.min(x0, W / 2 - 80 * u) - 40 * u, y: H - ch - 40 * u, w: Math.max(totale, 160 * u) + 80 * u, h: ch + 40 * u } };
@@ -506,7 +545,9 @@ function controlli(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   gem.pivot.set(gx, gy);
   gem.position.set(gx, gy);
   d.s.addChild(gem);
-  d.testo(String(v.energia), gx, gy, 18, 0x10233d, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = gy;
+  const tEn = d.testo(String(v.energia), gx, gy, 18, 0x10233d, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 });
+  tEn.y = gy;
+  anim.numero('energia', v.energia, tEn);
   d.testo('ENERGIA', px + 48 * u, py + 8 * u, 10.5, 0x9cc4f5, { titoli: true, bold: true, ls: 0.5 });
   const tappeEt = v.fazione === 'custodi' ? 'Sigilli' : 'Riti';
   d.testo(`${tappeEt} ${v.tappe}/3`, px + 48 * u, py + 24 * u, 11.5, 0xe6dcc4);
@@ -662,23 +703,27 @@ function riordinoBiblioteca(d: Disegno, c: Controller, uids: number[], ui: UiSta
 }
 
 /** Scheda grande: la carta con la sua cornice a sinistra, le note a destra. Un tocco ovunque la chiude. */
-function schedaGrande(d: Disegno, W: number, H: number, dati: DatiCarta, note: string[], chiudi: () => void, id: string, sopra = ''): void {
+function schedaGrande(d: Disegno, W: number, H: number, dati: DatiCarta, note: string[], chiudi: () => void, id: string, sopra = '', gruppo = ''): void {
   const u = d.u;
   d.rett(0, 0, W, H, 0x000000, { r: 0, alpha: 0.72, id, tap: chiudi });
+  const gr = new Container();
+  d.s.addChild(gr);
+  const dg = d.dentro(gr);
   const cw = Math.min((H - 14 * u) / (330 / 236), W * 0.42);
   const ch = altezzaCarta(cw);
   const pw = Math.min(310 * u, W - cw - 50 * u);
   const x0 = (W - cw - 16 * u - pw) / 2;
   const y0 = (H - ch) / 2;
-  cartaGrande(d, x0, y0, cw, dati, { completa: true, alone: true });
+  cartaGrande(dg, x0, y0, cw, dati, { completa: true, alone: true });
   const px = x0 + cw + 16 * u;
   let y = y0 + ch * 0.12;
-  if (sopra) { d.testo(sopra, px, y, 12, tavolozza(dati.schema).luce, { titoli: true, bold: true, ls: 1 }); y += 22 * u; }
+  if (sopra) { dg.testo(sopra, px, y, 12, tavolozza(dati.schema).luce, { titoli: true, bold: true, ls: 1 }); y += 22 * u; }
   for (const riga of note) {
-    const t = d.testo(riga, px, y, 13.5, 0xe6dcc4, { w: pw });
+    const t = dg.testo(riga, px, y, 13.5, 0xe6dcc4, { w: pw });
     y += t.height + 8 * u;
   }
-  d.testo('Tocca per chiudere', px, y0 + ch - 16 * u, 11, COL.tenue);
+  dg.testo('Tocca per chiudere', px, y0 + ch - 16 * u, 11, COL.tenue);
+  if (gruppo) anim.gruppo(gruppo, gr, W / 2, H / 2);
 }
 
 function vistaGrande(d: Disegno, c: Controller, g: NonNullable<UiStato['grande']>, W: number, H: number, az: Azioni): void {
@@ -700,7 +745,7 @@ function vistaGrande(d: Disegno, c: Controller, g: NonNullable<UiStato['grande']
 
 function eventoCosmico(d: Disegno, c: Controller, W: number, H: number, az: Azioni): void {
   const e = c.evento!;
-  schedaGrande(d, W, H, datiEvento(c, e), [e.tipo === '?' ? 'Evento improvviso.' : `Tipo: ${NOME_TIPO_EVENTO[e.tipo] ?? e.tipo}.`], () => az.chiudiEvento(), 'evento:chiudi', 'EVENTO COSMICO');
+  schedaGrande(d, W, H, datiEvento(c, e), [e.tipo === '?' ? 'Evento improvviso.' : `Tipo: ${NOME_TIPO_EVENTO[e.tipo] ?? e.tipo}.`], () => az.chiudiEvento(), 'evento:chiudi', 'EVENTO COSMICO', 'evento');
 }
 
 function pannelloRegole(d: Disegno, W: number, H: number, az: Azioni): void {

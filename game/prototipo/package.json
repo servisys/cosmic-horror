@@ -16,7 +16,8 @@
     "verifica-tappa4": "node scripts/verifica-tappa4.mjs",
     "prova-telefono": "node scripts/prova-telefono.mjs",
     "verifica-aiuti": "node scripts/verifica-aiuti.mjs",
-    "grafica-finale": "node scripts/grafica-finale.mjs"
+    "grafica-finale": "node scripts/grafica-finale.mjs",
+    "verifica-animazioni": "node scripts/verifica-animazioni.mjs"
   },
   "dependencies": {
     "pixi.js": "8.6.6",

@@ -1,69 +1,32 @@
 ---
-id: CT-DEV-004
-fase: esecuzione
+id: CT-DEV-005
+fase: piano
 pronto: si
 branch: feature/ct-dev-004-pubblicazione-prova-produzione
 scritto_da: Cowork (chat Claude del progetto)
 data: 2026-11-01
 ---
 
-# CT-DEV-004 — Pubblicazione dal Mac mini allineata a Folk Lore: sito di prova automatico, produzione a mano
+# CT-DEV-005 — Rifiniture alla PR #74 prima della fusione: indirizzi veri dei siti e lettura del lucchetto di Folk Lore
 
 ## Documenti autorevoli
 - `docs/00_MASTER_INDEX.md` (APPROVED), `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` (APPROVED).
-- `docs/05-technical-design/04-build-deployment/CT_GUIDA_PUBBLICAZIONE_AZURE_V0.1.md` (DRAFT, contesto), `game/prototipo/scripts/pubblica.mjs`, `strumenti/mac-mini/`, `game/prototipo/public/staticwebapp.config.json`.
-- Decisione di Matteo in chat a Cowork il 2026-11-01 («sì sì perfetto») sulla proposta riassunta qui sotto.
+- PR #74 (branch `feature/ct-dev-004-pubblicazione-prova-produzione`, testa 52c504c5a66ef5a503f19a8acc05772c1b704683) e il tuo resoconto CT-DEV-004.
 
-## Contesto: come pubblica oggi l'altro progetto di Matteo (Folk Lore)
-Cowork l'ha letto nel suo repository; qui il riassunto, perché tu non hai accesso a quel repository:
-- Mac mini di build `macmini-di-matteo`, raggiunto via Tailscale + SSH come utente `builder` (una chiave per computer, mai password); i progetti stanno in `/Users/builder/dev-machine/progetti/<nome>`.
-- Due Static Web App: **prova** e **produzione**. Comando `npm run pubblica -- prova` / `npm run pubblica -- produzione`; l'ambiente va detto sempre, nessun valore predefinito. In produzione va **lo stesso commit già pubblicato in prova, senza ricostruirlo** (copia salvata della build di prova per commit, più controllo che il sito di prova risponda con quel commit).
-- Token: uno per sito, dalla variabile `SWA_DEPLOYMENT_TOKEN_PROVA` / `SWA_DEPLOYMENT_TOKEN_PRODUZIONE` oppure dai file `.swa-token-prova` / `.swa-token-produzione` nella cartella del progetto, permessi 600, in `.gitignore`; passato al processo figlio nell'ambiente, mai sulla riga di comando.
-- Regole della macchina (guida dell'ambiente di build di Matteo, fuori dai repository): nessun segreto in file di progetto o chat, **una build pesante alla volta**, nessuna modifica all'infrastruttura.
+## Contesto
+Cowork ha letto il diff della PR #74: va bene. Restano due cose da sistemare **sullo stesso branch** (nuovi commit sulla PR #74, nessuna PR nuova), prima che Matteo la fonda.
 
-## Obiettivo
-Adattare la pubblicazione di Cosmic Horror a queste convenzioni, con una differenza voluta: **il sito di prova si aggiorna da solo** a ogni nuovo commit su `main` (job launchd già esistente); **la produzione solo a mano**, con lo stesso commit già in prova.
+## Richiesta
+1. **Indirizzi veri dei siti** in `game/prototipo/siti-pubblicazione.json` al posto dei segnaposto (Matteo li ha creati, non sono segreti):
+   - prova: `https://red-dune-05eec2f03.3.azurestaticapps.net`
+   - produzione: `https://lively-stone-0fd684403.4.azurestaticapps.net`
+   Aggiorna la `nota` del file (non parla più di segnaposto) e, se la guida V0.2 dice di sostituirli, aggiornala.
+2. **Lucchetto di Folk Lore: il formato è JSON, non un pid nudo.** Cowork ha controllato nel repository di Folk Lore (`test/esegui.js`): il file `.coda/batteria.lock` contiene una riga sola tipo `{"pid":12345,"filtro":"tutto","quando":"2026-11-01T19:40:00.000Z"}`. Oggi `controlla-e-pubblica.sh` fa `head -n 1 | tr -dc '0-9'`, che incolla al pid anche le cifre della data (e del filtro): il numero risultante non è un processo vivo, quindi il job **partirebbe durante la batteria di Folk Lore**. L'errore nasce dal task CT-DEV-004, che diceva «contiene il pid»: non è colpa tua.
+   - Estrai il pid dal campo `"pid":<numero>` (con `sed`/`grep -o`, compatibile con la bash 3.2 di macOS); come ripiego, se il file è un numero nudo, usa quello.
+   - Se il file esiste ma il pid non si legge, comportati in modo prudente: considera la batteria in corso se il file è più recente di 120 minuti (stessa soglia del blocco proprio), altrimenti ignoralo.
+   - Aggiorna `prova-logica.sh` (e il commento in testa allo script e in `pubblica.conf.esempio`) con il formato JSON vero: un caso con pid vivo nel JSON (salta il giro), uno con pid morto (procede), uno illeggibile recente (salta).
+3. Verifiche: `npm run tipi`, `npm test`, `npm run build` su Windows; `prova-logica.sh` se la bash c'è.
+4. Push sullo stesso branch, nessuna fusione. Nel resoconto: nuova testa della PR #74 (sha completo di 40 caratteri) e `git diff --stat` rispetto a `main`.
 
-## Scope incluso
-1. `pubblica.mjs`: argomento obbligatorio `prova` | `produzione`; token per ambiente come sopra (variabile o file `.swa-token-<ambiente>` nella radice del clone, aggiunto a `.gitignore`); il vecchio `SWA_CLI_DEPLOYMENT_TOKEN` non si legge più; `produzione` pubblica la copia della build di prova di quel commit senza ricostruire e si ferma con un messaggio chiaro se quel commit non è stato pubblicato in prova (o se il sito di prova risponde con un altro commit).
-2. `strumenti/mac-mini/`: utente `builder`, clone in `/Users/builder/dev-machine/progetti/cosmic-horror`, cartella di lavoro e log coerenti; il job launchd pubblica **solo in prova**; token letto dal file `.swa-token-prova` (niente Portachiavi); **una build pesante alla volta**: proponi nel piano come evitare di partire mentre gira una build di Folk Lore (per esempio un file di blocco comune in `/Users/builder/dev-machine/`, o aspettare se c'è un `npm`/`node` pesante in corso) e indica cosa va chiesto a Matteo sulla sua guida; installa/disinstalla aggiornati; `prova-logica.sh` aggiornato.
-3. Versione nel gioco: mostra anche l'ambiente (prova / produzione).
-4. Guida: nuova versione `CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md` (V0.1 DEPRECATED): due Static Web App Free (prova e produzione), dove mettere i due token (file con permessi 600, mai in chat), Tailscale/SSH come `builder`, deploy key in sola lettura per il clone, installazione del job (solo prova), come pubblicare in produzione, inviti dei giocatori (sul sito di produzione; sul sito di prova solo Matteo), installazione sul telefono.
-5. PR verso `main`, descrizione in italiano.
-
-## Fuori scope
-- Fusioni o chiusure di PR; creare risorse Azure; toccare il Mac (lo configura Matteo seguendo la guida).
-- Cambiare il gioco o le regole.
-
-## Vincoli tecnici
-- Base `main`. Push solo con `git push -u origin HEAD`, poi `git switch main`. Niente `cd` prima dei comandi, niente pipe, un comando git alla volta.
-- Nessun segreto nei file. Script bash compatibili con macOS (zsh/bash di sistema).
-
-## Criteri di accettazione
-- `npm run pubblica` senza ambiente si ferma subito con un messaggio; `produzione` rifiuta un commit non pubblicato in prova.
-- Job del Mac: solo prova, blocco «una build alla volta», nessun Portachiavi.
-- `prova-logica.sh` e i test verdi (quelli eseguibili sul PC Windows); guida V0.2 coerente.
-
-## Test obbligatori
-- `npm test`, `npm run tipi`, `npm run build`; `npm run pubblica -- prova --prova` (solo controlli e build, se esiste l'opzione) e le prove della logica di produzione con un token finto.
-- `git diff --stat` nel resoconto.
-
-## Output richiesto
-- Fase `piano`: pre-flight plan con la soluzione per «una build alla volta», file toccati, rischi, domande per Matteo.
-- Fase `esecuzione` (solo dopo nuovo via): Implementation Report con commit, PR e cosa non è stato verificato (il Mac vero non è raggiungibile da te).
-
-## Via di Matteo per la fase esecuzione (2026-11-01, in chat a Cowork)
-Matteo ha dato il via («sì») al tuo pre-flight plan, con queste risposte e correzioni:
-
-1. **Una build pesante alla volta:** Folk Lore NON si modifica. Oggi Folk Lore non ha un blocco valido per tutto il Mac; ha solo il lucchetto della sua batteria di test, `/Users/builder/dev-machine/progetti/mandi/.coda/batteria.lock`, che contiene il pid di chi la sta eseguendo. Il job di Cosmic Horror salta il giro (senza segnare fallimento) se: quel file esiste con un pid vivo, oppure il controllo `pgrep` che proponi trova build in corso sotto `progetti/` fuori da Cosmic Horror, oppure c'è il blocco proprio di Cosmic Horror. Il blocco proprio con `mkdir` resta, solo per Cosmic Horror (non serve una cartella comune). Il percorso del lucchetto di Folk Lore va in `pubblica.conf` con quel valore predefinito.
-2. **Indirizzi dei due siti:** in un file nel repository (non sono segreti), con segnaposto finché Matteo non crea i siti; vanno sostituiti poi.
-3. **Ambiente nella scritta del gioco:** sì, letto a runtime da `versione.json` scritto al momento della pubblicazione; produzione non ricostruisce.
-4. **Modalità `versioni` (tag):** toglila.
-5. **Copie delle build di prova:** dentro il clone, ignorate da git (es. `.pubblicati/<commit>/`, come Folk Lore), tenendo le ultime 10.
-
-Correzioni in più:
-- **Niente cartella BASE separata.** Il clone esiste già sul Mac in `/Users/builder/dev-machine/progetti/cosmic-horror`, clonato via HTTPS. Il job lavora lì; log e blocco dentro il clone, ignorati da git. Non creare `/Users/builder/dev-machine/cosmic-horror-pubblica`.
-- **Niente deploy key** nella guida: il repository è pubblico e il clone è HTTPS. Una riga: se un giorno diventa privato, `gh auth setup-git` per `builder`.
-- **Controllo all'installazione:** `installa.sh` prova `git fetch` con `GIT_TERMINAL_PROMPT=0`; se fallisce o chiede credenziali, si ferma con un messaggio chiaro su cosa sistemare, invece di installare un job che fallisce ogni minuto.
-- La guida V0.2 dice: nessun clone da fare (già presente), dopo la fusione basta `git pull` in quella cartella, poi i file token con chmod 600 e l'installazione del job.
-- Nessuna fusione: apri la PR verso `main` e fermati. Verifica solo quello che si può provare su Windows; il resto in «Non verificato».
+## Fuori perimetro
+Nessuna altra modifica. Niente fusioni o chiusure.

@@ -1,6 +1,6 @@
 ---
 id: CT-DEV-004
-fase: piano
+fase: esecuzione
 pronto: si
 branch: feature/ct-dev-004-pubblicazione-prova-produzione
 scritto_da: Cowork (chat Claude del progetto)
@@ -51,3 +51,19 @@ Adattare la pubblicazione di Cosmic Horror a queste convenzioni, con una differe
 ## Output richiesto
 - Fase `piano`: pre-flight plan con la soluzione per «una build alla volta», file toccati, rischi, domande per Matteo.
 - Fase `esecuzione` (solo dopo nuovo via): Implementation Report con commit, PR e cosa non è stato verificato (il Mac vero non è raggiungibile da te).
+
+## Via di Matteo per la fase esecuzione (2026-11-01, in chat a Cowork)
+Matteo ha dato il via («sì») al tuo pre-flight plan, con queste risposte e correzioni:
+
+1. **Una build pesante alla volta:** Folk Lore NON si modifica. Oggi Folk Lore non ha un blocco valido per tutto il Mac; ha solo il lucchetto della sua batteria di test, `/Users/builder/dev-machine/progetti/mandi/.coda/batteria.lock`, che contiene il pid di chi la sta eseguendo. Il job di Cosmic Horror salta il giro (senza segnare fallimento) se: quel file esiste con un pid vivo, oppure il controllo `pgrep` che proponi trova build in corso sotto `progetti/` fuori da Cosmic Horror, oppure c'è il blocco proprio di Cosmic Horror. Il blocco proprio con `mkdir` resta, solo per Cosmic Horror (non serve una cartella comune). Il percorso del lucchetto di Folk Lore va in `pubblica.conf` con quel valore predefinito.
+2. **Indirizzi dei due siti:** in un file nel repository (non sono segreti), con segnaposto finché Matteo non crea i siti; vanno sostituiti poi.
+3. **Ambiente nella scritta del gioco:** sì, letto a runtime da `versione.json` scritto al momento della pubblicazione; produzione non ricostruisce.
+4. **Modalità `versioni` (tag):** toglila.
+5. **Copie delle build di prova:** dentro il clone, ignorate da git (es. `.pubblicati/<commit>/`, come Folk Lore), tenendo le ultime 10.
+
+Correzioni in più:
+- **Niente cartella BASE separata.** Il clone esiste già sul Mac in `/Users/builder/dev-machine/progetti/cosmic-horror`, clonato via HTTPS. Il job lavora lì; log e blocco dentro il clone, ignorati da git. Non creare `/Users/builder/dev-machine/cosmic-horror-pubblica`.
+- **Niente deploy key** nella guida: il repository è pubblico e il clone è HTTPS. Una riga: se un giorno diventa privato, `gh auth setup-git` per `builder`.
+- **Controllo all'installazione:** `installa.sh` prova `git fetch` con `GIT_TERMINAL_PROMPT=0`; se fallisce o chiede credenziali, si ferma con un messaggio chiaro su cosa sistemare, invece di installare un job che fallisce ogni minuto.
+- La guida V0.2 dice: nessun clone da fare (già presente), dopo la fusione basta `git pull` in quella cartella, poi i file token con chmod 600 e l'installazione del job.
+- Nessuna fusione: apri la PR verso `main` e fermati. Verifica solo quello che si può provare su Windows; il resto in «Non verificato».

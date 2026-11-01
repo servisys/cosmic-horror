@@ -157,14 +157,53 @@ describe('carte dei Custodi', () => {
     mano(g, 0, 'CU13');
     expect(legali(g).some((m) => m.t === 'gioca')).toBe(false);
   });
-  it('CU14 Studio del Necronomicon: il prossimo Sigillo di questo turno costa 1 in meno', () => {
+  it('CU14 Studio del Necronomicon (CT-DES-068): in questo turno il Sigillo si pone anche con instabilità 4, e solo in questo turno', () => {
     const g = partita(C);
     presenza(g, 0, 0, 'CU03');
+    inst(g, 0, 4);
     mano(g, 0, 'CU14');
+    const tappa = (terr: number) => legali(g).some((m) => m.t === 'tappa' && m.terr === terr);
+    expect(tappa(0)).toBe(false); // senza la carta, instabilita' 4: no
     gioca(g, 0, 'CU14');
+    expect(g.s.giocatori[0].energia).toBe(19); // la carta costa 1
+    expect(tappa(0)).toBe(true);
     const e = g.s.giocatori[0].energia;
     mossa(g, 0, { t: 'tappa', terr: 0 });
-    expect(g.s.giocatori[0].energia).toBe(e - 1);
+    expect(g.s.giocatori[0].energia).toBe(e - 2); // il Sigillo costa sempre 2: niente sconto
+    expect(g.s.giocatori[0].tappe[0]).toBeDefined();
+    // l'effetto finisce a fine turno
+    finisci(g, 0);
+    expect(g.s.giocatori[0].aperturaTappa).toBe(false);
+    finisci(g, 1);
+    energia(g, 0, 20);
+    presenza(g, 0, 1, 'CU03');
+    inst(g, 1, 4);
+    expect(legali(g).some((m) => m.t === 'tappa' && m.terr === 1)).toBe(false);
+  });
+  it('CU14 Studio del Necronomicon: vale per tutte le tappe del turno; le altre condizioni restano', () => {
+    const g = partita(C);
+    presenza(g, 0, 0, 'CU03');
+    presenza(g, 0, 1, 'CU03');
+    inst(g, 0, 4);
+    inst(g, 1, 4);
+    inst(g, 2, 4); // senza presenze: non lo controlli
+    mano(g, 0, 'CU14');
+    gioca(g, 0, 'CU14');
+    mossa(g, 0, { t: 'tappa', terr: 0 });
+    const ter = legali(g).filter((m) => m.t === 'tappa').map((m) => (m.t === 'tappa' ? m.terr : -1));
+    expect(ter).toEqual([1]); // il secondo Sigillo si puo' porre; il territorio non controllato no
+    inst(g, 1, 5); // instabilita' 5: oltre la soglia spostata
+    expect(legali(g).some((m) => m.t === 'tappa')).toBe(false);
+  });
+  it('CU14 Studio del Necronomicon: non cambia Esorcismo di Armitage (CU13)', () => {
+    const g = partita(C);
+    g.s.giocatori[1].tappe[0] = g.s.turniCompletati;
+    presenza(g, 0, 0, 'CU03');
+    mano(g, 0, 'CU14', 'CU13');
+    const esorcismi = () => legali(g).filter((m) => m.t === 'gioca' && g.s.giocatori[0].mano.find((c) => c.uid === m.carta)?.id === 'CU13').length;
+    const prima = esorcismi();
+    gioca(g, 0, 'CU14');
+    expect(esorcismi()).toBe(prima);
   });
   it('CU15 Polvere di Ibn Ghazi: elimina una presenza avversaria con forza 3 o meno', () => {
     const g = partita(C);
@@ -327,15 +366,54 @@ describe('carte dei Risvegliati', () => {
     gioca(g, 0, 'RI14', { pres: v.uid });
     expect(forzaPresenza(g, 0, 1, v)).toBe(2);
   });
-  it('RI15 Formula di Dho-Hna: il prossimo rito costa 1 in meno', () => {
+  it('RI15 Formula di Dho-Hna (CT-DES-068): in questo turno il rito si completa anche con instabilità 2, e solo in questo turno', () => {
     const g = partita(R);
     presenza(g, 0, 0, 'RI04');
-    inst(g, 0, 3);
+    inst(g, 0, 2);
     mano(g, 0, 'RI15');
+    const tappa = (terr: number) => legali(g).some((m) => m.t === 'tappa' && m.terr === terr);
+    expect(tappa(0)).toBe(false); // senza la carta, instabilita' 2: no
     gioca(g, 0, 'RI15');
+    expect(g.s.giocatori[0].energia).toBe(19); // la carta costa 1
+    expect(tappa(0)).toBe(true);
     const e = g.s.giocatori[0].energia;
     mossa(g, 0, { t: 'tappa', terr: 0 });
-    expect(g.s.giocatori[0].energia).toBe(e - 1);
+    expect(g.s.giocatori[0].energia).toBe(e - 2); // il rito costa sempre 2: niente sconto
+    expect(g.s.giocatori[0].tappe[0]).toBeDefined();
+    // l'effetto finisce a fine turno
+    finisci(g, 0);
+    expect(g.s.giocatori[0].aperturaTappa).toBe(false);
+    finisci(g, 1);
+    energia(g, 0, 20);
+    presenza(g, 0, 1, 'RI04');
+    inst(g, 1, 2);
+    expect(legali(g).some((m) => m.t === 'tappa' && m.terr === 1)).toBe(false);
+  });
+  it('RI15 Formula di Dho-Hna: le altre condizioni restano (presenza, forza, instabilità almeno 2)', () => {
+    const g = partita(R);
+    presenza(g, 0, 0, 'RI01'); // forza bassa
+    presenza(g, 1, 0, 'CU05'); // avversario piu' forte
+    presenza(g, 1, 0, 'CU05');
+    presenza(g, 0, 1, 'RI04');
+    inst(g, 0, 2);
+    inst(g, 1, 1); // instabilita' 1: sotto la soglia spostata
+    inst(g, 2, 2); // senza una tua presenza
+    mano(g, 0, 'RI15');
+    gioca(g, 0, 'RI15');
+    expect(forzaTerritorio(g, 0, 0)).toBeLessThan(forzaTerritorio(g, 0, 1));
+    expect(legali(g).some((m) => m.t === 'tappa')).toBe(false);
+  });
+  it('RI15 Formula di Dho-Hna: non cambia la Profanazione (RI12)', () => {
+    const g = partita(R);
+    g.s.giocatori[1].tappe[0] = g.s.turniCompletati;
+    presenza(g, 0, 0, 'RI04');
+    inst(g, 0, 2);
+    mano(g, 0, 'RI15', 'RI12');
+    gioca(g, 0, 'RI15');
+    // la Profanazione richiede ancora instabilita' 3 o piu'
+    expect(legali(g).some((m) => m.t === 'gioca' && g.s.giocatori[0].mano.find((c) => c.uid === m.carta)?.id === 'RI12')).toBe(false);
+    inst(g, 0, 3);
+    expect(legali(g).some((m) => m.t === 'gioca' && g.s.giocatori[0].mano.find((c) => c.uid === m.carta)?.id === 'RI12')).toBe(true);
   });
   it('RI16 Benedizione di Yog-Sothoth: una tua presenza +3 forza, potente 1', () => {
     const g = partita(R);

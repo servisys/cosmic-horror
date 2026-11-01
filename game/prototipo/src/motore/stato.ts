@@ -28,8 +28,8 @@ export interface Giocatore {
   /** turniGiocati dell'avversario quando e' scattato il segnale (null = nessun segnale). */
   segnale: number | null;
   esposizioneRidottaInTurno: boolean;
-  /** Sconto sulla prossima tappa del turno (carte "Preparare"). */
-  scontoTappa: number;
+  /** Formula di Dho-Hna / Studio del Necronomicon (CT-DES-068): fino a fine turno la soglia di instabilita' per le tappe si sposta di 1. */
+  aperturaTappa: boolean;
   /** Tipi dei prossimi eventi rivelati dal Diario di Zadok Allen (informazione visibile al solo proprietario). */
   eventiVisti: string[];
 }

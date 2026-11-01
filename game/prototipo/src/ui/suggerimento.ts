@@ -6,6 +6,7 @@ export type TipoSuggerimento =
   | 'energia-finita'
   | 'avversario-un-passo'
   | 'puoi-tappa'
+  | 'apertura-tappa'
   | 'tappa-non-sicura'
   | 'instabilita'
   | 'forza-mancante'
@@ -58,6 +59,20 @@ export function suggerimento(v: Vista): Suggerimento | null {
       testo: `Puoi ${v.fazione === 'custodi' ? 'porre un Sigillo' : 'completare un rito'} ${aT(t.nome)}: tocca «${v.fazione === 'custodi' ? 'Poni Sigillo' : 'Completa rito'}» su quel territorio (costa ${t.costoTappa}).`,
     };
   }
+  // 2b - Formula di Dho-Hna / Studio del Necronomicon (CT-DES-068): la carta permette una tappa altrimenti impossibile e c'e' l'energia per carta + tappa
+  if (!v.aperturaTappa) {
+    const carte = v.mano.filter((c) => (c.id === 'CU14' || c.id === 'RI15') && mosse.some((m) => m.t === 'gioca' && m.carta === c.uid));
+    for (const c of carte) {
+      const t = v.territori.find((x) => x.tappaConApertura && x.costoTappa + c.costo <= v.energia);
+      if (!t) continue;
+      return {
+        tipo: 'apertura-tappa',
+        testo: c.id === 'CU14'
+          ? `Con lo Studio del Necronomicon puoi porre un Sigillo ${aT(t.nome)} anche se l'instabilità è 4: giocalo, poi tocca «Poni Sigillo» (costa ${c.costo} la carta e ${t.costoTappa} il Sigillo).`
+          : `Con la Formula di Dho-Hna puoi completare un rito ${aT(t.nome)} anche se l'instabilità è 2: giocala, poi tocca «Completa rito» (costa ${c.costo} la carta e ${t.costoTappa} il rito).`,
+      };
+    }
+  }
   // 3 - una tappa mia non e' ancora al sicuro
   const insicura = v.territori.find((t) => t.mioTappa && t.mioTappaTogliibile);
   if (insicura) {
@@ -67,13 +82,14 @@ export function suggerimento(v: Vista): Suggerimento | null {
     };
   }
   // 4 - l'instabilita' non e' dalla parte giusta
+  const sp = v.aperturaTappa ? 1 : 0;
   if (v.fazione === 'custodi') {
-    const alta = v.territori.find((t) => t.inst > 3 && !t.mioTappa && (t.controllo === 'io' || t.mie.length > 0));
+    const alta = v.territori.find((t) => t.inst > 3 + sp && !t.mioTappa && (t.controllo === 'io' || t.mie.length > 0));
     if (alta) {
       return { tipo: 'instabilita', testo: `L'instabilità ${diT(alta.nome)} è salita sopra 3: lì non puoi più porre Sigilli finché non la abbassi.` };
     }
   } else {
-    const bassa = v.territori.find((t) => t.inst < 3 && !t.mioTappa && t.mie.length > 0);
+    const bassa = v.territori.find((t) => t.inst < 3 - sp && !t.mioTappa && t.mie.length > 0);
     if (bassa) {
       return { tipo: 'instabilita', testo: `${aT(bassa.nome).replace(/^a /, 'A ').replace(/^alla /, 'Alla ')} l'instabilità è ${bassa.inst}: servono 3 o più per completare un rito. Alzala con le tue carte.` };
     }
@@ -113,13 +129,14 @@ export function motivoTappa(v: Vista, t: VistaTerritorio): string | null {
   if (!v.mioTurno) return 'turno di Lui';
   if (t.mioTappa) return `${nomeTappa(v)} già ${v.fazione === 'custodi' ? 'posto' : 'completato'}`;
   if (v.mosseLegali.some((m) => m.t === 'tappa' && m.terr === t.indice)) return null;
+  const sp = v.aperturaTappa ? 1 : 0;
   if (v.fazione === 'custodi') {
     if (t.controllo !== 'io') return 'non controlli';
-    if (t.inst > 3) return `instabilità ${t.inst} (max 3)`;
+    if (t.inst > 3 + sp) return `instabilità ${t.inst} (max ${3 + sp})`;
   } else {
     if (t.mie.length === 0) return 'serve una tua presenza';
     if (t.forzaMia < t.forzaLoro) return 'forza di Lui maggiore';
-    if (t.inst < 3) return `instabilità ${t.inst} (servono 3)`;
+    if (t.inst < 3 - sp) return `instabilità ${t.inst} (servono ${3 - sp})`;
   }
   if (t.tappaPossibile && v.energia < t.costoTappa) return `serve ${t.costoTappa} energia`;
   if (v.tappe >= 2 && !v.segnaleMio) return 'dopo il turno di Lui';

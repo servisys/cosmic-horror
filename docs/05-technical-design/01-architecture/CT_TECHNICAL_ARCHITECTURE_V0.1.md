@@ -82,6 +82,7 @@ Da `game/prototipo/`, dopo `npm install`:
 
 | Libreria | Versione | Uso |
 |---|---|---|
+| 0.1.11 | DRAFT | Paragrafo 12: Formula di Dho-Hna e Studio del Necronomicon (CT-DES-068). |
 | 0.1.10 | DRAFT | Paragrafo 12: bottone Sigillo/rito ben visibile, consiglio a sinistra, verifica delle sovrapposizioni. |
 | 0.1.9 | DRAFT | Paragrafo 12: leggibilita' sul telefono (testi da 12 px, miniature e carte piu' grandi), pressione lunga, carte giocabili illuminate. |
 | 0.1.8 | DRAFT | Paragrafo 12: animazioni, movimento ridotto, peso della build. |
@@ -154,6 +155,8 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Verifica:** `npm run leggibilita -- <url>` (tre misure con tocco, pressione lunga con un vero tocco da `scripts/pressione.mjs`, misura dei testi).
 
 - **Bottone Sigillo/rito e sovrapposizioni:** il bottone sta subito sotto la targhetta (in alto nel quadro), dorato pieno con bordo scuro, bagliore e testo scuro, alto almeno 32 px; spento e' grigio scuro con il motivo leggibile. Le miniature di Lui e le tue stanno in una sola fila sotto il bottone, a ventaglio se tante; il consiglio sta nella meta' sinistra dello schermo, sopra la mano, cosi' la Landa non tocca Fine turno, icone, consiglio, energia e mano abbassata. Le righe «al sicuro dopo…» sulla plancia compaiono solo se c'e' posto (non nella Landa). `window.__ct.misure()` elenca i rettangoli toccabili; `npm run sovrapposizioni -- <url>` li confronta alle tre misure del telefono con 0, 3 e 6 carte per lato.
+
+- **Formula di Dho-Hna e Studio del Necronomicon (CT-DES-068):** le due carte (RI15, CU14) non danno piu' sconti: impostano per il giocatore l'effetto `aperturaTappa` fino a fine turno (si azzera all'inizio e alla fine del suo turno), che sposta di 1 la soglia di instabilita' di `tappaPosabile` (Sigillo fino a 4, rito da 2); tutte le altre condizioni e il costo (2) restano; Profanazione ed Esorcismo non cambiano. La vista espone `aperturaTappa` e, per ogni territorio, `tappaConApertura` (tappa impossibile adesso ma possibile con la carta): ci si basano il computer (gioca la carta se serve a una tappa altrimenti impossibile e c'e' l'energia per carta + tappa) e il consiglio. `npx tsx src/simulazione/conta-apertura.ts` conta quante volte il computer le usa e quante tappe ne nascono.
 
 ## 13. Elenco delle ambiguità
 

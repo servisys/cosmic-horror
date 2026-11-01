@@ -50,7 +50,7 @@ export function creaPartita(cat: Catalogo, opz: OpzioniPartita): Partita {
   const ordine: FazioneId[] = primo === 'custodi' ? ['custodi', 'risvegliati'] : ['risvegliati', 'custodi'];
   s.giocatori = ordine.map((f): Giocatore => ({
     fazione: f, mazzo: mazzi[f], mano: [], scarti: [], esposizione: 0, energia: 0, turniGiocati: 0, tappe: {},
-    segnale: null, esposizioneRidottaInTurno: false, scontoTappa: 0, eventiVisti: [],
+    segnale: null, esposizioneRidottaInTurno: false, aperturaTappa: false, eventiVisti: [],
   })) as [Giocatore, Giocatore];
   s.territori = cat.dati.territori.map((t): TerritorioStato => ({
     inst: 0, presenze: [[], []], controllo: null, malus: 0, malusFinoAlGiro: 0,
@@ -160,7 +160,6 @@ function eseguiMossa(g: Partita, pi: number, m: Mossa): void {
       return;
     case 'tappa': {
       gi.energia -= costoTappa(g, pi, m.terr);
-      gi.scontoTappa = 0;
       aggiungiTappa(g, pi, m.terr);
       return;
     }
@@ -215,7 +214,7 @@ function passo(g: Partita, p: Passo): void {
       const extra = numControllati(g, pi) >= REGOLE.extraTerritori.minimo ? REGOLE.extraTerritori.energia : 0;
       gi.energia = base + extra;
       gi.esposizioneRidottaInTurno = false;
-      gi.scontoTappa = 0;
+      gi.aperturaTappa = false;
       log(g, `--- Giro ${s.giro}, turno di ${gi.fazione}: energia ${gi.energia}`);
       return;
     }
@@ -231,7 +230,7 @@ function passo(g: Partita, p: Passo): void {
       }
       return;
     case 'fine_turno':
-      gi.scontoTappa = 0;
+      gi.aperturaTappa = false;
       s.turniCompletati++;
       if (pi === 0) {
         s.turno = 1;

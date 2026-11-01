@@ -162,7 +162,47 @@ describe('tutorial', () => {
     expect(passiTutorial('custodi')[0].testo).toContain('3 Sigilli');
     expect(passiTutorial('risvegliati')[0].testo).toContain('3 riti');
   });
-  it('esposizione e simili non servono ai testi (vista solo)', () => {
+  it("Risvegliati con la Formula di Dho-Hna: consiglia di giocarla per completare un rito con instabilità 2 (CT-DES-068)", () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, 1, 'RI04');
+    inst(g, 1, 2);
+    mano(g, 0, 'RI15');
+    energia(g, 0, 3);
+    const s = sug(g)!;
+    expect(s.tipo).toBe('apertura-tappa');
+    expect(s.testo).toContain("Con la Formula di Dho-Hna puoi completare un rito alla Biblioteca della Miskatonic anche se l'instabilità è 2");
+  });
+  it("Custodi con lo Studio del Necronomicon: consiglia di giocarlo per porre un Sigillo con instabilità 4 (CT-DES-068)", () => {
+    const g = partita('custodi');
+    presenza(g, 0, 0, 'CU03');
+    inst(g, 0, 4);
+    mano(g, 0, 'CU14');
+    energia(g, 0, 3);
+    const s = sug(g)!;
+    expect(s.tipo).toBe('apertura-tappa');
+    expect(s.testo).toContain("Con lo Studio del Necronomicon puoi porre un Sigillo a Innsmouth anche se l'instabilità è 4");
+  });
+  it("nessun consiglio sulla carta se manca l'energia per carta + tappa, o se la tappa si puo' gia' fare", () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, 1, 'RI04');
+    inst(g, 1, 2);
+    mano(g, 0, 'RI15');
+    energia(g, 0, 2); // carta 1 + rito 2 = 3
+    expect(sug(g)?.tipo).not.toBe('apertura-tappa');
+    energia(g, 0, 3);
+    inst(g, 1, 3); // il rito si puo' gia' completare
+    expect(sug(g)?.tipo).toBe('puoi-tappa');
+  });
+  it("dopo aver giocato la carta il motivo della tappa usa la soglia spostata", () => {
+    const g = partita('custodi');
+    presenza(g, 0, 0, 'CU03');
+    inst(g, 0, 5);
+    mano(g, 0, 'CU14');
+    g.s.giocatori[0].aperturaTappa = true;
+    const v = creaVista(g, 0);
+    expect(motivoTappa(v, v.territori[0])).toBe('instabilità 5 (max 4)');
+  });
+  it("esposizione e simili non servono ai testi (vista solo)", () => {
     const g = partita('custodi');
     esposizione(g, 0, 5);
     expect(sug(g)).not.toBeNull();

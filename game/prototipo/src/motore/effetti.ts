@@ -24,7 +24,7 @@ export const TESTI_EFFETTO: Record<string, [string, string?]> = {
   CU11: ['La tua esposizione -1.'],
   CU12: ['Una tua presenza ha +2 forza fino a fine partita.'],
   CU13: ['Rimuovi un rito avversario non ancora consolidato da un territorio che controlli.'],
-  CU14: ['Il prossimo Sigillo che poni in questo turno costa 1 energia in meno.'],
+  CU14: ['In questo turno puoi porre un Sigillo anche su un territorio con instabilità 4 (invece di 3 o meno).'],
   CU15: ['Elimina una presenza avversaria con forza 3 o meno.'],
   CU16: ['Peschi 2 carte.'],
   CU17: ["Instabilita' di tutti i territori -2."],
@@ -43,7 +43,7 @@ export const TESTI_EFFETTO: Record<string, [string, string?]> = {
   RI12: ["Rimuovi un Sigillo avversario non ancora consolidato da un territorio con instabilita' 3 o piu', dove hai una presenza e almeno tanta forza quanto l'avversario."],
   RI13: ['Peschi 2 carte.'],
   RI14: ['Una presenza avversaria -2 forza fino a fine partita.'],
-  RI15: ['Il prossimo rito che completi in questo turno costa 1 energia in meno.'],
+  RI15: ['In questo turno puoi completare un rito anche su un territorio con instabilità 2 (invece di 3 o più).'],
   RI16: ['Una tua presenza ha +3 forza fino a fine partita.'],
   RI17: ["Instabilita' di tutti i territori +1; elimina una presenza avversaria con forza 2 o meno."],
   RI18: ['Elimina tutte le presenze con forza 3 o meno su un territorio, anche le tue.'],
@@ -167,7 +167,7 @@ export function effettoAzione(g: Partita, pi: number, c: CartaIst, m: Param): vo
     case 'RI16': if (vittima) vittima.p.bonus += 3; break;
     case 'CU13': togliTappa(g, o, m.terr!); break;
     case 'RI12': togliTappa(g, o, m.terr!); break;
-    case 'CU14': case 'RI15': gi.scontoTappa += 1; break;
+    case 'CU14': case 'RI15': gi.aperturaTappa = true; break;
     case 'CU15': if (vittima) eliminaDaAzione(g, vittima.t, vittima.pi, vittima.p, costo); break;
     case 'CU16': case 'RI13': pesca(g, pi, 2); break;
     case 'CU17': for (let t = 0; t < NUM_TERR; t++) addInst(g, t, -2); break;

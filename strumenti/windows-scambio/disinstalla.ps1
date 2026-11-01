@@ -8,6 +8,7 @@
 param(
   [string]$Repo = (Join-Path $env:USERPROFILE 'cosmic-horror'),
   [string]$Scambio = (Join-Path $env:USERPROFILE 'cosmic-horror-scambio'),
+  [string]$Base = (Join-Path $env:USERPROFILE 'CosmicHorrorScambio'),
   [switch]$AncheCartella
 )
 
@@ -26,4 +27,4 @@ if ($AncheCartella -and (Test-Path (Join-Path $Scambio '.git'))) {
   else { Write-Host "La cartella di scambio non e' stata tolta (ha modifiche?): $Scambio" }
 }
 
-Write-Host "Log e storico delle esecuzioni restano in $(Join-Path $env:LOCALAPPDATA 'CosmicHorrorScambio')."
+Write-Host "Log e storico delle esecuzioni restano in $Base."

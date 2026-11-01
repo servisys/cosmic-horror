@@ -3,7 +3,8 @@
 # Cosa fa:
 #   1. controlla che git e Claude Code ci siano;
 #   2. crea la cartella di lavoro del branch "scambio" (git worktree, separata dal repository di lavoro);
-#   3. copia osserva-scambio.ps1 in %LOCALAPPDATA%\CosmicHorrorScambio (cosi' non dipende dal branch aperto nel repository);
+#   3. copia osserva-scambio.ps1 in %USERPROFILE%\CosmicHorrorScambio (cosi' non dipende dal branch aperto nel repository;
+#      NON in %LOCALAPPDATA%: l'app Claude per Windows e' un'app a pacchetto e li' i file che crea sono virtuali, invisibili all'Utilita' di pianificazione);
 #   4. registra l'attivita' pianificata "CosmicHorror-Scambio": ogni minuto e all'accesso, nascosta, con l'utente corrente.
 #
 # Uso (da PowerShell, nella cartella strumenti\windows-scambio del repository):
@@ -14,7 +15,7 @@
 param(
   [string]$Repo = (Join-Path $env:USERPROFILE 'cosmic-horror'),
   [string]$Scambio = (Join-Path $env:USERPROFILE 'cosmic-horror-scambio'),
-  [string]$Base = (Join-Path $env:LOCALAPPDATA 'CosmicHorrorScambio'),
+  [string]$Base = (Join-Path $env:USERPROFILE 'CosmicHorrorScambio'),
   [string]$Claude = '',
   [int]$TimeoutMinuti = 90
 )
@@ -61,6 +62,9 @@ if (Test-Path (Join-Path $Scambio '.git')) {
 $ErrorActionPreference = 'Stop'
 
 # --- 3. copia dello script
+if ($Base.StartsWith($env:LOCALAPPDATA, [StringComparison]::OrdinalIgnoreCase)) {
+  Write-Host "ATTENZIONE: $Base sta sotto AppData\Local: se questo script e' lanciato da un'app a pacchetto (per esempio l'app Claude) i file risulteranno invisibili all'Utilita' di pianificazione. Meglio una cartella sotto $env:USERPROFILE." -ForegroundColor Yellow
+}
 New-Item -ItemType Directory -Force -Path $Base | Out-Null
 $Script = Join-Path $Base 'osserva-scambio.ps1'
 Copy-Item -Force (Join-Path $PSScriptRoot 'osserva-scambio.ps1') $Script

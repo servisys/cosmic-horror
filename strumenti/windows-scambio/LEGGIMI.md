@@ -16,11 +16,12 @@ Ogni versione di `TASK.md` viene eseguita una sola volta. Per ripetere: `osserva
 
 Le regole stanno nello script, non nel task: un testo in `TASK.md` non può allargarle.
 
-- Fase `piano`: solo lettura. Niente modifiche, commit o push.
-- Fase `esecuzione`: niente fusioni, chiusure di PR, force push, push su `main`, cancellazione di branch, `git reset --hard`, `git clean`, `gh api`.
+- Fase `piano`: solo lettura. Può leggere file e usare solo `git status`, `log`, `diff`, `show`, `fetch`, `ls-files`, `git branch --show-current` e `git branch --list`, e `gh pr view`, `list`, `diff`. Niente modifiche, commit, push o creazione di branch.
+- Fase `esecuzione`: modifica file, fa commit e push **solo di branch `feature/`, `fix/` o `planning/`**, e può aprire PR. `git` è limitato ai sottocomandi necessari (`status`, `log`, `diff`, `show`, `fetch`, `ls-files`, `add`, `commit`, `checkout`/`switch` verso un branch `feature/`, `fix/`, `planning/` o `main`, `push` di quei branch). `npm` solo `ci`, `test`, `run build`, `run verifica…`. Niente `node` né `npx`.
+- Sempre vietati: fusioni, chiusure di PR, force push (anche con `+` davanti al branch), push che cancellano branch (`:branch`, `--delete`), push su `main`, `git reset --hard`, `git clean`, `gh api`.
 - Fusioni e chiusure restano come nel protocollo: le autorizza solo Matteo, scrivendo direttamente a Code in una sessione interattiva.
 
-I divieti sono regole di Claude Code sui comandi, quindi un comando scritto in modo diverso potrebbe sfuggire. La protezione vera di `main` è una regola di protezione del branch su GitHub, se il piano GitHub del repository la consente.
+I divieti sono regole di Claude Code sui comandi, quindi un comando scritto in modo diverso potrebbe sfuggire. La protezione vera di `main` è una regola di branch (ruleset) su GitHub: blocca force push e cancellazione e richiede una PR per modificare `main`.
 
 ## Installazione
 
@@ -35,19 +36,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\installa.ps1
 L'installazione:
 
 - crea `C:\Users\<utente>\cosmic-horror-scambio`, una cartella di lavoro (git worktree) dedicata al branch `scambio`, così il repository di lavoro resta sul suo branch;
-- copia lo script in `%LOCALAPPDATA%\CosmicHorrorScambio`;
+- copia lo script in `C:\Users\<utente>\CosmicHorrorScambio` (`%USERPROFILE%\CosmicHorrorScambio`);
 - registra l'attività pianificata `CosmicHorror-Scambio` (ogni minuto e all'accesso, nascosta, con l'utente corrente).
 
-Percorsi diversi: `-Repo`, `-Scambio`, `-Claude`. Tempo massimo di un'esecuzione: `-TimeoutMinuti` (predefinito 90).
+**Perché non in `AppData`:** l'app Claude per Windows è un'app «a pacchetto» (MSIX) e per i programmi che lancia i file creati in `%LOCALAPPDATA%` finiscono in una copia privata (`AppData\Local\Packages\Claude_…\LocalCache\Local`) che l'Utilità di pianificazione non vede: il task non trova lo script e resta bloccato. Sotto `%USERPROFILE%` i file sono reali per tutti. `installa.ps1` avvisa se gli si passa una cartella sotto `AppData\Local`.
+
+Percorsi diversi: `-Repo`, `-Scambio`, `-Base`, `-Claude`. Tempo massimo di un'esecuzione: `-TimeoutMinuti` (predefinito 90).
 
 ## Controllo
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\CosmicHorrorScambio\osserva-scambio.ps1" -Stato
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\CosmicHorrorScambio\osserva-scambio.ps1" -Stato
 ```
 
-- Log: `%LOCALAPPDATA%\CosmicHorrorScambio\log\scambio.log`.
-- Ogni esecuzione: `%LOCALAPPDATA%\CosmicHorrorScambio\esecuzioni\<data>-<id>-<fase>\` (task, resoconto, errori).
+- Log: `%USERPROFILE%\CosmicHorrorScambio\log\scambio.log`.
+- Ogni esecuzione: `%USERPROFILE%\CosmicHorrorScambio\esecuzioni\<data>-<id>-<fase>\` (task, resoconto, errori).
 
 ## Quando non parte
 

@@ -19,7 +19,7 @@
 param(
   [string]$Repo = (Join-Path $env:USERPROFILE 'cosmic-horror'),
   [string]$Scambio = (Join-Path $env:USERPROFILE 'cosmic-horror-scambio'),
-  [string]$Base = (Join-Path $env:LOCALAPPDATA 'CosmicHorrorScambio'),
+  [string]$Base = (Join-Path $env:USERPROFILE 'CosmicHorrorScambio'),
   [string]$Claude = '',
   [int]$TimeoutMinuti = 90,
   [switch]$Stato,
@@ -164,8 +164,17 @@ $RegoleEsecuzione = 'FASE ESECUZIONE: esegui il task seguendo il pre-flight plan
   'Lavora solo su un branch feature/, fix/ o planning/ con il nome indicato nel task, mai su main. Puoi fare commit, push del tuo branch e aprire una PR verso main. ' +
   'Non fondere, non chiudere PR, non cancellare branch, niente force push. Lancia i test indicati nel task e riportane l esito.'
 
-$ToolPiano = 'Read,Glob,Grep,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*)'
-$ToolEsecuzione = 'Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*),Bash(gh pr comment:*)'
+$ToolPiano = 'Read,Glob,Grep,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch --show-current),Bash(git branch --list:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*)'
+# fase esecuzione: niente node ne' npx; git solo coi sottocomandi necessari; push solo di HEAD (nessun refspec possibile: ne' :, ne' +, ne' main);
+# npm solo ci, test, run build, run verifica. Nota sulla sintassi: "x:*" vale solo per parole intere (dopo "x" ci deve essere uno spazio o la fine);
+# per i nomi di branch (feature/qualcosa) si usa il joker "feature/*".
+$ToolEsecuzione = 'Read,Edit,Write,Glob,Grep,' +
+  'Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch --show-current),Bash(git branch --list:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(git add:*),Bash(git commit:*),' +
+  'Bash(git checkout -b feature/*),Bash(git checkout -b fix/*),Bash(git checkout -b planning/*),Bash(git switch -c feature/*),Bash(git switch -c fix/*),Bash(git switch -c planning/*),' +
+  'Bash(git switch feature/*),Bash(git switch fix/*),Bash(git switch planning/*),Bash(git switch main),Bash(git checkout main),' +
+  'Bash(git push -u origin HEAD),Bash(git push origin HEAD),' +
+  'Bash(npm ci:*),Bash(npm test:*),Bash(npm run build:*),Bash(npm run verifica*),' +
+  'Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*),Bash(gh pr comment:*)'
 $ToolVietati = 'Bash(gh pr merge:*),Bash(gh pr close:*),Bash(gh api:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push --force-with-lease:*),Bash(git push origin main:*),Bash(git push origin HEAD:main:*),Bash(git push origin --delete:*),Bash(git push --delete:*),Bash(git merge:*),Bash(git branch -D:*),Bash(git branch -d:*),Bash(git reset --hard:*),Bash(git clean:*)'
 
 # ---------------------------------------------------------------- comando -Stato

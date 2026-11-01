@@ -1,5 +1,54 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-001 - fase esecuzione - 2026-11-01 13:31 - FATTO
+
+## Resoconto CT-DEV-001
+
+**Richiesta eseguita:** sì, ma l'estrazione non è stata provata. Il codice è scritto e la PR è aperta, però non ho potuto far girare PowerShell.
+
+**Cosa è stato fatto** (solo file in `strumenti/windows-scambio/`):
+- `osserva-scambio.ps1`: Code ora parte con `--output-format stream-json --verbose`. Il flusso grezzo va in `esecuzioni\<data>-<id>-<fase>\flusso.jsonl`.
+- Nuova funzione `Estrai-Flusso`: dal flusso ricava il testo finale del resoconto e `comandi.txt`. Per ogni comando scrive l'esito: eseguito, BLOCCATO dai permessi o ERRORE.
+- Token e chiavi nei comandi vengono coperti con `[COPERTO]`.
+- In fondo al resoconto su `REPORT.md` finisce una riga col numero di comandi bloccati e i primi 5. La riga c'è sempre, anche con 0 bloccati.
+- Nuovo parametro `-Prova <file.jsonl>`: stampa resoconto, `comandi.txt` e riga dei bloccati da un flusso salvato, senza lanciare Code.
+- Aggiunto `prove/flusso-esempio.jsonl`. Contiene un comando eseguito, due bloccati (uno con token finto), un errore e un risultato finale.
+- Aggiornato il LEGGIMI.
+
+**`git diff --stat` rispetto a main:**
+- `LEGGIMI.md`: 7 righe
+- `osserva-scambio.ps1`: 123 righe
+- `prove/flusso-esempio.jsonl`: 13 righe nuove
+- Totale: 3 file, 139 inserimenti, 4 cancellazioni
+
+**Branch e PR:**
+- Branch: `fix/ct-dev-001-log-comandi`
+- Commit: `4478be3`
+- PR #68 verso `main`: https://github.com/servisys/cosmic-horror/pull/68
+- Sono tornato su `main`.
+
+**Verifiche eseguite:** nel file `.ps1` non ci sono caratteri non ASCII. Nessun file fuori da `strumenti/windows-scambio/` è cambiato.
+
+**Cose non eseguite davvero:**
+- La funzione di estrazione non è mai girata: il comando PowerShell è stato negato dai permessi di questa fase. Il file di esempio è quindi non provato.
+- Il formato reale di stream-json è quello che mi aspetto, non l'ho visto in una esecuzione vera. Mi aspetto:
+  - blocchi `tool_use` e `tool_result`;
+  - un evento finale `result` con `permission_denials`;
+  - il testo del rifiuto riconosciuto da una regola di testo (`permission`, `haven't granted`, `not allowed`, `was denied`).
+- Se il formato reale è diverso, la funzione potrebbe non vedere i comandi bloccati. Con un flusso illeggibile il resoconto ricade sul messaggio di errore già esistente.
+- Quel ripiego non l'ho provato.
+- Il punto più incerto è proprio il riconoscimento dei comandi bloccati.
+
+**Prova da fare (Matteo):**
+```
+powershell -NoProfile -ExecutionPolicy Bypass -File strumenti\windows-scambio\osserva-scambio.ps1 -Prova strumenti\windows-scambio\prove\flusso-esempio.jsonl
+```
+Dovrebbe mostrare 5 comandi, di cui 2 bloccati (`git push origin main` e il `curl` con token coperto), e la riga dei bloccati.
+
+Dopo la fusione serve reinstallare lo script, come previsto dal task.
+
+---
+
 ## CT-DEV-001 - fase piano - 2026-11-01 13:22 - FATTO
 
 # Pre-flight plan CT-DEV-001 (fase piano, solo lettura)

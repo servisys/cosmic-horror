@@ -1,5 +1,118 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FEAT-001 - fase piano - 2026-11-01 16:28 - FATTO
+
+# Resoconto CT-FEAT-001, fase piano
+
+## Richiesta eseguita
+Ho letto TASK.md ed eseguito la sola fase piano. Non ho modificato file, fatto commit o push, né scritto nella cartella di scambio.
+
+## Verifiche fatte
+- **Documenti autorevoli:**
+  - APPROVED: Core Rules V0.12, Scope V0.2, Master Index e Protocollo V0.4.
+  - DRAFT: Regole del Decision Log V0.2 e Guida del Mondo V0.1. Il task li cita come riferimento, quindi li uso solo come contesto non vincolante (Master Index, regola 4).
+  - Il file carte V0.6 ha nell'intestazione `status: DRAFT`. Il Decision Log CT-DES-068 è un DRAFT con voce REGISTRATA, che è il formato da copiare.
+- **Citazioni (CT-DES-061):** ho controllato le 4 frasi in inglese sui testi di `reference/literature/gutenberg/`. Sono tutte esatte; due vanno a capo a metà frase nel file.
+- **Task pronto:** sì. Restano le domande qui sotto, ma nessuna blocca l'avvio del lavoro sui documenti e sul motore.
+- **Cose già pronte:** le scene 3D `dunwich_v2` e `rlyeh_v2` esistono già. In `config-plancia.ts` Dunwich e R'lyeh sono già presenti con `territorioId: null`. `npm run simula`, `leggibilita` e `sovrapposizioni` esistono già.
+
+## Cosa ho trovato nel codice
+- `NUM_TERR = 3` è in `stato.ts`.
+- **Numeri e indici scritti nel codice** (da portare a 5 territori):
+  - `[0, 1, 2]` in `eventi.ts` e `effetti.ts`.
+  - `t === 0`, `t === 1` e `t === 2` per gli effetti dei territori in `motore.ts`, `eventi.ts` e `operazioni.ts`.
+  - Gli eventi E05 (Landa) ed E10 (Innsmouth) puntano a un indice fisso.
+  - `simula.ts` divide per 3.
+  - `computer.ts` usa gli id `T1r`, `T2r` e `T3r`.
+- **Dati letti dai file:** il caricamento prende il file YAML con la versione più alta. Aggiungendo `CT_CARTE_PROTOTIPO_V0.7.yaml` il gioco lo legge da solo.
+- **Interfaccia:** mancano i testi di tutorial e regole in-game. In `scena.ts` (riga 828) ci sono «tre Sigilli» e «tre riti», e `main.ts` e `scena-territorio.ts` trattano Dunwich e R'lyeh come «non in gioco».
+
+## Divisione del lavoro
+Propongo **2 PR** dallo stesso branch.
+
+**PR 1: documenti, dati, motore e test.**
+- Decision Log `CT_DECISION_LOG_CT_DES_069_073_V0.1.md`, DRAFT. CT-DES-074 va scritta come PROPOSTA.
+- `CT_CORE_RULES_V0.13.md`:
+  - la V0.12 diventa DEPRECATED;
+  - modifiche a §2, §5, §6, §8, §10, glossario e changelog;
+  - nuovi chiarimenti in §13.
+- `CT_CARTE_PROTOTIPO_V0.7.yaml`: T4 e T5 con citazione, T4r *Pietra Incisa* e T5r *Idolo di Cthulhu*. Il file V0.6 diventa DEPRECATED.
+- Master Index 0.6.1 (o 0.7.0) con i nuovi documenti.
+- Motore:
+  - `NUM_TERR = 5`;
+  - **effetti dei territori legati all'id** (T1…T5) in un solo punto, senza più indici scritti nel codice;
+  - `tappaPosabile`: R'lyeh solo con 2 tappe, e con 2 tappe solo R'lyeh;
+  - *Pietre ritte* come nuova mossa `pietre`: 1 energia, una volta per turno, solo su un altro territorio, ±1;
+  - *Pietra Incisa* con scelta del segno;
+  - *Idolo* come presenza propria a R'lyeh, +2 forza fino a fine partita;
+  - «La città dormiente»: esposizione +1 in più per la carta potente giocata a R'lyeh;
+  - effetti cosmici a instabilità 5 per R'lyeh e Dunwich, nell'ordine già previsto in §13.4;
+  - energia extra con 3 territori;
+  - eventi estesi a 5 territori.
+- Test nuovi per ogni regola, più il controllo dati e `config-plancia.test`.
+- Una prima simulazione di prova, solo per controllare che il gioco non si blocchi.
+
+**PR 2: computer, interfaccia, simulazioni e build.**
+- Computer: tabella qui sotto e uso di Pietre ritte, Pietra Incisa e Idolo.
+- Interfaccia:
+  - Dunwich e R'lyeh in gioco;
+  - targhetta «ULTIMA TAPPA» su R'lyeh, più consiglio e scena;
+  - bottone per Pietre ritte;
+  - tutorial e regole in-game aggiornati.
+- Segnaposto per le 2 carte senza illustrazione.
+- Contatori nuovi in `simula.ts` per l'uso delle carte nuove.
+- Build in `scambio/da-claude/tappa5/dist/`.
+
+**Scope V0.2** (APPROVED, cita «3 territori» alle righe 29 e 51): propongo `CT_PROTOTYPE_SCOPE_V0.3.md` in DRAFT, con modifiche minime solo a quelle due righe, V0.2 DEPRECATED. In alternativa lo lascio com'è e lo segnalo.
+
+## Tabella delle priorità del computer a 5 territori (da confermare)
+Resta **PROPOSTA** nel Decision Log finché Matteo non conferma. «Esterni» sono i 4 territori diversi da R'lyeh.
+
+| | Custodi | Risvegliati |
+|---|---|---|
+| 1 | Se i Risvegliati hanno 2 tappe, difende R'lyeh: abbassa l'instabilità sotto 3 (carte, Pietra Incisa −1, Pietre ritte −1) o gioca lì presenze per superarne la forza. Può anche togliere un rito non consolidato. | Se i Custodi hanno 2 tappe, alza l'instabilità di R'lyeh sopra 3 (carte, Pietra Incisa +1, Pietre ritte +1), toglie un Sigillo non consolidato o gioca presenze a R'lyeh per togliergliene il controllo. |
+| 2 | Se può, pone un Sigillo: con meno di 2 tappe su un esterno, con 2 tappe a R'lyeh. | Se può, completa un rito, con le stesse due regole. |
+| 3 | Con meno di 2 tappe rinforza l'esterno più conteso. Con 1 tappa comincia anche a mettere presenze a R'lyeh. Con 2 tappe prepara R'lyeh con presenze fino a controllarlo. | Con meno di 2 tappe segue CT-DES-067 sugli esterni. Con 1 o più tappe contende anche R'lyeh (forza minore o uguale, instabilità almeno 2 o presenza già lì). Con 2 tappe mette presenze a R'lyeh. |
+| 4 | Se l'esposizione è 5 o più, la abbassa. | Gioca le carte potenti quando ha l'energia. |
+| 5 | Pietre ritte (se controlla Dunwich): tiene R'lyeh a 3 o meno prima dell'ultima tappa e l'instabilità bassa dove ha un Sigillo da porre. | Pietre ritte (se controlla Dunwich): tiene R'lyeh a 3 o più, altrimenti alza l'instabilità dove ha presenze. |
+| Fuori tabella | Idolo di Cthulhu solo se ha una presenza a R'lyeh e controllo contestato. | Idolo di Cthulhu come per i Custodi. |
+
+## Simulazioni e Playwright con i permessi della fase esecuzione
+- **Confronto con 3 territori:** prima di toccare il codice lancio `npm run simula 1000 0 -- --json` su `main` e salvo il risultato per il confronto. Poi lo stesso comando a 5 territori.
+- **Script nuovi:** nessun `node`/`npx` diretto. Gli script npm esistenti bastano per le simulazioni e per `leggibilita` e `sovrapposizioni` (956x440, 844x390, 740x340).
+- **Nuovo script `verifica-cinque-territori`** (nome `verifica-...`): controlla targhetta e scena di R'lyeh, il bottone Pietre ritte e il tutorial a 5 quadri. Lo creo e lo dichiaro nell'Implementation Report.
+- `simula.ts` ha già vittorie, giri e partite interrotte. Aggiungo l'uso di Pietre ritte, Pietra Incisa e Idolo, le partite oltre 15 giri e la mediana.
+
+## Rischi
+1. **Stallo su R'lyeh, rischio principale.**
+   - I Custodi devono controllare R'lyeh con instabilità ≤3. I Risvegliati hanno bisogno di instabilità ≥3 e forza uguale o maggiore.
+   - Dal giro 7 tutti salgono di +1 a fine giro. A 5 ci vogliono −2 prima di poter porre il Sigillo, e a 5 c'è «Cthulhu si agita».
+   - Il tetto di 4 presenze per giocatore limita la forza.
+   - Se la simulazione mostra molte partite oltre 15 giri o senza vincitore, le segnalo con numeri e proposte, senza correggerle da solo (task, fuori scope).
+2. **Cambia il flusso casuale.** Gli eventi «più instabile» e «più presenze» ora scelgono tra 5 territori, quindi i semi non riproducono più le partite di prima. Il confronto con 3 territori è fatto sulle statistiche, non partita per partita.
+3. **Riordino degli indici.** T4 e T5 vanno in coda al file, indici 3 e 4. Il lavoro più delicato è sostituire i numeri fissi con gli id dei territori.
+4. **Illustrazioni:** le due carte nuove usano un segnaposto coerente fino a ComfyUI.
+
+## Domande per Matteo
+1. **Tabella del computer:** va bene come proposta, o va cambiata? In particolare il punto 3, dove con 1 tappa si comincia a prepararsi a R'lyeh.
+2. **Orrore di Dunwich:** «la presenza con forza più alta su Dunwich» considera le presenze di entrambi i giocatori? Io ho assunto di sì.
+3. **Pietre ritte:** conferma che vale per il giocatore che controlla Dunwich all'inizio della mossa, che «altro territorio» significa diverso da Dunwich e che non fa salire l'esposizione.
+4. **Tappa perduta:** se un giocatore ha 2 tappe e ne perde una, non può più fare R'lyeh finché non ne rifà due. Conferma?
+5. **Scope V0.3:** va bene la mia proposta di una V0.3 con modifiche minime?
+6. **PR:** va bene la divisione in 2 PR? Oppure una sola, più grande?
+
+## Cosa non è stato verificato
+- Non ho eseguito test, build o simulazioni, perché la fase piano è di sola lettura. Non ho numeri di partenza per le partite a 5 territori.
+- Non ho letto in dettaglio `scena.ts` (889 righe) e `vista.ts`. Non so ancora quanto lavoro serva per mostrare 5 territori a 740x340, né se la Vista debba esporre nuovi dati per Pietre ritte e R'lyeh.
+- Non ho controllato i test esistenti uno per uno. Alcuni danno per scontati i 3 territori e andranno aggiornati.
+
+## Branch e PR
+Branch previsto: `feature/ct-feat-001-cinque-territori`, base `main`. Per ora nessun branch e nessuna PR. Aspetto il via per la fase esecuzione.
+
+Comandi bloccati dai permessi: 5. Primi 5: `head -30 docs/01-game-design/01-core-rules/CT_CORE_RULES_V0.12.md | head -20; for f in docs/01-game-design/01-core-rules...`; `cat game/prototipo/package.json; find game/prototipo/src game/prototipo/test game/prototipo/scripts public -type f 2>/de...`; `cd /c/Users/MatteoTemporini-Laye/cosmic-horror/game/prototipo && cat package.json && git ls-files src test scripts | hea...`; `cd /c/Users/MatteoTemporini-Laye/cosmic-horror/game/prototipo && cat package.json; git ls-files src test | tr '\n' ' '`; `find /c/Users/MatteoTemporini-Laye/cosmic-horror/game/prototipo/src /c/Users/MatteoTemporini-Laye/cosmic-horror/game/pro...`
+
+---
+
 ## CT-DEL-002 - fase esecuzione - 2026-11-01 16:12 - FATTO
 
 Resoconto CT-DEL-002 (fase esecuzione)

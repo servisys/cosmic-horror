@@ -18,7 +18,8 @@
     "verifica-aiuti": "node scripts/verifica-aiuti.mjs",
     "grafica-finale": "node scripts/grafica-finale.mjs",
     "verifica-animazioni": "node scripts/verifica-animazioni.mjs",
-    "leggibilita": "node scripts/leggibilita.mjs"
+    "leggibilita": "node scripts/leggibilita.mjs",
+    "sovrapposizioni": "node scripts/sovrapposizioni.mjs"
   },
   "dependencies": {
     "pixi.js": "8.6.6",

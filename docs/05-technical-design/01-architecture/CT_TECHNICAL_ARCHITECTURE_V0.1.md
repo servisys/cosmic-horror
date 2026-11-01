@@ -82,6 +82,7 @@ Da `game/prototipo/`, dopo `npm install`:
 
 | Libreria | Versione | Uso |
 |---|---|---|
+| 0.1.10 | DRAFT | Paragrafo 12: bottone Sigillo/rito ben visibile, consiglio a sinistra, verifica delle sovrapposizioni. |
 | 0.1.9 | DRAFT | Paragrafo 12: leggibilita' sul telefono (testi da 12 px, miniature e carte piu' grandi), pressione lunga, carte giocabili illuminate. |
 | 0.1.8 | DRAFT | Paragrafo 12: animazioni, movimento ridotto, peso della build. |
 | 0.1.7 | DRAFT | Paragrafo 12: ingresso nei territori con le scene 3D (scorrimento, pizzico, «Gioca una carta qui»). |
@@ -151,6 +152,8 @@ Node 24 sul PC di sviluppo. Nessuna libreria di grafica (PixiJS arriva dalla tap
 - **Pressione lunga:** `pressioneLunga` (`src/ui/disegno.ts`) apre la scheda grande dopo circa 400 ms senza spostarsi (vibrazione breve se il telefono la supporta). Vale per le carte della mano, le miniature, le carte della scena e quelle di «Gioca una carta qui»; il rilascio che segue non e' un tocco (`pressioneRecente`) e la scheda si chiude solo con un nuovo tocco. Al mouse apre anche il clic destro. Il canvas ha `touch-action: none`, niente selezione e niente menu del browser. La lente nella mano e' stata tolta (al mouse restano l'anteprima al passaggio e il clic destro).
 - **Carte giocabili:** in mano le carte che si possono giocare hanno un bordo dorato luminoso con un bagliore che pulsa piano; le altre sono sbiadite e senza bagliore; la selezionata e' piu' alta e con bordo e bagliore piu' forti.
 - **Verifica:** `npm run leggibilita -- <url>` (tre misure con tocco, pressione lunga con un vero tocco da `scripts/pressione.mjs`, misura dei testi).
+
+- **Bottone Sigillo/rito e sovrapposizioni:** il bottone sta subito sotto la targhetta (in alto nel quadro), dorato pieno con bordo scuro, bagliore e testo scuro, alto almeno 32 px; spento e' grigio scuro con il motivo leggibile. Le miniature di Lui e le tue stanno in una sola fila sotto il bottone, a ventaglio se tante; il consiglio sta nella meta' sinistra dello schermo, sopra la mano, cosi' la Landa non tocca Fine turno, icone, consiglio, energia e mano abbassata. Le righe «al sicuro dopo…» sulla plancia compaiono solo se c'e' posto (non nella Landa). `window.__ct.misure()` elenca i rettangoli toccabili; `npm run sovrapposizioni -- <url>` li confronta alle tre misure del telefono con 0, 3 e 6 carte per lato.
 
 ## 13. Elenco delle ambiguità
 

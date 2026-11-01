@@ -1,5 +1,34 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-002 - fase piano - 2026-11-01 16:05 - FATTO
+
+**Richiesta eseguita:** CT-DEL-002, fase piano, sola lettura. Non ho modificato nulla e non ho fuso nulla.
+
+**Verifiche su PR 71 (tutte positive):**
+- La PR è aperta e non è in bozza.
+- Il branch di destinazione è `main`.
+- La testa è `1a80198516d4b501e9b006c96f232acd2bf7a2b8`, uguale allo sha del campo `fusioni`.
+- Fondibile: `MERGEABLE`, stato `CLEAN`.
+- I file toccati sono esattamente due, come in `file_attesi_71`: `README.md` e `docs/00-project-overview/01-vision-concept/CT_VISION_AND_PILLARS_V0.11_BOZZA.md`.
+- Il protocollo V0.4 è `APPROVED` (riga 3 del file).
+- Il repository è su `main` e pulito.
+
+**Cosa è stato fatto:** nessuna modifica, nessun commit, nessun push. Non ci sono branch né PR nuovi.
+
+**Rischi e domande aperte:** nessuno. Il task è pronto per la fase esecuzione, dopo il via di Matteo.
+
+**Non verificato:**
+- Non ho riletto il contenuto del diff. Mi sono fidato di quanto scritto nel task, cioè che cambino solo i riferimenti al protocollo e una riga di changelog.
+- Non ho controllato la protezione di `main` né l'esito delle verifiche automatiche sulla PR. `mergeStateStatus` è `CLEAN`.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-DOC-003 - fase esecuzione - 2026-11-01 15:59 - FATTO
 
 **Resoconto CT-DOC-003**

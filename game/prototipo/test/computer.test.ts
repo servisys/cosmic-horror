@@ -225,8 +225,51 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
   });
 });
 
+describe('Formula di Dho-Hna e Studio del Necronomicon (CT-DES-068)', () => {
+  it("Risvegliati: gioca la Formula se permette un rito altrimenti impossibile e ha l'energia per carta + rito", () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, 0, 'RI04');
+    inst(g, 0, 2);
+    mano(g, 0, 'RI15');
+    energia(g, 0, 3);
+    const v = creaVista(g, 0);
+    expect(idCarta(v, sceglieMossa(v, cat))).toBe('RI15');
+    // poi completa il rito
+    applica(g, 0, sceglieMossa(v, cat));
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m).toEqual({ t: 'tappa', terr: 0 });
+  });
+  it("Custodi: gioca lo Studio se permette un Sigillo altrimenti impossibile e ha l'energia per carta + Sigillo", () => {
+    const g = partita('custodi');
+    presenza(g, 0, 0, 'CU03');
+    inst(g, 0, 4);
+    mano(g, 0, 'CU14');
+    energia(g, 0, 3);
+    const v = creaVista(g, 0);
+    expect(idCarta(v, sceglieMossa(v, cat))).toBe('CU14');
+  });
+  it("non le gioca se manca l'energia per carta + tappa, se la tappa e' gia' possibile o se non serve a nessuna tappa", () => {
+    for (const [fazione, id, instab] of [['risvegliati', 'RI15', 2], ['custodi', 'CU14', 4]] as const) {
+      const g = partita(fazione);
+      presenza(g, 0, 0, fazione === 'custodi' ? 'CU03' : 'RI04');
+      inst(g, 0, instab);
+      mano(g, 0, id);
+      energia(g, 0, 2); // carta 1 + tappa 2 = 3
+      let v = creaVista(g, 0);
+      expect(idCarta(v, sceglieMossa(v, cat))).not.toBe(id);
+      energia(g, 0, 3);
+      inst(g, 0, 3); // tappa gia' possibile: la sceglie, senza carta
+      v = creaVista(g, 0);
+      expect(sceglieMossa(v, cat)).toEqual({ t: 'tappa', terr: 0 });
+      inst(g, 0, fazione === 'custodi' ? 5 : 1); // fuori anche dalla soglia spostata
+      v = creaVista(g, 0);
+      expect(idCarta(v, sceglieMossa(v, cat))).not.toBe(id);
+    }
+  });
+});
+
 describe('il computer e deterministico', () => {
-  it('stessa vista, stessa mossa', () => {
+  it("stessa vista, stessa mossa", () => {
     const g = nuova(5);
     const v = creaVista(g, 0);
     expect(sceglieMossa(v, cat)).toEqual(sceglieMossa(v, cat));

@@ -45,6 +45,8 @@ export interface VistaTerritorio {
   mioTappaTogliibile: boolean;
   /** Condizioni per la mia tappa soddisfatte (costo escluso) in questo momento. */
   tappaPossibile: boolean;
+  /** La tappa non si puo' fare adesso ma si potrebbe con la soglia di instabilita' spostata di 1 (Formula di Dho-Hna / Studio del Necronomicon). */
+  tappaConApertura: boolean;
   costoTappa: number;
   riservaRimasta: number;
 }
@@ -55,6 +57,8 @@ export interface Vista {
   fazioneAvv: FazioneId;
   giro: number;
   mioTurno: boolean;
+  /** Questo turno hai giocato la Formula di Dho-Hna / lo Studio del Necronomicon: la soglia di instabilita' per le tappe e' spostata di 1. */
+  aperturaTappa: boolean;
   energia: number;
   esposizione: number;
   esposizioneAvv: number;
@@ -89,6 +93,7 @@ export function creaVista(g: Partita, io: number): Vista {
     fazioneAvv: av.fazione,
     giro: s.giro,
     mioTurno: s.turno === io,
+    aperturaTappa: me.aperturaTappa,
     energia: me.energia,
     esposizione: me.esposizione,
     esposizioneAvv: av.esposizione,
@@ -121,6 +126,7 @@ export function creaVista(g: Partita, io: number): Vista {
         loroTappaTogliibile: tappaTogliibile(g, altro(io), i),
         mioTappaTogliibile: tappaTogliibile(g, io, i),
         tappaPossibile: tappaPosabile(g, io, i),
+        tappaConApertura: !tappaPosabile(g, io, i) && tappaPosabile(g, io, i, true),
         costoTappa: costoTappa(g, io, i),
         riservaRimasta: t.riserva.length,
       } satisfies VistaTerritorio;

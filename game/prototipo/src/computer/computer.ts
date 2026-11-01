@@ -74,8 +74,8 @@ function candidatiCustodi(v: Vista): Cand[] {
       const ultimaAmmessa = v.tappe < 2 || v.segnaleMio;
       if (!t.mioTappa && t.inst <= 3 && t.forzaMia + c.forza > t.forzaLoro && ultimaAmmessa) out.push({ m, punti: 720 });
     }
-    // "Studio del Necronomicon" quando manca 1 energia per il Sigillo
-    if (c.id === ID_CUSTODI.preparaSigillo && v.territori.some((t) => t.tappaPossibile && t.costoTappa > v.energia && t.costoTappa - 1 <= v.energia - c.costo)) {
+    // "Studio del Necronomicon" (CT-DES-068): solo se in questo turno permette un Sigillo altrimenti impossibile e c'e' l'energia per carta + Sigillo
+    if (c.id === ID_CUSTODI.preparaSigillo && v.territori.some((t) => t.tappaConApertura && t.costoTappa + c.costo <= v.energia)) {
       out.push({ m, punti: 690 });
     }
   }
@@ -134,7 +134,8 @@ function candidatiRisvegliati(v: Vista): Cand[] {
   // 2 - se puo', completa un rito
   for (const m of tappe(v)) out.push({ m, punti: 700 });
   for (const { m, c } of g) {
-    if (c.id === ID_RISVEGLIATI.preparaRito && v.territori.some((t) => t.tappaPossibile && t.costoTappa > v.energia && t.costoTappa - 1 <= v.energia - c.costo)) {
+    // "Formula di Dho-Hna" (CT-DES-068): solo se in questo turno permette un rito altrimenti impossibile e c'e' l'energia per carta + rito
+    if (c.id === ID_RISVEGLIATI.preparaRito && v.territori.some((t) => t.tappaConApertura && t.costoTappa + c.costo <= v.energia)) {
       out.push({ m, punti: 690 });
     }
   }

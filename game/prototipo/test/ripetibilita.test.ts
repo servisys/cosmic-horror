@@ -78,10 +78,10 @@ describe('lettura e controllo dei dati', () => {
     d.fazioni[0].carte.push(nuova);
     expect(controllaDati(d).errori.join('\n')).toContain('CU99: il codice non conosce questa carta');
   });
-  it('i file V0.5 sono YAML 1.2 valido: letti senza correzioni e senza avvisi', () => {
+  it('i file V0.6 sono YAML 1.2 valido: letti senza correzioni e senza avvisi', () => {
     const r = controllaDati(caricaDati());
     expect(r.avvisi).toEqual([]);
-    expect(caricaDati().fileCarte).toContain('_V0.5.yaml');
+    expect(caricaDati().fileCarte).toContain('_V0.6.yaml');
   });
   it('segnala una carta di riserva senza id', () => {
     const d = structuredClone(caricaDati());

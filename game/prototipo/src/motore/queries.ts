@@ -58,7 +58,7 @@ export function esposizionePiuAlta(g: Partita): number[] {
 
 export function costoTappa(g: Partita, pi: number, t: number): number {
   const gi = g.s.giocatori[pi];
-  let c = REGOLE.costoTappa - gi.scontoTappa;
+  let c = REGOLE.costoTappa;
   if (gi.fazione === 'risvegliati') {
     // Lavinia Whateley (RI06): i riti su questo territorio costano 1 in meno (una volta per ogni Lavinia).
     c -= g.s.territori[t].presenze[pi].filter((p) => p.carta.id === 'RI06').length;
@@ -67,9 +67,12 @@ export function costoTappa(g: Partita, pi: number, t: number): number {
 }
 
 /**
+
  * Condizioni per porre un Sigillo (Custodi) o completare un rito (Risvegliati) sul territorio t, escluso il costo (CT-DES-055, CT-DES-015).
+ * Con la Formula di Dho-Hna / lo Studio del Necronomicon la soglia di instabilita' si sposta di 1 per il turno (CT-DES-068);
+ * `conApertura` forza lo spostamento (serve a sapere cosa permetterebbe giocare la carta).
  */
-export function tappaPosabile(g: Partita, pi: number, t: number): boolean {
+export function tappaPosabile(g: Partita, pi: number, t: number, conApertura = false): boolean {
   const gi = g.s.giocatori[pi];
   const terr = g.s.territori[t];
   if (gi.tappe[t] !== undefined) return false; // al massimo una per territorio
@@ -78,9 +81,10 @@ export function tappaPosabile(g: Partita, pi: number, t: number): boolean {
     const avv = g.s.giocatori[altro(pi)];
     if (gi.segnale === null || avv.turniGiocati <= gi.segnale) return false;
   }
-  if (gi.fazione === 'custodi') return terr.controllo === pi && terr.inst <= REGOLE.sogliaSigillo;
+  const spost = conApertura || gi.aperturaTappa ? 1 : 0;
+  if (gi.fazione === 'custodi') return terr.controllo === pi && terr.inst <= REGOLE.sogliaSigillo + spost;
   const mie = terr.presenze[pi];
-  return mie.length > 0 && forzaTerritorio(g, t, pi) >= forzaTerritorio(g, t, altro(pi)) && terr.inst >= REGOLE.sogliaSigillo;
+  return mie.length > 0 && forzaTerritorio(g, t, pi) >= forzaTerritorio(g, t, altro(pi)) && terr.inst >= REGOLE.sogliaSigillo - spost;
 }
 
 

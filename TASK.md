@@ -1,6 +1,6 @@
 ---
 id: CT-DOC-003
-fase: piano
+fase: esecuzione
 pronto: si
 branch: planning/ct-doc-003-riferimenti-protocollo
 scritto_da: Cowork (chat Claude del progetto)
@@ -12,6 +12,12 @@ data: 2026-11-01
 ## Documenti autorevoli
 - `docs/00_MASTER_INDEX.md` (APPROVED 0.6.0) e `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` (APPROVED), §5 Regole sui file.
 - Richiesta di Matteo in chat a Cowork il 2026-11-01 («3», cioè il task per README e Vision).
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («vai»). Risposte:
+1. Vision: strada **B** (stesso file V0.11, solo i due riferimenti cambiati).
+2. Sì alla nota: una riga che dica che sono stati aggiornati solo i riferimenti al protocollo (V0.1 → V0.4), il 2026-11-01. Se il file ha un changelog mettila lì, altrimenti nel formato di nota che il file già usa; `version` non cambia.
+Segui il pre-flight plan.
 
 ## Obiettivo
 Far puntare al protocollo in vigore (V0.4) i documenti che citano ancora la V0.1, senza cambiare nient'altro.

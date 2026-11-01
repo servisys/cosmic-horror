@@ -1,0 +1,1 @@
+Il task non ha campi fusioni/chiusure: nessuna delega, fusioni e chiusure restano bloccate.

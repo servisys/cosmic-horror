@@ -1,0 +1,12 @@
+{
+  "69": { "stato": "OPEN", "base": "main", "testa": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["docs/a.md", "docs/cartella/b.md"] },
+  "71": { "stato": "OPEN", "base": "main", "testa": "9999999999999999999999999999999999999999", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["docs/a.md"] },
+  "72": { "stato": "OPEN", "base": "feature/altro", "testa": "cccccccccccccccccccccccccccccccccccccccc", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["docs/a.md"] },
+  "73": { "stato": "OPEN", "base": "main", "testa": "dddddddddddddddddddddddddddddddddddddddd", "fondibile": "CONFLICTING", "bozza": false, "forkEsterno": false, "file": ["docs/a.md"] },
+  "74": { "stato": "OPEN", "base": "main", "testa": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["docs/a.md", "src/codice.js"] },
+  "75": { "stato": "MERGED", "base": "main", "testa": "ffffffffffffffffffffffffffffffffffffffff", "fondibile": "UNKNOWN", "bozza": false, "forkEsterno": false, "file": ["docs/a.md"] },
+  "76": { "stato": "OPEN", "base": "main", "testa": "1111111111111111111111111111111111111111", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["qualsiasi/cosa.md"] },
+  "80": { "stato": "OPEN", "base": "main", "testa": "2222222222222222222222222222222222222222", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["x.md"] },
+  "81": { "stato": "CLOSED", "base": "main", "testa": "3333333333333333333333333333333333333333", "fondibile": "UNKNOWN", "bozza": false, "forkEsterno": false, "file": ["x.md"] },
+  "99": { "stato": "OPEN", "base": "main", "testa": "4444444444444444444444444444444444444444", "fondibile": "MERGEABLE", "bozza": false, "forkEsterno": false, "file": ["y.md"] }
+}

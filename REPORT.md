@@ -1,5 +1,38 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-004 - fase piano - 2026-11-01 21:15 - FATTO
+
+**Resoconto CT-DEL-004, fase piano**
+
+**Richiesta eseguita:** controlli in sola lettura sulla PR 74. Non ho fuso né modificato nulla.
+
+**Verifiche (tutte positive):**
+- Protocollo V0.4: `status: APPROVED`.
+- PR 74 aperta, non draft, verso `main`.
+- Testa `ceebd6cfa0e90367f27144135372a58a3e649644`, uguale allo sha in `fusioni`.
+- GitHub la dà `MERGEABLE` e `CLEAN`, quindi senza conflitti.
+- File toccati: 20, tutti dentro `file_attesi_74`:
+  - `.gitignore`
+  - la cartella `docs/05-technical-design/04-build-deployment/`, con le guide Azure V0.1 e V0.2
+  - `CT_TECHNICAL_ARCHITECTURE_V0.1.md`
+  - `game/prototipo/`: `package.json`, `staticwebapp.config.json`, `siti-pubblicazione.json`, tre script in `scripts/`, tre file in `src/ui/`, `pubblica.test.ts`
+  - cinque file e `pubblica.conf.esempio` in `strumenti/mac-mini/`
+- Repository su `main`, pulito.
+
+**Branch e PR:** nessun branch, commit o push. La PR 74 resta com'è.
+
+**Non verificato:** gli esiti dei check di CI e il contenuto del diff. Mi sono fermato ai metadati di GitHub, come chiede il task.
+
+**Pre-flight plan:** il task è pronto. Nella fase esecuzione si ripetono gli stessi controlli, si chiude con FATTO e la fusione la esegue lo script. Rischi e domande aperte: nessuno.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-DEV-005 - fase esecuzione - 2026-11-01 20:58 - FATTO
 
 # Resoconto CT-DEV-005

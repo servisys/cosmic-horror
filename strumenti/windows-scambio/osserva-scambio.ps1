@@ -14,6 +14,7 @@
 # Uso: osserva-scambio.ps1 [-Stato] [-Riprova]
 #   -Stato    mostra a che punto e' (ultime righe del log, blocco, STATO.md)
 #   -Riprova  esegue di nuovo il TASK.md attuale anche se e' gia' stato eseguito
+#   -Prova <file.jsonl>  non lancia Code: mostra resoconto, comandi.txt e riga dei bloccati ricavati da un flusso salvato
 # Scritto per Windows PowerShell 5.1 (quello incluso in Windows). Solo caratteri ASCII in questo file.
 
 param(
@@ -22,6 +23,7 @@ param(
   [string]$Base = (Join-Path $env:USERPROFILE 'CosmicHorrorScambio'),
   [string]$Claude = '',
   [int]$TimeoutMinuti = 90,
+  [string]$Prova = '',
   [switch]$Stato,
   [switch]$Riprova
 )
@@ -33,12 +35,12 @@ $Branch = 'scambio'
 $StatoDir = Join-Path $Base 'stato'
 $LogDir = Join-Path $Base 'log'
 $RunDir = Join-Path $Base 'esecuzioni'
-New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null
+if (-not $Prova) { New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null }   # -Prova non crea nulla
 $Log = Join-Path $LogDir 'scambio.log'
 $Blocco = Join-Path $StatoDir 'blocco'
 $Fatti = Join-Path $StatoDir 'task-eseguiti.txt'
 $Vuoto = Join-Path $StatoDir 'vuoto.txt'
-if (-not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
+if (-not $Prova -and -not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
 
 # ---------------------------------------------------------------- utilita'
 
@@ -148,6 +150,97 @@ function Aggiungi-Report([string]$intestazione, [string]$corpo) {
   [IO.File]::WriteAllText($f, $nuovo.TrimEnd() + "`n", $Utf8)
 }
 
+# copre token e chiavi nel testo dei comandi (comandi.txt e riga pubblicata)
+function Copri-Segreti([string]$t) {
+  $t = $t -replace '(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,})', '[COPERTO]'
+  $t = $t -replace '(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{12,}', '$1[COPERTO]'
+  $t = $t -replace '(?i)((?:password|passwd|pwd|token|secret|api[_-]?key|apikey)\s*[=:]\s*)\S+', '$1[COPERTO]'
+  return $t
+}
+
+# legge il flusso stream-json di Claude Code (una riga json per evento) e ricava:
+#   Resoconto = testo finale; Comandi = testo di comandi.txt; Bloccati = comandi bloccati dai permessi; Totale = comandi provati
+# Formato atteso: eventi "assistant" con blocchi tool_use (id, name, input), eventi "user" con blocchi tool_result
+# (tool_use_id, content, is_error), evento finale "result" (result, permission_denials).
+function Estrai-Flusso([string]$file) {
+  $usi = New-Object System.Collections.ArrayList
+  $perId = @{}
+  $rifiutati = @{}
+  $resoconto = ''
+  $ultimoTesto = ''
+  foreach ($riga in [IO.File]::ReadAllLines($file, $Utf8)) {
+    if (-not $riga.Trim()) { continue }
+    try { $ev = $riga | ConvertFrom-Json } catch { continue }
+    if ($ev.type -eq 'assistant' -and $ev.message -and $ev.message.content -and -not ($ev.message.content -is [string])) {
+      foreach ($b in $ev.message.content) {
+        if ($b.type -eq 'text' -and $b.text) { $ultimoTesto = [string]$b.text }
+        elseif ($b.type -eq 'tool_use') {
+          $inp = $b.input
+          $testo = ''
+          if ($inp -and $inp.command) { $testo = [string]$inp.command }
+          else {
+            $arg = ''
+            if ($inp) {
+              foreach ($k in 'file_path', 'path', 'pattern') { if (-not $arg -and $inp.$k) { $arg = [string]$inp.$k } }
+            }
+            $testo = "[$($b.name)] $arg"
+          }
+          $uso = @{ Id = [string]$b.id; Nome = [string]$b.name; Testo = (Copri-Segreti $testo); Esito = 'SENZA ESITO' }
+          [void]$usi.Add($uso)
+          $perId[$uso.Id] = $uso
+        }
+      }
+    }
+    elseif ($ev.type -eq 'user' -and $ev.message -and $ev.message.content -and -not ($ev.message.content -is [string])) {
+      foreach ($b in $ev.message.content) {
+        if ($b.type -ne 'tool_result' -or -not $perId.ContainsKey([string]$b.tool_use_id)) { continue }
+        $uso = $perId[[string]$b.tool_use_id]
+        if ($b.is_error -eq $true) {
+          $c = ''
+          if ($b.content -is [string]) { $c = $b.content }
+          else { $c = (@($b.content) | ForEach-Object { $_.text }) -join ' ' }
+          # messaggi reali visti: 'This command requires approval', 'Permission to use Bash with command ... has been denied.', '... needs approval', '... contains multiple operations'; il segnale piu' sicuro e' comunque permission_denials dell'evento finale
+          if ($c -match "(?i)permission|haven't granted|not allowed|was denied|has been denied|requires? approval|needs approval|require approval|multiple operations") { $uso.Esito = 'BLOCCATO dai permessi' }
+          else { $uso.Esito = 'ERRORE' }
+        } else { $uso.Esito = 'eseguito' }
+      }
+    }
+    elseif ($ev.type -eq 'result') {
+      if ($ev.result) { $resoconto = [string]$ev.result }
+      foreach ($d in @($ev.permission_denials)) { if ($d -and $d.tool_use_id) { $rifiutati[[string]$d.tool_use_id] = $true } }
+    }
+  }
+  if (-not $resoconto.Trim()) { $resoconto = $ultimoTesto }
+  $righe = New-Object System.Collections.ArrayList
+  $bloccati = New-Object System.Collections.ArrayList
+  $n = 0
+  foreach ($u in $usi) {
+    $n++
+    if ($rifiutati.ContainsKey($u.Id)) { $u.Esito = 'BLOCCATO dai permessi' }
+    [void]$righe.Add(('{0}. [{1}]' -f $n, $u.Esito))
+    [void]$righe.Add($u.Testo)
+    [void]$righe.Add('')
+    if ($u.Esito -like 'BLOCCATO*') { [void]$bloccati.Add($u.Testo) }
+  }
+  $comandi = "Comandi provati da Claude Code: $n (bloccati: $($bloccati.Count))`n`n" + ($righe -join "`n")
+  return @{ Resoconto = $resoconto; Comandi = $comandi; Bloccati = @($bloccati); Totale = $n }
+}
+
+# riga da aggiungere in fondo al resoconto pubblicato: numero di comandi bloccati e i primi 5
+function Riga-Bloccati($info) {
+  $b = @($info.Bloccati)
+  $riga = "Comandi bloccati dai permessi: $($b.Count)"
+  if ($b.Count -gt 0) {
+    $primi = @($b | Select-Object -First 5 | ForEach-Object {
+      $t = ($_ -replace '\s+', ' ').Replace('`', "'").Trim()
+      if ($t.Length -gt 120) { $t = $t.Substring(0, 120) + '...' }
+      '`' + $t + '`'
+    })
+    $riga += '. Primi ' + $primi.Count + ': ' + ($primi -join '; ')
+  }
+  return $riga
+}
+
 # ---------------------------------------------------------------- regole fisse per Code
 
 $RegoleComuni = 'Sei Claude Code avviato in automatico dallo script di scambio di Cosmic Horror, senza nessuno davanti allo schermo. ' +
@@ -192,6 +285,19 @@ if ($Stato) {
   Write-Output ''
   Write-Output 'Ultime righe del log:'
   if (Test-Path $Log) { Get-Content $Log -Encoding UTF8 -Tail 20 }
+  exit 0
+}
+
+# ---------------------------------------------------------------- comando -Prova
+
+if ($Prova) {
+  $info = Estrai-Flusso $Prova
+  Write-Output '=== RESOCONTO ==='
+  Write-Output $info.Resoconto
+  Write-Output '=== COMANDI.TXT ==='
+  Write-Output $info.Comandi
+  Write-Output '=== RIGA PUBBLICATA ==='
+  Write-Output (Riga-Bloccati $info)
   exit 0
 }
 
@@ -263,7 +369,8 @@ try {
   $nomeRun = '{0}-{1}-{2}' -f $inizio.ToString('yyyyMMdd-HHmmss'), ($id -replace '[^A-Za-z0-9_-]', '_'), $fase
   $cartellaRun = Join-Path $RunDir $nomeRun
   New-Item -ItemType Directory -Force -Path $cartellaRun | Out-Null
-  $uscita = Join-Path $cartellaRun 'resoconto.md'
+  $uscita = Join-Path $cartellaRun 'flusso.jsonl'
+  $comandiFile = Join-Path $cartellaRun 'comandi.txt'
   $errori = Join-Path $cartellaRun 'errori.txt'
   Copy-Item $taskFile (Join-Path $cartellaRun 'TASK.md')
 
@@ -273,7 +380,7 @@ try {
 
   $argomenti = @(
     '-p', ('"' + $prompt + '"'),
-    '--output-format', 'text',
+    '--output-format', 'stream-json', '--verbose',
     '--add-dir', ('"' + $Scambio + '"'),
     '--allowedTools', ('"' + $tool + '"'),
     '--disallowedTools', ('"' + $ToolVietati + '"'),
@@ -294,13 +401,24 @@ try {
 
   $fine = Get-Date
   $corpo = ''
-  if (Test-Path $uscita) { $corpo = [IO.File]::ReadAllText($uscita, $Utf8) }
+  $rigaBloccati = ''
+  if (Test-Path $uscita) {
+    try {
+      $info = Estrai-Flusso $uscita
+      $corpo = $info.Resoconto
+      [IO.File]::WriteAllText($comandiFile, $info.Comandi + "`n", $Utf8)
+      $rigaBloccati = Riga-Bloccati $info
+    } catch {
+      Scrivi-Log "$id | estrazione dal flusso non riuscita: $($_.Exception.Message)"
+    }
+  }
   if (-not $corpo.Trim()) {
     $err = ''
     if (Test-Path $errori) { $err = [IO.File]::ReadAllText($errori, $Utf8).Trim() }
     if ($err.Length -gt 1500) { $err = $err.Substring($err.Length - 1500) }
     $corpo = "Claude Code non ha prodotto un resoconto. Ultime righe degli errori:`n`n``````text`n$err`n``````"
   }
+  if ($rigaBloccati) { $corpo = $corpo.TrimEnd() + "`n`n" + $rigaBloccati }
   $branchDopo = (Invoke-Git $Repo rev-parse --abbrev-ref HEAD).Out
   $durata = [int]($fine - $inizio).TotalMinutes
 

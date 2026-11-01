@@ -1,0 +1,24 @@
+=== RESOCONTO ===
+Richiesta eseguita in parte.
+
+Due comandi bloccati, un test fallito.
+=== COMANDI.TXT ===
+Comandi provati da Claude Code: 5 (bloccati: 2)
+
+1. [eseguito]
+[Read] C:\scambio\TASK.md
+
+2. [eseguito]
+git status
+
+3. [BLOCCATO dai permessi]
+git push origin main
+
+4. [BLOCCATO dai permessi]
+curl -H "Authorization: Bearer [COPERTO]" https://example.com && echo token=[COPERTO]
+
+5. [ERRORE]
+npm test
+
+=== RIGA PUBBLICATA ===
+Comandi bloccati dai permessi: 2. Primi 2: `git push origin main`; `curl -H "Authorization: Bearer [COPERTO]" https://example.com && echo token=[COPERTO]`

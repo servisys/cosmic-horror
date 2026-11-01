@@ -1,5 +1,32 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-004 - fase esecuzione - 2026-11-01 21:19 - FATTO
+
+Resoconto CT-DEL-004 (fase esecuzione)
+
+**Richiesta eseguita:** ripetuti in sola lettura i controlli sulla PR 74. Esito: FATTO. Non ho fuso nulla, la fusione la esegue lo script.
+
+**Verifiche (tutte positive):**
+- La PR 74 è aperta (`OPEN`) e punta a `main`.
+- La testa è `ceebd6cfa0e90367f27144135372a58a3e649644`, uguale allo sha indicato in `fusioni`.
+- GitHub la dà fondibile senza conflitti (`MERGEABLE`, `CLEAN`).
+- I 20 file toccati stanno tutti dentro `file_attesi_74`: `.gitignore`, il documento di architettura tecnica, `docs/05-technical-design/04-build-deployment/`, `game/prototipo/package.json`, `public/staticwebapp.config.json`, `scripts/`, `siti-pubblicazione.json`, `src/ui/`, `test/pubblica.test.ts` e `strumenti/mac-mini/`.
+- Il repository è su `main`, senza modifiche locali. Risulta indietro di 4 commit rispetto a `origin/main`, ma non l'ho aggiornato perché il task è in sola lettura.
+
+**Cosa è stato fatto:** nessuna modifica, commit, branch, push o PR.
+
+**Branch e PR:** nessun branch di lavoro. PR 74 non toccata.
+
+**Non verificato:** non ho lanciato test, perché il task non ne prevede. Non ho letto il contenuto del diff, solo l'elenco dei file.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- PR #74: FUSA (merge commit, testa ceebd6cfa0e90367f27144135372a58a3e649644).
+
+---
+
 ## CT-DEL-004 - fase piano - 2026-11-01 21:15 - FATTO
 
 **Resoconto CT-DEL-004, fase piano**

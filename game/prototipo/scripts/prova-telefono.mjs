@@ -7,7 +7,8 @@ import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { premiArea } from './pressione.mjs';
 
-const URL = process.argv[2];
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-telefono';
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({
@@ -82,11 +83,13 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
   for (let k = 0; k < 40 && giocate < 2; k++) {
     const m = await p.evaluate(() => window.__ct.suggerisci());
     if (m.t === 'fine') break;
+    if (m.t === 'pietre') { await tap('btn:pietre'); await tap(`pietre:${m.terr}:${m.segno > 0 ? 'piu' : 'meno'}`); continue; } // Pietre ritte di Dunwich
     if (m.t !== 'gioca') { await tap(m.t === 'tappa' ? `btn:tappa:${m.terr}` : 'btn:riduci'); continue; }
     const n0 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);
     await tap(`mano:${m.carta}`);
     if (await p.evaluate(() => window.__ct.zoomAttivo())) return { ok: false, dettaglio: 'anteprima aperta dopo il tocco su una carta' };
     if (m.terr !== undefined) await tap(`terr:${m.terr}`);
+    if (m.segno !== undefined && (await stabile().then(() => p.evaluate(() => !!window.__ct.aree()['segno:piu'])))) await tap(m.segno > 0 ? 'segno:piu' : 'segno:meno'); // Pietra Incisa
     if (m.pres !== undefined && (await stabile().then(() => p.evaluate((i) => !!window.__ct.aree()[i], `pres:${m.pres}`)))) await tap(`pres:${m.pres}`);
     if (m.cerca !== undefined) await tap(`cerca:${m.cerca}`);
     if (await stabile().then(() => p.evaluate(() => !!window.__ct.aree()['btn:gioca']))) await tap('btn:gioca');

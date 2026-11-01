@@ -72,6 +72,16 @@ export function datiTerritorio(c: Controller, i: number): DatiCarta {
   return { idImg: t.id, nome: t.nome, costo: null, forza: null, tipo: 'Territorio', effetto: t.effetto, citazione: t.citazione, schema: 'riserva', cosmica: false };
 }
 
+/** Illustrazione della carta; se manca ancora (T4r, T5r) un segnaposto coerente con il nome della carta, da sostituire quando arriva l'immagine. */
+function illustrazione(d: Disegno, dati: DatiCarta, x: number, y: number, w: number, h: number): void {
+  if (d.immagine(dati.idImg, x, y, w, h, 1, 0)) return;
+  const tv = TAV[dati.schema];
+  d.rett(x, y, w, h, 0, { r: 0, tex: texturaGradiente([[0, '#2b2114'], [1, '#14100a']], true) });
+  d.rett(x + 3 * d.u, y + 3 * d.u, w - 6 * d.u, h - 6 * d.u, 0, { r: 3 * d.u, alpha: 0.001, stroke: tv.luce, sw: 1, strokeAlpha: 0.55 });
+  const t = d.testo(dati.nome, x + w / 2, y + h / 2, 12.5, 0xe6dcc4, { titoli: true, bold: true, anchorX: 0.5, anchorY: 0.5, w: w - 14 * d.u, align: 'center' });
+  t.y = y + h / 2;
+}
+
 const RAPPORTO = 330 / 236;
 
 /** Altezza della scheda grande per una data larghezza. */
@@ -134,7 +144,7 @@ export function cartaGrande(d: Disegno, x: number, y: number, w: number, dati: D
   // illustrazione
   const ay = iy + hb + 1.5 * s;
   const ah = opz.completa ? 128 * s : ih * 0.4;
-  if (!d.immagine(dati.idImg, ix, ay, iw, ah, 1, 0)) d.rett(ix, ay, iw, ah, 0x222222, { r: 0 });
+  illustrazione(d, dati, ix, ay, iw, ah);
   d.rett(ix, ay + ah, iw, 2 * s, 0x3a2e18, { r: 0 });
   let yy = ay + ah + 2 * s;
   // barra del tipo
@@ -208,7 +218,7 @@ export function cartaRidotta(cont: Container, dd: Disegno, w: number, h: number,
   if (dati.costo !== null) gemma(d, w - p - 10 * u, p + hb / 2, 8.5 * u, String(dati.costo));
   const ay = p + hb + 1 * u;
   const ah = 62 * u;
-  if (!d.immagine(dati.idImg, p, ay, w - 2 * p, ah, 1, 0)) d.rett(p, ay, w - 2 * p, ah, 0x222222, { r: 0 });
+  illustrazione(d, dati, p, ay, w - 2 * p, ah);
   d.rett(p, ay + ah, w - 2 * p, 1.5 * u, 0x3a2e18, { r: 0 });
   const yb = ay + ah + 1.5 * u;
   d.rett(p, yb, w - 2 * p, h - p - yb, 0xefe6cf, { r: 3 * u });

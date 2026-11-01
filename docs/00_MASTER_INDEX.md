@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror — Master Index
 status: APPROVED
-version: 0.6.0
+version: 0.7.0
 owner: Team Cosmic Horror
 last_reviewed: 2026-11-01
 repository_scope: GitHub
@@ -187,7 +187,7 @@ Regole:
 | 2 | `CT_CORE_RULES_V0.x.md` (in `01-game-design/01-core-rules/`; la versione più alta è quella valida) | `APPROVED` |
 | 3 | `CT_LORE_BIBLE.md` | `APPROVED` |
 | 4 | `CT_MECHANICS_GLOSSARY.md` | `APPROVED` |
-| 5 | `CT_PROTOTYPE_SCOPE.md` | `APPROVED` |
+| 5 | `CT_PROTOTYPE_SCOPE_V0.x.md` (in `00-project-overview/02-roadmap/`; la versione più alta è quella valida) | `APPROVED` |
 | 6 | `CT_TECHNICAL_ARCHITECTURE.md` | `APPROVED` |
 | 7 | `CT_USER_FLOWS.md` | `APPROVED` |
 | 8 | `CT_ROADMAP.md` | `APPROVED` |
@@ -294,3 +294,4 @@ Claude deve produrre prima un pre-flight plan e, al termine, un Implementation R
 | 0.4.0 | DRAFT | Preparata da Cowork. §6: Vision e Core Rules indicate con il nome reale dei file versionati e la loro cartella. Nessun'altra modifica. |
 | 0.5.0 | APPROVED | Approvato da Matteo il 2026-11-01. Riferimenti al protocollo aggiornati a `CT_COWORK_CODE_PROTOCOL_V0.2.md`. Nessun'altra modifica. |
 | 0.6.0 | APPROVED | Approvato da Matteo il 2026-11-01. Riferimenti al protocollo aggiornati a `CT_COWORK_CODE_PROTOCOL_V0.4.md`. Nessun'altra modifica. |
+| 0.7.0 | APPROVED | CT-FEAT-001 (via di Matteo del 2026-11-01). §6, riga 5: lo scope del prototipo è indicato con il nome reale dei file versionati e la loro cartella (versione più alta valida, ora `CT_PROTOTYPE_SCOPE_V0.3.md`), come già per Vision e Core Rules. Documenti nuovi dei cinque territori: `CT_DECISION_LOG_CT_DES_069_073_V0.1.md` (CT-DES-069…074), `CT_CORE_RULES_V0.13.md`, `CT_PROTOTYPE_SCOPE_V0.3.md`, `CT_CARTE_PROTOTIPO_V0.7.yaml`. Nessun'altra modifica. |

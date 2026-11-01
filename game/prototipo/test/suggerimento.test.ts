@@ -151,6 +151,56 @@ describe('motivo per cui una carta non si puo\' giocare', () => {
   });
 });
 
+describe('cinque territori: R lyeh, ultima tappa e Pietre ritte (CT-DES-070, CT-DES-071)', () => {
+  const RLYEH = 4;
+  const DUNWICH = 3;
+  it('con 2 tappe il consiglio spiega che l ultima si fa solo a R lyeh e perche non ancora', () => {
+    const g = partita('custodi');
+    g.s.giocatori[0].tappe[0] = g.s.turniCompletati - 5;
+    g.s.giocatori[0].tappe[1] = g.s.turniCompletati - 5;
+    g.s.giocatori[0].segnale = 0;
+    mano(g, 0, 'CU01');
+    const s = sug(g)!;
+    expect(s.tipo).toBe('ultima-tappa');
+    expect(s.testo).toContain("solo a R'lyeh");
+    expect(s.testo).toContain('non controlli');
+  });
+  it('l avversario a 2 tappe: il consiglio indica R lyeh', () => {
+    for (const [f, parola] of [['custodi', 'rito'], ['risvegliati', 'Sigillo']] as const) {
+      const g = partita(f);
+      g.s.giocatori[1].tappe[0] = g.s.turniCompletati;
+      g.s.giocatori[1].tappe[1] = g.s.turniCompletati;
+      g.s.giocatori[1].segnale = 0;
+      mano(g, 0, 'CU01');
+      const s = sug(g)!;
+      expect(s.tipo).toBe('avversario-un-passo');
+      expect(s.testo).toContain("R'lyeh");
+      expect(s.testo).toContain(parola);
+    }
+  });
+  it('motivo della tappa: R lyeh con meno di 2 tappe, esterni con 2 tappe', () => {
+    const g = partita('custodi');
+    presenza(g, 0, RLYEH, 'CU03');
+    presenza(g, 0, 0, 'CU03');
+    const v = creaVista(g, 0);
+    expect(motivoTappa(v, v.territori[RLYEH])).toBe('prima servono 2 tappe');
+    g.s.giocatori[0].tappe[1] = g.s.turniCompletati - 5;
+    g.s.giocatori[0].tappe[2] = g.s.turniCompletati - 5;
+    const w = creaVista(g, 0);
+    expect(motivoTappa(w, w.territori[0])).toBe("ora solo a R'lyeh");
+  });
+  it('Pietre ritte: il consiglio le ricorda a chi controlla Dunwich', () => {
+    const g = partita('custodi');
+    presenza(g, 0, DUNWICH, 'CU03');
+    g.s.giocatori[0].tappe[DUNWICH] = g.s.turniCompletati - 5; // Sigillo gia' consolidato: li' non c'e' altro da fare
+    mano(g, 0);
+    expect(sug(g)?.tipo).toBe('pietre-ritte');
+  });
+  it('il tutorial dice che l ultima tappa e a R lyeh', () => {
+    for (const f of ['custodi', 'risvegliati'] as const) expect(passiTutorial(f)[0].testo).toContain("R'lyeh");
+  });
+});
+
 describe('tutorial', () => {
   it('6 passi per fazione, con testi brevi e le aree da evidenziare', () => {
     for (const f of ['custodi', 'risvegliati'] as const) {

@@ -10,7 +10,7 @@ describe('eventi cosmici', () => {
     const g = nuova();
     inst(g, 1, 2);
     risolviEventoDi(g, 'E01');
-    expect(insts(g)).toEqual([0, 3, 0]);
+    expect(insts(g)).toEqual([0, 3, 0, 0, 0]);
   });
   it('E02 Nebbia dal Mare: sul territorio con piu presenze -1 forza fino alla fine del giro successivo', () => {
     const g = nuova();
@@ -39,12 +39,12 @@ describe('eventi cosmici', () => {
     const g = nuova();
     inst(g, 2, 3);
     risolviEventoDi(g, 'E04');
-    expect(insts(g)).toEqual([1, 1, 3]);
+    expect(insts(g)).toEqual([1, 1, 3, 1, 1]);
   });
   it('E05 Il Meteorite: la Landa Maledetta +1', () => {
     const g = nuova();
     risolviEventoDi(g, 'E05');
-    expect(insts(g)).toEqual([0, 0, 1]);
+    expect(insts(g)).toEqual([0, 0, 1, 0, 0]);
   });
   it('E06 Rivelazione: ogni giocatore pesca 1 carta', () => {
     const g = nuova();
@@ -58,7 +58,7 @@ describe('eventi cosmici', () => {
     const g = nuova();
     inst(g, 0, 1);
     risolviEventoDi(g, 'E07');
-    expect(insts(g)).toEqual([3, 0, 0]);
+    expect(insts(g)).toEqual([3, 0, 0, 0, 0]);
   });
   it('E08 Shoggoth Affamato: il piu esposto elimina la propria presenza con forza piu bassa', () => {
     const g = nuova();
@@ -74,7 +74,7 @@ describe('eventi cosmici', () => {
   it('E09 Le Stelle si Allineano: tutti i territori +1', () => {
     const g = nuova();
     risolviEventoDi(g, 'E09');
-    expect(insts(g)).toEqual([1, 1, 1]);
+    expect(insts(g)).toEqual([1, 1, 1, 1, 1]);
   });
   it('E10 Luci sulla Scogliera del Diavolo: chi controlla Innsmouth esposizione +1', () => {
     const g = nuova();
@@ -120,7 +120,7 @@ describe('eventi cosmici', () => {
     presenza(g, 1, 2, 'RI09'); // 0
     presenza(g, 1, 2, 'RI04'); // 4
     risolviEventoDi(g, 'E15');
-    expect(insts(g)).toEqual([1, 1, 1]);
+    expect(insts(g)).toEqual([1, 1, 1, 1, 1]);
     expect(totPresenze(g, 0, 0)).toBe(1);
     expect(totPresenze(g, 1, 0)).toBe(0);
     expect(totPresenze(g, 2, 1)).toBe(1);
@@ -140,7 +140,7 @@ describe('eventi cosmici', () => {
     esposizione(g, 1, 6);
     const n = g.s.giocatori[1].mano.length;
     risolviEventoDi(g, 'E17');
-    expect(insts(g)).toEqual([1, 1, 1]);
+    expect(insts(g)).toEqual([1, 1, 1, 1, 1]);
     expect(g.s.giocatori[1].mano.length).toBe(n + 1 - 1);
   });
   it('E18 Il Sogno di Cthulhu: entrambi +1 esposizione; il piu esposto +1 in piu', () => {
@@ -155,7 +155,7 @@ describe('eventi cosmici', () => {
     inst(g, 0, 3);
     inst(g, 1, 1);
     risolviEventoDi(g, 'E19');
-    expect(insts(g)).toEqual([2, 0, 0]);
+    expect(insts(g)).toEqual([2, 0, 0, 0, 0]);
   });
   it('E20 Yog-Sothoth e la Porta: il piu esposto, due carte del mazzo si trasformano', () => {
     const g = nuova();

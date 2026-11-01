@@ -14,15 +14,21 @@ describe('illustrazioni', () => {
   }
   for (const id of cat.eventi.keys()) attesi.push(id);
   for (const t of cat.dati.territori) attesi.push(t.id);
+  // Dunwich e R'lyeh (e le loro riserve) sono nei dati dalla V0.7 ma le illustrazioni si faranno dopo con ComfyUI (CT-FEAT-001):
+  // l'interfaccia usera' un segnaposto (CT-FEAT-002). Quando i file arrivano, vanno tolti da questa lista.
+  const inAttesa = ['T4', 'T5', 'T4r', 'T5r'];
+  const richiesti = attesi.filter((id) => !inAttesa.includes(id));
 
   it('ogni carta (anche cosmica), evento e territorio ha un file WebP con nome = id', () => {
-    const mancanti = attesi.filter((id) => !existsSync(join(CARTELLA, id + '.webp')));
+    const mancanti = richiesti.filter((id) => !existsSync(join(CARTELLA, id + '.webp')));
     expect(mancanti).toEqual([]);
-    expect(attesi.length).toBe(71);
+    expect(richiesti.length).toBe(71);
+    expect(attesi.length).toBe(75);
   });
   it('non ci sono file di troppo', () => {
     const presenti = readdirSync(CARTELLA).map((f) => f.replace('.webp', '')).sort();
-    expect(presenti).toEqual([...attesi].sort());
+    const previsti = attesi.filter((id) => !inAttesa.includes(id) || presenti.includes(id));
+    expect(presenti).toEqual([...previsti].sort());
   });
   it('sono leggere: ognuna sotto 120 KB e il totale sotto 4 MB', () => {
     let tot = 0;

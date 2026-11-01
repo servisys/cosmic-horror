@@ -6,8 +6,10 @@ import {
   assicuraMazzetto, creaMazzettiEventi, effettiCosmiciTerritori, instabilitaCrescente, risolviEvento, scadenze,
 } from './eventi.js';
 import { addEsp, addInst, aggiornaControllo, aggiungiTappa, pesca } from './operazioni.js';
-import { costoTappa, eff, log, numControllati, tappaPosabile, type Partita } from './queries.js';
-import { faseDelGiro, REGOLE } from './regole.js';
+import {
+  costoTappa, eff, idTerr, indiceTerr, log, numControllati, pietreRitte, tappaPosabile, type Partita,
+} from './queries.js';
+import { faseDelGiro, REGOLE, TERR } from './regole.js';
 import { casuale, mescola } from './rng.js';
 import {
   NUM_TERR, type CartaIst, type Giocatore, type Mossa, type Passo, type Presenza, type Stato, type TerritorioStato,
@@ -50,12 +52,12 @@ export function creaPartita(cat: Catalogo, opz: OpzioniPartita): Partita {
   const ordine: FazioneId[] = primo === 'custodi' ? ['custodi', 'risvegliati'] : ['risvegliati', 'custodi'];
   s.giocatori = ordine.map((f): Giocatore => ({
     fazione: f, mazzo: mazzi[f], mano: [], scarti: [], esposizione: 0, energia: 0, turniGiocati: 0, tappe: {},
-    segnale: null, esposizioneRidottaInTurno: false, aperturaTappa: false, eventiVisti: [],
+    segnale: null, esposizioneRidottaInTurno: false, pietreUsateInTurno: false, aperturaTappa: false, eventiVisti: [],
   })) as [Giocatore, Giocatore];
   s.territori = cat.dati.territori.map((t): TerritorioStato => ({
     inst: 0, presenze: [[], []], controllo: null, malus: 0, malusFinoAlGiro: 0,
     riserva: t.riserva.flatMap((r) => Array.from({ length: r.copie }, () => nuovaCarta(s, r.id))),
-  })) as [TerritorioStato, TerritorioStato, TerritorioStato];
+  }));
   // mano iniziale: 5 carte, il secondo giocatore ne pesca 1 in piu'
   for (let p = 0; p < 2; p++) pesca(g, p, REGOLE.manoIniziale + p);
   log(g, `Partita con seme ${opz.seme}: apre ${s.giocatori[0].fazione}`);
@@ -104,6 +106,7 @@ export function mosseLegali(g: Partita): Mossa[] {
   for (let t = 0; t < NUM_TERR; t++) {
     if (tappaPosabile(g, pi, t) && costoTappa(g, pi, t) <= gi.energia) out.push({ t: 'tappa', terr: t });
   }
+  for (const p of pietreRitte(g, pi)) out.push({ t: 'pietre', ...p });
   if (gi.energia >= REGOLE.costoRiduzione && !gi.esposizioneRidottaInTurno && gi.esposizione > 0) out.push({ t: 'riduci' });
   out.push({ t: 'fine' });
   return out;
@@ -163,19 +166,26 @@ function eseguiMossa(g: Partita, pi: number, m: Mossa): void {
       aggiungiTappa(g, pi, m.terr);
       return;
     }
+    case 'pietre':
+      gi.energia -= REGOLE.costoPietreRitte;
+      gi.pietreUsateInTurno = true;
+      log(g, `${gi.fazione} usa le Pietre ritte di Dunwich: instabilita' di ${g.cat.dati.territori[m.terr].nome} ${m.segno > 0 ? '+1' : '-1'}`);
+      addInst(g, m.terr, m.segno);
+      return;
     case 'gioca': {
       const i = gi.mano.findIndex((x) => x.uid === m.carta);
       const c = gi.mano[i];
       const ce = eff(g, c);
       gi.energia -= ce.costo;
       gi.mano.splice(i, 1);
-      const par: Param = { terr: m.terr, pres: m.pres, cerca: m.cerca };
+      const par: Param = { terr: m.terr, pres: m.pres, cerca: m.cerca, segno: m.segno };
       log(g, `${gi.fazione} gioca ${ce.nome}`);
-      // carta potente: esposizione e, se coinvolge un territorio, instabilita' (+1 in piu' alla Landa Maledetta)
+      // carta potente: esposizione e, se coinvolge un territorio, instabilita' (+1 in piu' alla Landa Maledetta;
+      // a R'lyeh, La citta' dormiente, +1 in piu' di esposizione per chi la gioca)
       if (ce.potente) {
-        addEsp(g, pi, ce.potente);
         const t = territorioPerPotente(g, m);
-        if (t !== undefined) addInst(g, t, 1 + (t === 2 ? 1 : 0));
+        addEsp(g, pi, ce.potente + (t !== undefined && idTerr(g, t) === TERR.rlyeh ? REGOLE.espExtraRlyeh : 0));
+        if (t !== undefined) addInst(g, t, 1 + (idTerr(g, t) === TERR.landa ? 1 : 0));
       }
       if (ce.tipo === 'presenza') {
         const pres: Presenza = { uid: s.prossimoUid++, carta: c, bonus: 0 };
@@ -214,12 +224,13 @@ function passo(g: Partita, p: Passo): void {
       const extra = numControllati(g, pi) >= REGOLE.extraTerritori.minimo ? REGOLE.extraTerritori.energia : 0;
       gi.energia = base + extra;
       gi.esposizioneRidottaInTurno = false;
+      gi.pietreUsateInTurno = false;
       gi.aperturaTappa = false;
       log(g, `--- Giro ${s.giro}, turno di ${gi.fazione}: energia ${gi.energia}`);
       return;
     }
     case 'inizio_pesca':
-      pesca(g, pi, 1 + (s.territori[0].controllo === pi ? 1 : 0));
+      pesca(g, pi, 1 + (s.territori[indiceTerr(g, TERR.innsmouth)].controllo === pi ? 1 : 0));
       return;
     case 'inizio_effetti':
       for (let t = 0; t < NUM_TERR; t++) {

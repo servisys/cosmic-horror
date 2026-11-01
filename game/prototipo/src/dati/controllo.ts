@@ -1,5 +1,6 @@
 // Controllo dei dati: segnala dati mancanti o sbagliati e testi di effetto che non corrispondono piu' al codice.
 import { TESTI_EFFETTO } from '../motore/effetti.js';
+import { TERR } from '../motore/regole.js';
 import { TESTI_EVENTO } from '../motore/testi-eventi.js';
 import type { CartaDef, Citazione, Dati } from './tipi.js';
 
@@ -76,7 +77,10 @@ export function controllaDati(d: Dati): EsitoControllo {
     if (tot !== 40) e.push(`${f.id}: il mazzo ha ${tot} carte invece di 40 (CT-DES-025)`);
   }
   // territori
-  if (!Array.isArray(d.territori) || d.territori.length !== 3) e.push('Servono esattamente 3 territori (CT-DES-022)');
+  if (!Array.isArray(d.territori) || d.territori.length !== 5) e.push('Servono esattamente 5 territori (CT-DES-069)');
+  else if (d.territori.map((t) => t.id).join(',') !== Object.values(TERR).join(',')) {
+    e.push(`I territori devono essere nell'ordine ${Object.values(TERR).join(', ')} (gli effetti si agganciano all'id)`);
+  }
   for (const t of d.territori ?? []) {
     const dove = `territorio ${t.id}`;
     unico(t.id, dove);

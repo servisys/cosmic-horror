@@ -4,7 +4,8 @@ import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { pressioneMouse } from './pressione.mjs';
 
-const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-tappa4';
 mkdirSync(OUT, { recursive: true });
 const VISTE = [{ nome: '956x440', w: 956, h: 440 }, { nome: '1280x800', w: 1280, h: 800 }];
@@ -85,9 +86,11 @@ for (const vista of VISTE) {
     if (m.t === 'fine') await clic('btn:fine');
     else if (m.t === 'riduci') await clic('btn:riduci');
     else if (m.t === 'tappa') await clic(`btn:tappa:${m.terr}`);
+    else if (m.t === 'pietre') { await clic('btn:pietre'); await clic(`pietre:${m.terr}:${m.segno > 0 ? 'piu' : 'meno'}`); } // Pietre ritte di Dunwich
     else if (m.t === 'gioca') {
       await clic(`mano:${m.carta}`);
       if (m.terr !== undefined) await clic(`terr:${m.terr}`);
+      if (m.segno !== undefined && (await esiste('segno:piu'))) await clic(m.segno > 0 ? 'segno:piu' : 'segno:meno'); // Pietra Incisa
       if (m.pres !== undefined && (await esiste(`pres:${m.pres}`))) await clic(`pres:${m.pres}`);
       if (m.cerca !== undefined) await clic(`cerca:${m.cerca}`);
       if (await esiste('btn:gioca')) await clic('btn:gioca');

@@ -1,6 +1,6 @@
 ---
 title: Cosmic Horror - Regole base (Core Rules)
-status: APPROVED
+status: DEPRECATED
 version: 0.12.0
 owner: Matteo
 prepared_by: Cowork

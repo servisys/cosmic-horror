@@ -1,14 +1,16 @@
 // Forza cosmica: eventi di fine giro, instabilita' crescente ed effetti cosmici dei territori (Core Rules §6, §7, §11).
 import { addEsp, addInst, aggiornaControllo, elimina, pesca, scartaCasuale, trasforma } from './operazioni.js';
-import { esposizionePiuAlta, forzaPresenza, log, tuttePresenze, type Partita } from './queries.js';
-import { faseDelGiro, REGOLE } from './regole.js';
+import { esposizionePiuAlta, forzaPresenza, idTerr, indiceTerr, log, tuttePresenze, type Partita } from './queries.js';
+import { faseDelGiro, REGOLE, TERR } from './regole.js';
 import { mescola, scegli } from './rng.js';
 import { NUM_TERR, type Mazzetto } from './stato.js';
+
+const tuttiITerritori = (): number[] => Array.from({ length: NUM_TERR }, (_, t) => t);
 
 /** Territorio piu' instabile; in parita' sorteggio con il seme della partita. */
 function piuInstabile(g: Partita): number {
   const m = Math.max(...g.s.territori.map((t) => t.inst));
-  const c = [0, 1, 2].filter((t) => g.s.territori[t].inst === m);
+  const c = tuttiITerritori().filter((t) => g.s.territori[t].inst === m);
   return c.length === 1 ? c[0] : scegli(g.s, c);
 }
 
@@ -50,8 +52,8 @@ export function risolviEvento(g: Partita): void {
     case 'E02': {
       // Sul territorio con piu' presenze (in parita' sorteggio): -1 forza a tutte fino alla fine del giro successivo.
       const n = (t: number) => g.s.territori[t].presenze[0].length + g.s.territori[t].presenze[1].length;
-      const m = Math.max(n(0), n(1), n(2));
-      const c = [0, 1, 2].filter((t) => n(t) === m);
+      const m = Math.max(...tuttiITerritori().map(n));
+      const c = tuttiITerritori().filter((t) => n(t) === m);
       const t = c.length === 1 ? c[0] : scegli(g.s, c);
       g.s.territori[t].malus = 1;
       g.s.territori[t].malusFinoAlGiro = g.s.giro + 1;
@@ -59,7 +61,7 @@ export function risolviEvento(g: Partita): void {
     }
     case 'E03': for (const p of piuEsposti) scartaCasuale(g, p, 1); break;
     case 'E04': for (let t = 0; t < NUM_TERR; t++) if (g.s.territori[t].inst === 0) addInst(g, t, 1); break;
-    case 'E05': addInst(g, 2, 1); break;
+    case 'E05': addInst(g, indiceTerr(g, TERR.landa), 1); break;
     case 'E06': for (const p of [0, 1]) pesca(g, p, 1); break;
     case 'E07': addInst(g, piuInstabile(g), 2); break;
     case 'E08':
@@ -74,7 +76,7 @@ export function risolviEvento(g: Partita): void {
       }
       break;
     case 'E09': for (let t = 0; t < NUM_TERR; t++) addInst(g, t, 1); break;
-    case 'E10': { const c = g.s.territori[0].controllo; if (c !== null) addEsp(g, c, 1); break; }
+    case 'E10': { const c = g.s.territori[indiceTerr(g, TERR.innsmouth)].controllo; if (c !== null) addEsp(g, c, 1); break; }
     case 'E11': for (const p of piuEsposti) scartaCasuale(g, p, 2); break;
     case 'E12': for (const p of piuEsposti) trasforma(g, p, 1); break;
     case 'E13': {
@@ -135,11 +137,32 @@ export function effettiCosmiciTerritori(g: Partita): void {
   for (let t = 0; t < NUM_TERR; t++) {
     if (g.s.territori[t].inst !== REGOLE.sogliaEffettoCosmico) continue;
     const c = g.s.territori[t].controllo;
-    if (t === 0 && c !== null) addEsp(g, c, 1);
-    else if (t === 1 && c !== null) scartaCasuale(g, c, 1);
-    else if (t === 2) {
-      const v = tuttePresenze(g).filter((x) => x.t === 2 && forzaPresenza(g, 2, x.pi, x.p) <= 1);
-      for (const x of v) elimina(g, x.t, x.pi, x.p, 'La Landa Maledetta');
+    switch (idTerr(g, t)) {
+      case TERR.innsmouth:
+        if (c !== null) addEsp(g, c, 1);
+        break;
+      case TERR.biblioteca:
+        if (c !== null) scartaCasuale(g, c, 1);
+        break;
+      case TERR.landa: {
+        const v = tuttePresenze(g).filter((x) => x.t === t && forzaPresenza(g, t, x.pi, x.p) <= 1);
+        for (const x of v) elimina(g, x.t, x.pi, x.p, 'La Landa Maledetta');
+        break;
+      }
+      case TERR.dunwich: {
+        // L'Orrore di Dunwich (CT-DES-073): via la presenza con forza piu' alta (di entrambi i giocatori); a parita' tutte quelle con quella forza.
+        const pres = tuttePresenze(g).filter((x) => x.t === t);
+        if (!pres.length) break;
+        const f = (x: (typeof pres)[number]) => forzaPresenza(g, x.t, x.pi, x.p);
+        const max = Math.max(...pres.map(f));
+        for (const x of pres.filter((y) => f(y) === max)) elimina(g, x.t, x.pi, x.p, "L'Orrore di Dunwich (instabilita' 5)");
+        break;
+      }
+      case TERR.rlyeh:
+        // Cthulhu si agita (CT-DES-073): +1 esposizione a entrambi i giocatori.
+        log(g, "Cthulhu si agita: R'lyeh e' a instabilita' 5");
+        for (const p of [0, 1]) addEsp(g, p, REGOLE.espCosmicoRlyeh);
+        break;
     }
   }
   aggiornaControllo(g);

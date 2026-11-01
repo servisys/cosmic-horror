@@ -1,6 +1,6 @@
 // Funzioni di sola lettura sullo stato (forza, controllo, tappe) e piccole operazioni di base.
 import { carta, type Catalogo, type CartaEff } from './catalogo.js';
-import { REGOLE } from './regole.js';
+import { REGOLE, TERR, type TerrId } from './regole.js';
 import type { CartaIst, Presenza, Stato } from './stato.js';
 import { NUM_TERR } from './stato.js';
 
@@ -16,6 +16,16 @@ export function log(g: Partita, msg: string): void {
 }
 
 export const altro = (pi: number): number => 1 - pi;
+
+/** Id del territorio (T1...T5) di un indice. Gli effetti dei territori si agganciano all'id (CT-DES-069). */
+export const idTerr = (g: Partita, t: number): string => g.cat.dati.territori[t].id;
+
+/** Indice del territorio con quell'id nei dati. */
+export function indiceTerr(g: Partita, id: TerrId): number {
+  const i = g.cat.dati.territori.findIndex((x) => x.id === id);
+  if (i < 0) throw new Error('Territorio sconosciuto: ' + id);
+  return i;
+}
 
 /** Forza effettiva di una presenza (mai sotto 0). */
 export function forzaPresenza(g: Partita, t: number, pi: number, p: Presenza): number {
@@ -66,8 +76,13 @@ export function costoTappa(g: Partita, pi: number, t: number): number {
   return Math.max(0, c);
 }
 
-/**
+/** L'ultima tappa e' ammessa solo dopo il turno di avviso dell'avversario (CT-DES-015): il segnale c'e' e l'avversario ha giocato un turno intero dopo. */
+export function ultimaTappaSbloccata(g: Partita, pi: number): boolean {
+  const gi = g.s.giocatori[pi];
+  return gi.segnale !== null && g.s.giocatori[altro(pi)].turniGiocati > gi.segnale;
+}
 
+/**
  * Condizioni per porre un Sigillo (Custodi) o completare un rito (Risvegliati) sul territorio t, escluso il costo (CT-DES-055, CT-DES-015).
  * Con la Formula di Dho-Hna / lo Studio del Necronomicon la soglia di instabilita' si sposta di 1 per il turno (CT-DES-068);
  * `conApertura` forza lo spostamento (serve a sapere cosa permetterebbe giocare la carta).
@@ -76,17 +91,36 @@ export function tappaPosabile(g: Partita, pi: number, t: number, conApertura = f
   const gi = g.s.giocatori[pi];
   const terr = g.s.territori[t];
   if (gi.tappe[t] !== undefined) return false; // al massimo una per territorio
-  if (numTappe(g, pi) >= REGOLE.tappeVittoria - 1) {
-    // L'ultima tappa e' possibile solo dopo il turno di avviso dell'avversario.
-    const avv = g.s.giocatori[altro(pi)];
-    if (gi.segnale === null || avv.turniGiocati <= gi.segnale) return false;
-  }
+  // CT-DES-070: le prime due tappe sui territori esterni, la terza (quella che fa vincere) solo a R'lyeh;
+  // a R'lyeh non si fa una tappa prima di averne due (se ne perdi una, devi tornare a due).
+  const ultima = numTappe(g, pi) >= REGOLE.tappeVittoria - 1;
+  if ((idTerr(g, t) === TERR.rlyeh) !== ultima) return false;
+  if (ultima && !ultimaTappaSbloccata(g, pi)) return false;
   const spost = conApertura || gi.aperturaTappa ? 1 : 0;
   if (gi.fazione === 'custodi') return terr.controllo === pi && terr.inst <= REGOLE.sogliaSigillo + spost;
   const mie = terr.presenze[pi];
   return mie.length > 0 && forzaTerritorio(g, t, pi) >= forzaTerritorio(g, t, altro(pi)) && terr.inst >= REGOLE.sogliaSigillo - spost;
 }
 
+
+/**
+ * Pietre ritte (Dunwich, CT-DES-071, CT-DES-073): chi controlla Dunwich al momento della mossa, una volta per turno,
+ * spende 1 energia per alzare o abbassare di 1 l'instabilita' di un territorio diverso da Dunwich. Non fa salire l'esposizione.
+ * Si elencano solo i cambi che modificano davvero l'instabilita'.
+ */
+export function pietreRitte(g: Partita, pi: number): { terr: number; segno: 1 | -1 }[] {
+  const gi = g.s.giocatori[pi];
+  const dun = indiceTerr(g, TERR.dunwich);
+  if (gi.pietreUsateInTurno || gi.energia < REGOLE.costoPietreRitte || g.s.territori[dun].controllo !== pi) return [];
+  const out: { terr: number; segno: 1 | -1 }[] = [];
+  for (let t = 0; t < NUM_TERR; t++) {
+    if (t === dun) continue;
+    const inst = g.s.territori[t].inst;
+    if (inst < REGOLE.instMax) out.push({ terr: t, segno: 1 });
+    if (inst > 0) out.push({ terr: t, segno: -1 });
+  }
+  return out;
+}
 
 export function tuttePresenze(g: Partita): { t: number; pi: number; p: Presenza }[] {
   const out: { t: number; pi: number; p: Presenza }[] = [];

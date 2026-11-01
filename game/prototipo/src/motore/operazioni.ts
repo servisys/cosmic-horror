@@ -1,6 +1,6 @@
 // Operazioni elementari che cambiano lo stato: esposizione, instabilita', pesca, trasformazioni, eliminazioni, controllo.
-import { eff, forzaTerritorio, log, numTappe, altro, type Partita } from './queries.js';
-import { REGOLE } from './regole.js';
+import { eff, forzaTerritorio, idTerr, log, numTappe, altro, type Partita } from './queries.js';
+import { REGOLE, TERR } from './regole.js';
 import { intero, mescola } from './rng.js';
 import { NUM_TERR, type CartaIst, type Presenza } from './stato.js';
 
@@ -83,7 +83,7 @@ export function aggiornaControllo(g: Partita): void {
         log(g, `${gi.fazione}: prende una carta di riserva`);
       }
       // La Biblioteca della Miskatonic (T2): pesca 1 carta, poi guarda le prime 3 del mazzo e le riordina (CT-DES-058)
-      if (t === 1) {
+      if (idTerr(g, t) === TERR.biblioteca) {
         pesca(g, nuovo, 1);
         if (gi.mazzo.length >= 2) {
           const top = gi.mazzo.slice(-3).reverse().map((c) => c.uid);

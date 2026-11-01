@@ -6,7 +6,8 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-const URL = process.argv[2];
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-aiuti';
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({
@@ -128,7 +129,7 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
         }
       }
       // bottone Sigillo/rito: illuminato (utilizzabile) o spento
-      for (let t = 0; t < 3; t++) {
+      for (let t = 0; t < 5; t++) {
         const pu = await p.evaluate((i) => window.__ct.ctrl.puoTappa(i), t);
         const chiave = pu ? 'bottone-acceso' : 'bottone-spento';
         if (!trovati.has(chiave)) { trovati.set(chiave, 1); await p.screenshot({ path: `${OUT}/${chiave}_${fazione}.png` }); }
@@ -152,9 +153,11 @@ await prova('suggerimenti, bottoni e motivi durante partite complete', async () 
       if (m.t === 'fine') await a.tap('btn:fine');
       else if (m.t === 'riduci') await a.tap('btn:riduci');
       else if (m.t === 'tappa') await a.tap(`btn:tappa:${m.terr}`);
+      else if (m.t === 'pietre') { await a.tap('btn:pietre'); await a.tap(`pietre:${m.terr}:${m.segno > 0 ? 'piu' : 'meno'}`); } // Pietre ritte di Dunwich
       else if (m.t === 'gioca') {
         await a.tap(`mano:${m.carta}`);
         if (m.terr !== undefined) await a.tap(`terr:${m.terr}`);
+        if (m.segno !== undefined && (await a.ha('segno:piu'))) await a.tap(m.segno > 0 ? 'segno:piu' : 'segno:meno'); // Pietra Incisa
         if (m.pres !== undefined && (await a.ha(`pres:${m.pres}`))) await a.tap(`pres:${m.pres}`);
         if (m.cerca !== undefined) await a.tap(`cerca:${m.cerca}`);
         if (await a.ha('btn:gioca')) await a.tap('btn:gioca');

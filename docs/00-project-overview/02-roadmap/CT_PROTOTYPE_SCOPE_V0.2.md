@@ -1,7 +1,8 @@
 ---
 title: Cosmic Horror - Specifica del primo prototipo giocabile
-status: APPROVED
+status: DEPRECATED
 version: 0.2.0
+superseded_by: CT_PROTOTYPE_SCOPE_V0.3.md
 owner: Matteo
 prepared_by: Cowork
 project_prefix: CT_

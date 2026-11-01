@@ -2,12 +2,12 @@
 // il testo con cui e' stato scritto. Il controllo dei dati (src/dati/controllo.ts) segnala se un testo nei file cambia.
 import { addEsp, addInst, aggiornaControllo, aggiungiTappa, elimina, pesca, togliTappa } from './operazioni.js';
 import {
-  altro, eff, forzaPresenza, forzaTerritorio, log, tappaPosabile, tappaTogliibile, tuttePresenze, type Partita,
+  altro, eff, forzaPresenza, forzaTerritorio, indiceTerr, log, tappaPosabile, tappaTogliibile, tuttePresenze, type Partita,
 } from './queries.js';
-import { faseDelGiro, REGOLE } from './regole.js';
+import { faseDelGiro, REGOLE, TERR } from './regole.js';
 import { NUM_TERR, type CartaIst, type Mossa, type Presenza } from './stato.js';
 
-export type Param = { terr?: number; pres?: number; cerca?: string };
+export type Param = { terr?: number; pres?: number; cerca?: string; segno?: 1 | -1 };
 
 /** Testi degli effetti con cui e' scritto il codice qui sotto: [normale, cosmica]. */
 export const TESTI_EFFETTO: Record<string, [string, string?]> = {
@@ -50,6 +50,8 @@ export const TESTI_EFFETTO: Record<string, [string, string?]> = {
   T1r: ['Peschi 1 carta e vedi il tipo dei prossimi 2 eventi cosmici.'],
   T2r: ['Cerca nel tuo mazzo una carta azione e mettila in mano.'],
   T3r: ['+1 energia in questo turno.'],
+  T4r: ["Instabilita' di un territorio +1 o -1, a tua scelta."],
+  T5r: ["Una tua presenza a R'lyeh ha +2 forza fino a fine partita."],
 };
 
 export function trovaPresenza(g: Partita, uid: number): { t: number; pi: number; p: Presenza } | undefined {
@@ -58,12 +60,15 @@ export function trovaPresenza(g: Partita, uid: number): { t: number; pi: number;
 
 /** Specifica del bersaglio di ogni azione. */
 type Bersaglio =
-  | 'nessuno' | 'terr' | 'presPropria' | 'presAvv3' | 'presAvv' | 'presAvv2facolt' | 'esorcismo' | 'profanazione' | 'cerca';
+  | 'nessuno' | 'terr' | 'terrSegno' | 'presPropria' | 'presPropriaRlyeh' | 'presAvv3' | 'presAvv' | 'presAvv2facolt' | 'esorcismo'
+  | 'profanazione' | 'cerca';
 const BERSAGLIO: Record<string, Bersaglio> = {
   CU10: 'terr', CU11: 'nessuno', CU12: 'presPropria', CU13: 'esorcismo', CU14: 'nessuno', CU15: 'presAvv3', CU16: 'nessuno',
   CU17: 'nessuno', CU18: 'terr', RI10: 'terr', RI11: 'nessuno', RI12: 'profanazione', RI13: 'nessuno', RI14: 'presAvv',
   RI15: 'nessuno', RI16: 'presPropria', RI17: 'presAvv2facolt', RI18: 'terr', T1r: 'nessuno', T2r: 'cerca', T3r: 'nessuno',
+  T4r: 'terrSegno', T5r: 'presPropriaRlyeh',
 };
+const tuttiITerritori = (): number[] => Array.from({ length: NUM_TERR }, (_, t) => t);
 
 /** Combinazioni di parametri con cui si puo' giocare la carta (senza guardare l'energia). */
 export function parametriPossibili(g: Partita, pi: number, c: CartaIst): Param[] {
@@ -85,8 +90,21 @@ export function parametriPossibili(g: Partita, pi: number, c: CartaIst): Param[]
   const tutte = tuttePresenze(g);
   switch (spec) {
     case 'nessuno': return [{}];
-    case 'terr': return [0, 1, 2].map((terr) => ({ terr }));
+    case 'terr': return tuttiITerritori().map((terr) => ({ terr }));
+    case 'terrSegno':
+      // Pietra Incisa: +1 o -1 a scelta, solo i cambi che modificano davvero l'instabilita'
+      return tuttiITerritori().flatMap((terr) => {
+        const inst = g.s.territori[terr].inst;
+        const out: Param[] = [];
+        if (inst < REGOLE.instMax) out.push({ terr, segno: 1 });
+        if (inst > 0) out.push({ terr, segno: -1 });
+        return out;
+      });
     case 'presPropria': return tutte.filter((x) => x.pi === pi).map((x) => ({ pres: x.p.uid }));
+    case 'presPropriaRlyeh': {
+      const r = indiceTerr(g, TERR.rlyeh);
+      return tutte.filter((x) => x.pi === pi && x.t === r).map((x) => ({ pres: x.p.uid }));
+    }
     case 'presAvv': return tutte.filter((x) => x.pi === o).map((x) => ({ pres: x.p.uid }));
     case 'presAvv3':
       return tutte.filter((x) => x.pi === o && forzaPresenza(g, x.t, x.pi, x.p) <= 3).map((x) => ({ pres: x.p.uid }));
@@ -95,9 +113,9 @@ export function parametriPossibili(g: Partita, pi: number, c: CartaIst): Param[]
       return v.length ? v.map((x) => ({ pres: x.p.uid })) : [{}];
     }
     case 'esorcismo':
-      return [0, 1, 2].filter((t) => g.s.territori[t].controllo === pi && tappaTogliibile(g, o, t)).map((terr) => ({ terr }));
+      return tuttiITerritori().filter((t) => g.s.territori[t].controllo === pi && tappaTogliibile(g, o, t)).map((terr) => ({ terr }));
     case 'profanazione':
-      return [0, 1, 2].filter((t) => {
+      return tuttiITerritori().filter((t) => {
         const terr = g.s.territori[t];
         return tappaTogliibile(g, o, t) && terr.inst >= REGOLE.sogliaSigillo && terr.presenze[pi].length > 0 &&
           forzaTerritorio(g, t, pi) >= forzaTerritorio(g, t, o);
@@ -163,6 +181,8 @@ export function effettoAzione(g: Partita, pi: number, c: CartaIst, m: Param): vo
     case 'CU10': addInst(g, m.terr!, -1); break;
     case 'RI10': addInst(g, m.terr!, cos ? 2 : 1); break;
     case 'CU11': addEsp(g, pi, -1); break;
+    case 'T4r': addInst(g, m.terr!, m.segno!); break;
+    case 'T5r': if (vittima) vittima.p.bonus += 2; break;
     case 'CU12': if (vittima) vittima.p.bonus += 2; break;
     case 'RI16': if (vittima) vittima.p.bonus += 3; break;
     case 'CU13': togliTappa(g, o, m.terr!); break;

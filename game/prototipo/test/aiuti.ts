@@ -40,7 +40,7 @@ export function esposizione(g: Partita, pi: number, n: number): void {
 }
 
 /** Gioca la carta (la prima con quell'id in mano) con i parametri dati. */
-export function gioca(g: Partita, pi: number, id: string, par: { terr?: number; pres?: number; cerca?: string } = {}): void {
+export function gioca(g: Partita, pi: number, id: string, par: { terr?: number; pres?: number; cerca?: string; segno?: 1 | -1 } = {}): void {
   const c = g.s.giocatori[pi].mano.find((x) => x.id === id.replace('*', '') && x.trasformata === id.endsWith('*'));
   if (!c) throw new Error(`carta ${id} non in mano`);
   applica(g, pi, { t: 'gioca', carta: c.uid, ...par });

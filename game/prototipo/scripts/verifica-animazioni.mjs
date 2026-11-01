@@ -4,7 +4,8 @@
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 
-const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-animazioni';
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({
@@ -98,6 +99,7 @@ for (const vista of [{ nome: '956x440', w: 956, h: 440, df: 2 }, { nome: '1280x8
         await tap(p, `mano:${m.carta}`);
         await p.waitForTimeout(80);
         if (m.terr !== undefined) await tap(p, `terr:${m.terr}`);
+        if (m.segno !== undefined) { await ferma(p); if (await p.evaluate(() => !!window.__ct.aree()['segno:piu'])) await tap(p, m.segno > 0 ? 'segno:piu' : 'segno:meno'); } // Pietra Incisa
         if (m.pres !== undefined) { await ferma(p); if (await p.evaluate((i) => !!window.__ct.aree()[i], `pres:${m.pres}`)) await tap(p, `pres:${m.pres}`); }
         if (m.cerca !== undefined) await tap(p, `cerca:${m.cerca}`);
         await ferma(p);
@@ -114,6 +116,7 @@ for (const vista of [{ nome: '956x440', w: 956, h: 440, df: 2 }, { nome: '1280x8
         if (!foto.lampo) { await p.screenshot({ path: `${OUT}/${vista.nome}_lampo_sigillo.png` }); foto.lampo = true; }
         continue;
       }
+      if (m.t === 'pietre') { await tap(p, 'btn:pietre'); await tap(p, `pietre:${m.terr}:${m.segno > 0 ? 'piu' : 'meno'}`); continue; } // Pietre ritte di Dunwich
       await tap(p, m.t === 'riduci' ? 'btn:riduci' : 'btn:fine');
       await p.waitForTimeout(250);
     }

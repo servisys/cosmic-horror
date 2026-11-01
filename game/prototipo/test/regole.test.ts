@@ -21,13 +21,19 @@ describe('CT-DES-021 la forza cosmica agisce alla fine di ogni giro', () => {
   });
 });
 
-describe('CT-DES-022 e 052 tre territori fissi', () => {
-  it('ci sono 3 territori con i nomi fissi', () => {
+describe('CT-DES-069 cinque territori fissi (sostituisce CT-DES-022 e 052)', () => {
+  it('ci sono 5 territori con i nomi e gli id fissi', () => {
     const g = nuova();
-    expect(g.s.territori).toHaveLength(3);
+    expect(g.s.territori).toHaveLength(5);
     expect(cat.dati.territori.map((t) => t.nome)).toEqual([
-      'Innsmouth e la Scogliera del Diavolo', 'La Biblioteca della Miskatonic', 'La Landa Maledetta',
+      'Innsmouth e la Scogliera del Diavolo', 'La Biblioteca della Miskatonic', 'La Landa Maledetta', 'Dunwich', "R'lyeh",
     ]);
+    expect(cat.dati.territori.map((t) => t.id)).toEqual(['T1', 'T2', 'T3', 'T4', 'T5']);
+  });
+  it('ogni territorio ha la sua riserva da 3 carte, comprese Pietra Incisa (T4r) e Idolo di Cthulhu (T5r)', () => {
+    const g = nuova();
+    expect(g.s.territori[3].riserva.map((c) => c.id)).toEqual(['T4r', 'T4r', 'T4r']);
+    expect(g.s.territori[4].riserva.map((c) => c.id)).toEqual(['T5r', 'T5r', 'T5r']);
   });
 });
 
@@ -111,13 +117,28 @@ describe('CT-DES-027, 053 e 030 energia e fasi del turno', () => {
     expect(g.s.giocatori[0].energia).toBeLessThanOrEqual(8 + 1);
     expect(g.s.giocatori[0].turniGiocati).toBe(10);
   });
-  it('+1 energia se all inizio del turno controlli almeno 2 territori', () => {
+  it('+1 energia solo se all inizio del turno controlli almeno 3 territori (CT-DES-072)', () => {
     const g = nuova();
     presenza(g, 0, 0, 'CU01');
     presenza(g, 0, 1, 'CU01');
     finisci(g, 0);
     finisci(g, 1);
-    // secondo turno: 3 di base + 1
+    // secondo turno con 2 territori: 3 di base, nessun extra
+    expect(g.s.giocatori[0].energia).toBe(3);
+    presenza(g, 0, 2, 'CU01');
+    expect(numControllati(g, 0)).toBe(3);
+    finisci(g, 0);
+    finisci(g, 1);
+    // terzo turno con 3 territori: 4 di base + 1
+    expect(g.s.giocatori[0].energia).toBe(5);
+  });
+  it('i territori di Dunwich e R lyeh contano per l energia extra', () => {
+    const g = nuova();
+    presenza(g, 0, 0, 'CU01');
+    presenza(g, 0, 3, 'CU01');
+    presenza(g, 0, 4, 'CU01');
+    finisci(g, 0);
+    finisci(g, 1);
     expect(g.s.giocatori[0].energia).toBe(4);
   });
   it('l energia non spesa non si conserva', () => {
@@ -264,6 +285,7 @@ describe('CT-DES-037, 038, 015 e 055 obiettivi, tappe, segnale e turno di avviso
     presenza(g, 0, 0, 'CU03');
     presenza(g, 0, 1, 'CU03');
     presenza(g, 0, 2, 'CU03');
+    presenza(g, 0, 4, 'CU03'); // R'lyeh: la terza tappa si fa solo li' (CT-DES-070)
     return g;
   }
   it('Sigillo: serve il controllo e instabilita 3 o meno, costa 2, uno per territorio (CT-DES-055)', () => {
@@ -292,8 +314,9 @@ describe('CT-DES-037, 038, 015 e 055 obiettivi, tappe, segnale e turno di avviso
     // turno di avviso dell'avversario
     finisci(g, 1);
     energia(g, 0, 10);
-    expect(legali(g).some((m) => m.t === 'tappa' && m.terr === 2)).toBe(true);
-    mossa(g, 0, { t: 'tappa', terr: 2 });
+    // con due tappe si fa solo R'lyeh: le altre non sono piu' possibili
+    expect(legali(g).filter((m) => m.t === 'tappa')).toEqual([{ t: 'tappa', terr: 4 }]);
+    mossa(g, 0, { t: 'tappa', terr: 4 });
     expect(g.s.vincitore).toBe(0);
     expect(legali(g)).toEqual([]);
   });
@@ -338,7 +361,7 @@ describe('CT-DES-056 tappe consolidate', () => {
   it('se perde una tappa il segnale si spegne; quando torna riparte il turno di avviso', () => {
     const g = nuova();
     energia(g, 0, 20);
-    for (const t of [0, 1, 2]) presenza(g, 0, t, 'CU03');
+    for (const t of [0, 1, 2, 4]) presenza(g, 0, t, 'CU03');
     mossa(g, 0, { t: 'tappa', terr: 0 });
     mossa(g, 0, { t: 'tappa', terr: 1 });
     expect(g.s.giocatori[0].segnale).not.toBeNull();
@@ -356,7 +379,7 @@ describe('CT-DES-056 tappe consolidate', () => {
     presenza(g, 0, 0, 'CU04'); // riprende il controllo
     mossa(g, 0, { t: 'tappa', terr: 0 });
     expect(g.s.giocatori[0].segnale).not.toBeNull();
-    expect(legali(g).some((m) => m.t === 'tappa' && m.terr === 2)).toBe(false); // nuovo turno di avviso
+    expect(legali(g).some((m) => m.t === 'tappa' && m.terr === 4)).toBe(false); // nuovo turno di avviso
   });
 });
 
@@ -497,7 +520,7 @@ describe('CT-DES-058 chiarimenti', () => {
     mano(g, 0, 'RI13'); // Sogni di R'lyeh: potente 1, nessun territorio
     gioca(g, 0, 'RI13');
     expect(g.s.giocatori[0].esposizione).toBe(1);
-    expect(g.s.territori.map((t) => t.inst)).toEqual([0, 0, 0]);
+    expect(g.s.territori.map((t) => t.inst)).toEqual([0, 0, 0, 0, 0]);
   });
   it('"mazzo" nella trasformazione indica le carte ancora da pescare', () => {
     const g = nuova(1, 'risvegliati');

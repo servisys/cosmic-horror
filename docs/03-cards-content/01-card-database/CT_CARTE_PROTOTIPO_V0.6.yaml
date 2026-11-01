@@ -1,5 +1,6 @@
 # Cosmic Horror - Carte del prototipo (prima lista)
-# status: DRAFT | version: 0.6.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+# status: DEPRECATED | version: 0.6.0 | prepared_by: Cowork | owner: Matteo | last_reviewed: 2026-10-31
+# superseded_by: CT_CARTE_PROTOTIPO_V0.7.yaml
 #
 # PROPOSTA DI COWORK, DA RIVEDERE DA MATTEO (CT-DES-047).
 # Formato provvisorio (YAML): il formato definitivo dei dati si decide nell'architettura tecnica (CT-DES-018).

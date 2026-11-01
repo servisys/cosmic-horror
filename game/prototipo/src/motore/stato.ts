@@ -28,6 +28,8 @@ export interface Giocatore {
   /** turniGiocati dell'avversario quando e' scattato il segnale (null = nessun segnale). */
   segnale: number | null;
   esposizioneRidottaInTurno: boolean;
+  /** Pietre ritte (Dunwich, CT-DES-071) gia' usate in questo turno. */
+  pietreUsateInTurno: boolean;
   /** Formula di Dho-Hna / Studio del Necronomicon (CT-DES-068): fino a fine turno la soglia di instabilita' per le tappe si sposta di 1. */
   aperturaTappa: boolean;
   /** Tipi dei prossimi eventi rivelati dal Diario di Zadok Allen (informazione visibile al solo proprietario). */
@@ -70,8 +72,10 @@ export interface Mazzetto {
 }
 
 export type Mossa =
-  | { t: 'gioca'; carta: number; terr?: number; pres?: number; cerca?: string }
+  | { t: 'gioca'; carta: number; terr?: number; pres?: number; cerca?: string; segno?: 1 | -1 }
   | { t: 'tappa'; terr: number }
+  /** Pietre ritte (Dunwich): instabilita' di un altro territorio +1 o -1, per 1 energia. */
+  | { t: 'pietre'; terr: number; segno: 1 | -1 }
   | { t: 'riduci' }
   | { t: 'riordina'; ordine: number[] }
   | { t: 'fine' };
@@ -84,7 +88,8 @@ export interface Stato {
   /** Indice (0 = primo, 1 = secondo) del giocatore di turno. */
   turno: number;
   giocatori: [Giocatore, Giocatore];
-  territori: [TerritorioStato, TerritorioStato, TerritorioStato];
+  /** Nell'ordine dei file dati: T1 Innsmouth, T2 Biblioteca, T3 Landa, T4 Dunwich, T5 R'lyeh (CT-DES-069). */
+  territori: TerritorioStato[];
   mazzettiEventi: Record<'fase_I' | 'fase_II' | 'fase_III', Mazzetto>;
   passi: Passo[];
   decisione: Decisione | null;
@@ -102,4 +107,4 @@ export interface Stato {
   cronaca: string[];
 }
 
-export const NUM_TERR = 3;
+export const NUM_TERR = 5; // CT-DES-069 (sostituisce CT-DES-022 e CT-DES-052)

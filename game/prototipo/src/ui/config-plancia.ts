@@ -1,5 +1,5 @@
 // Configurazione della plancia: tutte le posizioni, i territori attivi e le scene stanno qui, come dati.
-// Passare da 3 a 5 territori in gioco = cambiare `territorioId` (e le scene) in questo file, non il codice della scena.
+// Dal CT-FEAT-002 tutti e cinque i quadri sono in gioco (CT-DES-069): `territorioId` collega il quadro al territorio dei dati.
 // Le coordinate sono frazioni dell'immagine di sfondo (1600x736), che si mostra a tutto schermo (cover).
 
 export const IMG_W = 1600;
@@ -24,17 +24,24 @@ export interface LuceFissa {
 export interface Settore {
   id: 'innsmouth' | 'biblioteca' | 'dunwich' | 'landa' | 'rlyeh';
   nome: string;
-  /** Id del territorio di gioco (dati carte); null = visibile sulla plancia ma non in gioco. */
+  /** Id del territorio di gioco (dati carte); null = visibile sulla plancia ma non in gioco (oggi nessuno). */
   territorioId: string | null;
   /** Zona toccabile (frazioni dell'immagine). Per R'lyeh e' il riquadro che contiene l'ellisse del pozzo. */
   zona: Rett01;
   ellisse?: boolean;
-  /** Lato su cui sta la targhetta, nell'angolo alto del suo quadro. */
-  lato: 'sx' | 'dx';
+  /** Lato su cui sta la targhetta, nell'angolo alto del suo quadro; 'centro' per il pozzo di R'lyeh (targhetta al centro dell'ellisse). */
+  lato: 'sx' | 'dx' | 'centro';
   /** Candele, lanterne e bagliori che si animano nella scena 3D (frazioni dell'immagine della scena). */
   luci?: LuceFissa[];
   /** Nome del file della scena 3D (senza estensione) nella cartella delle scene. */
   scena: string;
+  /** Alza la targhetta (in px a scala 1, rispetto all'angolo alto del quadro): serve ai quadri in basso a sinistra, dove c'e' il pannello dell'energia. */
+  rialzo?: number;
+  /**
+   * Miniature delle carte giocate nel quadro (px a scala 1): scala delle miniature, larghezza massima della fila, bordo sinistro minimo
+   * (per non finire sotto il pannello dell'energia) e se la fila sta accanto ai bottoni invece che sotto.
+   */
+  mini?: { scala?: number; larghezzaMax?: number; xDa?: number; affianca?: boolean };
   /** Colore del bordo della targhetta e del titolo della scena. */
   colore: number;
 }
@@ -51,9 +58,9 @@ export const LUCI_PLANCIA: LuceFissa[] = [
 export const SETTORI: Settore[] = [
   { id: 'innsmouth', nome: 'Innsmouth', territorioId: 'T1', zona: { x: 0.031, y: 0.054, w: 0.439, h: 0.424 }, lato: 'sx', scena: 'innsmouth_v1', luci: [{ x: 0.332, y: 0.619, d: 0.05, tipo: 'candela' }, { x: 0.766, y: 0.3, d: 0.06, tipo: 'candela' }], colore: 0xa8823c },
   { id: 'biblioteca', nome: 'La Biblioteca della Miskatonic', territorioId: 'T2', zona: { x: 0.5, y: 0.04, w: 0.45, h: 0.438 }, lato: 'dx', scena: 'biblioteca_v1', luci: [{ x: 0.28, y: 0.62, d: 0.045, tipo: 'candela' }, { x: 0.353, y: 0.665, d: 0.045, tipo: 'candela' }, { x: 0.43, y: 0.76, d: 0.045, tipo: 'candela' }, { x: 0.55, y: 0.9, d: 0.045, tipo: 'candela' }, { x: 0.69, y: 0.78, d: 0.045, tipo: 'candela' }, { x: 0.753, y: 0.83, d: 0.045, tipo: 'candela' }, { x: 0.287, y: 0.33, d: 0.04, tipo: 'candela' }, { x: 0.473, y: 0.233, d: 0.04, tipo: 'candela' }, { x: 0.678, y: 0.415, d: 0.04, tipo: 'candela' }], colore: 0xa8823c },
-  { id: 'dunwich', nome: 'Dunwich', territorioId: null, zona: { x: 0.025, y: 0.489, w: 0.441, h: 0.489 }, lato: 'sx', scena: 'dunwich_v2', luci: [{ x: 0.94, y: 0.222, d: 0.06, tipo: 'candela' }], colore: 0xa8823c },
+  { id: 'dunwich', nome: 'Dunwich', territorioId: 'T4', zona: { x: 0.025, y: 0.489, w: 0.441, h: 0.489 }, lato: 'sx', scena: 'dunwich_v2', rialzo: 18, mini: { scala: 0.8, larghezzaMax: 176, xDa: 196, affianca: true }, luci: [{ x: 0.94, y: 0.222, d: 0.06, tipo: 'candela' }], colore: 0xa8823c },
   { id: 'landa', nome: 'La Landa Maledetta', territorioId: 'T3', zona: { x: 0.503, y: 0.482, w: 0.469, h: 0.496 }, lato: 'dx', scena: 'landa_v1', luci: [{ x: 0.66, y: 0.54, d: 0.12, tipo: 'viola' }], colore: 0xa8823c },
-  { id: 'rlyeh', nome: "R'lyeh", territorioId: null, zona: { x: 0.299, y: 0.264, w: 0.364, h: 0.455 }, ellisse: true, lato: 'sx', scena: 'rlyeh_v2', luci: [{ x: 0.93, y: 0.28, d: 0.06, tipo: 'candela' }, { x: 0.45, y: 0.62, d: 0.2, tipo: 'verde' }], colore: 0x6fe0a8 },
+  { id: 'rlyeh', nome: "R'lyeh", territorioId: 'T5', zona: { x: 0.299, y: 0.264, w: 0.364, h: 0.455 }, ellisse: true, lato: 'centro', scena: 'rlyeh_v2', mini: { scala: 0.8, larghezzaMax: 190 }, luci: [{ x: 0.93, y: 0.28, d: 0.06, tipo: 'candela' }, { x: 0.45, y: 0.62, d: 0.2, tipo: 'verde' }], colore: 0x6fe0a8 },
 ];
 
 /** Posizione sullo schermo di un rettangolo dell'immagine, con lo sfondo a tutto schermo (cover). */

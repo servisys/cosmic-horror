@@ -14,12 +14,16 @@ export interface Selezione {
   carta?: number;
   terr?: number;
   pres?: number;
+  /** Segno scelto per la Pietra Incisa (+1 o -1). */
+  segno?: 1 | -1;
 }
 
 export interface Opzioni {
   terr: number[];
   pres: number[];
   cerca: string[];
+  /** Segni ancora da scegliere (Pietra Incisa); vuoto se non serve scegliere. */
+  segni: (1 | -1)[];
   /** La carta selezionata si puo' giocare cosi' com'e' (premendo "Gioca"). */
   pronta: boolean;
 }
@@ -109,7 +113,8 @@ export class Controller {
   private candidate(): Gioca[] {
     if (this.selezione.carta === undefined) return [];
     return this.mossePerCarta(this.selezione.carta).filter(
-      (m) => (this.selezione.terr === undefined || m.terr === this.selezione.terr) && (this.selezione.pres === undefined || m.pres === this.selezione.pres),
+      (m) => (this.selezione.terr === undefined || m.terr === this.selezione.terr) && (this.selezione.pres === undefined || m.pres === this.selezione.pres) &&
+        (this.selezione.segno === undefined || m.segno === this.selezione.segno),
     );
   }
 
@@ -131,13 +136,17 @@ export class Controller {
     const terr = new Set<number>();
     const pres = new Set<number>();
     const cerca = new Set<string>();
+    const segni = new Set<1 | -1>();
     for (const m of c) {
       if (m.terr !== undefined && this.selezione.terr === undefined) terr.add(m.terr);
       if (m.pres !== undefined && this.selezione.pres === undefined) pres.add(m.pres);
       if (m.cerca !== undefined) cerca.add(m.cerca);
+      if (m.segno !== undefined && this.selezione.segno === undefined) segni.add(m.segno);
     }
-    const pronta = c.length > 0 && terr.size === 0 && pres.size === 0 && cerca.size === 0;
-    return { terr: [...terr], pres: [...pres], cerca: [...cerca], pronta };
+    // il segno si chiede dopo il territorio: con un solo segno possibile (instabilita' 0 o 5) la scelta e' gia' fatta
+    const segniDaChiedere = this.selezione.terr === undefined && terr.size > 0 ? [] : segni.size > 1 ? [...segni].sort().reverse() : [];
+    const pronta = c.length > 0 && terr.size === 0 && pres.size === 0 && cerca.size === 0 && segniDaChiedere.length === 0;
+    return { terr: [...terr], pres: [...pres], cerca: [...cerca], segni: segniDaChiedere, pronta };
   }
 
   scegliCarta(uid: number): void {
@@ -172,6 +181,13 @@ export class Controller {
     return true;
   }
 
+  /** Scelta del segno della Pietra Incisa (dopo il territorio). */
+  scegliSegno(segno: 1 | -1): boolean {
+    if (this.selezione.carta === undefined || !this.opzioni().segni.includes(segno)) return false;
+    this.selezione.segno = segno;
+    return this.giocaSeUnica();
+  }
+
   /** Gioca la carta selezionata quando non servono altre scelte. */
   giocaSelezionata(): boolean {
     const o = this.opzioni();
@@ -185,7 +201,7 @@ export class Controller {
     const c = this.candidate();
     const o = this.opzioni();
     // dopo il territorio non servono altre scelte: la mossa e' decisa
-    if (c.length >= 1 && o.terr.length === 0 && o.pres.length === 0 && o.cerca.length === 0) {
+    if (c.length >= 1 && o.terr.length === 0 && o.pres.length === 0 && o.cerca.length === 0 && o.segni.length === 0) {
       this.applicaUmano({ ...c[0], carta: this.selezione.carta! });
       return true;
     }
@@ -202,6 +218,19 @@ export class Controller {
   }
   puoRidurre(): boolean {
     return this.tuoTurno && !this.decisione && !!this.cerca({ t: 'riduci' });
+  }
+  /** Pietre ritte (Dunwich): quali territori e con quali segni, secondo il motore (vuoto se non le controlli, le hai gia' usate o manca l'energia). */
+  pietreRitte(): { terr: number; segno: 1 | -1 }[] {
+    if (!this.tuoTurno || this.decisione) return [];
+    return this.vista().mosseLegali.filter((m): m is Extract<Mossa, { t: 'pietre' }> => m.t === 'pietre').map((m) => ({ terr: m.terr, segno: m.segno }));
+  }
+  puoPietre(): boolean {
+    return this.pietreRitte().length > 0;
+  }
+  pietre(terr: number, segno: 1 | -1): boolean {
+    if (!this.pietreRitte().some((p) => p.terr === terr && p.segno === segno)) return false;
+    this.applicaUmano({ t: 'pietre', terr, segno });
+    return true;
   }
 
   tappa(t: number): boolean {
@@ -280,7 +309,7 @@ export class Controller {
 }
 
 const VERBI: Record<string, string> = {
-  gioca: 'giocano', finisce: 'finiscono', prende: 'prendono', riduce: 'riducono', ottiene: 'ottengono', scarta: 'scartano',
+  gioca: 'giocano', usa: 'usano', finisce: 'finiscono', prende: 'prendono', riduce: 'riducono', ottiene: 'ottengono', scarta: 'scartano',
   riordina: 'riordinano', VINCE: 'VINCONO',
 };
 

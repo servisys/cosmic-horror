@@ -223,10 +223,10 @@ describe('carte dei Custodi', () => {
   });
   it('CU17 Le Stelle Non Sono Giuste: instabilita di tutti i territori -2; potente 1', () => {
     const g = partita(C);
-    for (const t of [0, 1, 2]) inst(g, t, 4);
+    for (const t of [0, 1, 2, 3, 4]) inst(g, t, 4);
     mano(g, 0, 'CU17');
     gioca(g, 0, 'CU17');
-    expect(g.s.territori.map((t) => t.inst)).toEqual([2, 2, 2]);
+    expect(g.s.territori.map((t) => t.inst)).toEqual([2, 2, 2, 2, 2]);
     expect(g.s.giocatori[0].esposizione).toBe(1);
   });
   it('CU18 Fuoco Purificatore: elimina le presenze avversarie con forza 2 o meno su un territorio', () => {
@@ -430,7 +430,7 @@ describe('carte dei Risvegliati', () => {
     gioca(g, 0, 'RI17', { pres: v.uid });
     expect(totPresenze(g, 1, 1)).toBe(0);
     // +1 ovunque e +1 dalla carta potente sul territorio della vittima
-    expect(g.s.territori.map((t) => t.inst)).toEqual([1, 2, 1]);
+    expect(g.s.territori.map((t) => t.inst)).toEqual([1, 2, 1, 1, 1]);
     expect(g.s.giocatori[0].esposizione).toBe(2);
   });
   it('RI18 Dagon Emerge: elimina tutte le presenze con forza 3 o meno su un territorio, anche le tue', () => {
@@ -474,6 +474,57 @@ describe('carte di riserva dei territori', () => {
     const e = g.s.giocatori[0].energia;
     gioca(g, 0, 'T3r');
     expect(g.s.giocatori[0].energia).toBe(e + 1);
+  });
+  it('T4r Pietra Incisa: instabilita di un territorio +1 o -1 a scelta, costo 1, non potente (CT-DES-073)', () => {
+    const g = partita(C);
+    inst(g, 1, 2);
+    mano(g, 0, 'T4r', 'T4r', 'T4r');
+    const e = g.s.giocatori[0].energia;
+    gioca(g, 0, 'T4r', { terr: 1, segno: 1 });
+    expect(g.s.territori[1].inst).toBe(3);
+    gioca(g, 0, 'T4r', { terr: 1, segno: -1 });
+    expect(g.s.territori[1].inst).toBe(2);
+    expect(g.s.giocatori[0].energia).toBe(e - 2);
+    expect(g.s.giocatori[0].esposizione).toBe(0);
+    // vale anche su Dunwich e R'lyeh
+    gioca(g, 0, 'T4r', { terr: 4, segno: 1 });
+    expect(g.s.territori[4].inst).toBe(1);
+  });
+  it('T4r Pietra Incisa: le mosse legali offrono solo i cambi che modificano davvero l instabilita', () => {
+    const g = partita(C);
+    inst(g, 0, 0);
+    inst(g, 1, 5);
+    mano(g, 0, 'T4r');
+    const mosse = legali(g).filter((m) => m.t === 'gioca');
+    expect(mosse.some((m) => m.t === 'gioca' && m.terr === 0 && m.segno === -1)).toBe(false);
+    expect(mosse.some((m) => m.t === 'gioca' && m.terr === 0 && m.segno === 1)).toBe(true);
+    expect(mosse.some((m) => m.t === 'gioca' && m.terr === 1 && m.segno === 1)).toBe(false);
+    expect(mosse.some((m) => m.t === 'gioca' && m.terr === 1 && m.segno === -1)).toBe(true);
+  });
+  it('T5r Idolo di Cthulhu: una tua presenza a R lyeh +2 forza, costo 2, potente 1 (esposizione +2 a R lyeh)', () => {
+    const g = partita(R);
+    const p = presenza(g, 0, 4, 'RI01'); // forza 1
+    mano(g, 0, 'T5r');
+    const e = g.s.giocatori[0].energia;
+    expect(legali(g).filter((m) => m.t === 'gioca')).toHaveLength(1);
+    gioca(g, 0, 'T5r', { pres: p.uid });
+    expect(forza(g, 4, 0)).toBe(3);
+    expect(g.s.giocatori[0].energia).toBe(e - 2);
+    // potente 1, piu' 1 per La citta' dormiente (R'lyeh); l'instabilita' di R'lyeh sale di 1
+    expect(g.s.giocatori[0].esposizione).toBe(2);
+    expect(g.s.territori[4].inst).toBe(1);
+  });
+  it('T5r Idolo di Cthulhu: si gioca solo su una tua presenza a R lyeh', () => {
+    const g = partita(R);
+    mano(g, 0, 'T5r');
+    expect(legali(g).some((m) => m.t === 'gioca')).toBe(false);
+    presenza(g, 0, 0, 'RI01'); // non a R'lyeh
+    mano(g, 0, 'T5r'); // prendere il controllo dava una carta di riserva: si riparte da una mano pulita
+    expect(legali(g).some((m) => m.t === 'gioca')).toBe(false);
+    const qui = presenza(g, 0, 4, 'RI01');
+    mano(g, 0, 'T5r');
+    const mosse = legali(g).filter((m) => m.t === 'gioca');
+    expect(mosse.map((m) => (m.t === 'gioca' ? m.pres : undefined))).toEqual([qui.uid]);
   });
 });
 

@@ -1,5 +1,65 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-005 - fase piano - 2026-11-01 20:49 - FATTO
+
+Ho letto il task e controllato il codice sul branch della PR #74. Sto scrivendo il piano. Non ho modificato nulla.
+
+# Resoconto CT-DEV-005, fase piano
+
+## Richiesta eseguita
+Pre-flight plan per le due rifiniture sulla PR #74. Nessun file toccato, nessun commit, nessun push.
+
+## Verifiche
+- `docs/00_MASTER_INDEX.md` è APPROVED.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` è APPROVED (0.4.0, approvato da Matteo il 2026-11-01).
+- La testa del branch su origin è `52c504c5a66ef5a503f19a8acc05772c1b704683`. Coincide con quella del task.
+- Il bug del lucchetto c'è davvero. In `controlla-e-pubblica.sh:130` la riga è `head -n 1 | tr -dc '0-9'`. Su `{"pid":12345,"filtro":"tutto","quando":"2026-11-01T19:40:00.000Z"}` produce un numero lungo che non è un processo vivo. `kill -0` fallisce e il job parte durante la batteria di Folk Lore.
+- Il formato JSON del lucchetto l'ha verificato Cowork nel repository di Folk Lore. Io non ho quel repository e non l'ho ricontrollato.
+
+## Piano
+Si lavora sul branch `feature/ct-dev-004-pubblicazione-prova-produzione`, con nuovi commit sulla PR #74.
+
+1. **`game/prototipo/siti-pubblicazione.json`**
+   - Metto i due indirizzi veri (prova e produzione) al posto dei segnaposto.
+   - Riscrivo la `nota` senza più parlare di segnaposto.
+2. **`docs/05-technical-design/04-build-deployment/CT_GUIDA_PUBBLICAZIONE_AZURE_V0.2.md`**
+   - Il punto 7 della Parte 1 (riga 36) dice di sostituire i segnaposto. Lo cambio: gli indirizzi sono già inseriti, e si modificano solo con una normale PR.
+   - Alla riga 126 c'è la voce «Produzione: segnaposto» tra i problemi noti. Vedo se tenerla come caso di errore o toglierla.
+3. **`strumenti/mac-mini/controlla-e-pubblica.sh`**, blocco del lucchetto (righe 128-132) e commento in testa (riga 13)
+   - Estraggo il pid con `grep -o '"pid"[[:space:]]*:[[:space:]]*[0-9]*' | tr -dc '0-9'`. Uso comandi compatibili con la bash 3.2 di macOS.
+   - Se il file è un numero nudo, uso quello come ripiego.
+   - Se il file esiste ma il pid non si legge, la batteria è in corso solo se il file è più recente di 120 minuti. Uso `find -mmin -120`, come per il blocco proprio. Altrimenti lo ignoro.
+   - Il messaggio di attesa distingue pid vivo da «lucchetto illeggibile recente».
+4. **`strumenti/mac-mini/prova-logica.sh`** (righe 61-70) e **`pubblica.conf.esempio`** (righe 5-7)
+   - I casi 11-13 usano oggi un pid nudo. Passo al JSON vero e uso un pid vivo (`sleep 30`) per il caso «salta il giro».
+   - Aggiungo un caso con pid morto nel JSON (procede). Tengo il caso del pid inesistente, 999999, ma in JSON.
+   - Aggiungo un caso illeggibile e recente (salta).
+   - Aggiungo un caso con numero nudo come ripiego. Il task non lo chiede esplicitamente, ma serve a coprire il ripiego.
+   - Aggiungo un caso illeggibile e vecchio (procede), con `touch -t` per invecchiare il file. Anche questo non è chiesto esplicitamente. Controllo che `touch -t` funzioni su macOS e su Linux e, se serve, lo tengo fuori.
+   - Aggiorno i commenti dei due file con il formato JSON.
+5. **Verifiche su Windows** (cartella `game/prototipo`): `npm run tipi`, `npm test`, `npm run build`. Poi `prova-logica.sh` se c'è una bash.
+6. **Push** sullo stesso branch, senza fusione. Nel resoconto metto la nuova testa (sha di 40 caratteri) e `git diff --stat` rispetto a `main`.
+
+## Rischi
+- **Test con i segnaposto.** `prova-pubblica.mjs` (riga 87) e `pubblica-logica.mjs` (riga 91) usano ancora «SEGNAPOSTO». Il test 10 passa l'indirizzo con `CT_URL_PROVA`, quindi non dipende dal JSON. Con indirizzi veri il controllo resta valido come protezione. Non li tocco, perché sono fuori perimetro.
+- **`prova-logica.sh` su Windows.** Può non girare, perché usa `ps`, `kill -0` e `sleep`. Se la bash non c'è, lo dichiaro come non verificato. Non ho ancora controllato se Git Bash basta.
+- **Pid riusati.** Un pid vecchio riusato da un altro processo darebbe un falso «batteria in corso». È un rischio già presente e il task non lo cambia.
+- **Date del file.** `find -mmin` dipende dalla data del file. Un lucchetto con data nel futuro conta come recente, quindi si salta. È la scelta prudente.
+
+## Domande aperte
+Nessuna che blocchi. Il task è pronto per la fase di esecuzione.
+
+Piccolo dubbio da confermare, senza bloccare: alla riga 126 della guida tengo la voce «Produzione: segnaposto» oppure la tolgo? Propongo di riformularla come errore possibile se qualcuno rimette dei segnaposto.
+
+## Cosa non è stato verificato
+- Non ho eseguito `npm run tipi`, `npm test`, `npm run build` né `prova-logica.sh`, perché la fase piano è di sola lettura.
+- Non ho il repository di Folk Lore, quindi non ho riscontro diretto del formato JSON del lucchetto.
+- Non ho controllato se i due indirizzi Azure rispondono.
+
+Comandi bloccati dai permessi: 2. Primi 2: `B=origin/feature/ct-dev-004-pubblicazione-prova-produzione; git show $B:game/prototipo/siti-pubblicazione.json; git show...`; `cd /c/Users/MatteoTemporini-Laye/cosmic-horror; B=origin/feature/ct-dev-004-pubblicazione-prova-produzione; git show $B:...`
+
+---
+
 ## CT-DEV-004 - fase esecuzione - 2026-11-01 20:45 - FATTO
 
 Le modifiche sono su disco perché sono tornato su `main`: mostrano lo stato di `main`, non c'è nessun problema. Il lavoro è nel branch pushato.

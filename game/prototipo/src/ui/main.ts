@@ -6,7 +6,7 @@ import { Controller } from './controller.js';
 import { datiDelBuild } from './dati-build.js';
 import { alCaricarsiDiUnaScena, caricaImmagini, caricaScene, caricaSfondo, numeroTexture } from './immagini.js';
 import { caricaFont } from './tipografia.js';
-import { VERSIONE } from './versione.js';
+import { VERSIONE, caricaAmbiente, etichettaVersione } from './versione.js';
 import { registraServiceWorker, tuttoSchermoAlPrimoTocco } from './pwa.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { anim, type FotoStato } from './animazioni.js';
@@ -344,6 +344,8 @@ async function avvia(): Promise<void> {
   void caricaScene(SETTORI.map((x) => x.scena));
   const elVersione = document.getElementById('versione');
   if (elVersione) elVersione.textContent = 'Versione: ' + VERSIONE;
+  // l'ambiente (prova / produzione) arriva da versione.json: si aggiunge appena letto
+  void caricaAmbiente().then(() => { if (elVersione) elVersione.textContent = 'Versione: ' + etichettaVersione(); });
   gesti();
   tuttoSchermoAlPrimoTocco();
   registraServiceWorker(() => ctrl.attiva && !ctrl.finita);

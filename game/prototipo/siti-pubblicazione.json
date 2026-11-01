@@ -1,0 +1,5 @@
+{
+  "nota": "Indirizzi dei due siti (Azure Static Web Apps). Non sono segreti. Se si ricreano i siti, aggiorna qui gli indirizzi con una normale PR.",
+  "prova": "https://red-dune-05eec2f03.3.azurestaticapps.net",
+  "produzione": "https://lively-stone-0fd684403.4.azurestaticapps.net"
+}

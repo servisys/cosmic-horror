@@ -1,14 +1,12 @@
-# Configurazione del job di pubblicazione (si copia in ~/CosmicHorrorPubblica/pubblica.conf; si legge a ogni giro, non serve riavviare nulla).
-# Una riga per chiave, formato chiave=valore. Il token NON va qui: sta nel Portachiavi di macOS.
+# Configurazione del job di pubblicazione in prova (si copia in <clone>/.pubblicazione/pubblica.conf; si legge a ogni giro, non serve riavviare nulla).
+# Una riga per chiave, formato chiave=valore. Il token NON va qui: sta nel file .swa-token-prova nella radice del clone (permessi 600).
+# I valori predefiniti vanno bene per il Mac mini di Matteo (utente builder): di norma questo file non si tocca.
 
-# Indirizzo SSH del repository (usa la deploy key in sola lettura)
-REPO_URL=git@github.com:servisys/cosmic-horror.git
+# Una build pesante alla volta: lucchetto della batteria di test di Folk Lore. Il file contiene una riga JSON, per esempio
+# {"pid":12345,"filtro":"tutto","quando":"2026-11-01T19:40:00.000Z"}: conta il campo "pid" (va bene anche un numero nudo).
+# Se il file esiste e quel processo e' vivo, il job di Cosmic Horror salta il giro e riprova dopo.
+# Se il file esiste ma il pid non si legge, il giro si salta solo se il file e' piu' recente di 120 minuti.
+LUCCHETTO_FOLK_LORE=/Users/builder/dev-machine/progetti/mandi/.coda/batteria.lock
 
-# File della chiave privata della deploy key
-CHIAVE=~/.ssh/cosmic_horror_deploy
-
-# main = pubblica ogni nuovo commit di main; versioni = pubblica solo quando c'e' un nuovo tag v* (per esempio v0.2.0)
-MODALITA=main
-
-# Nome dell'elemento nel Portachiavi (di norma non si cambia)
-SERVIZIO_PORTACHIAVI=cosmic-horror-swa
+# Cartella dei progetti: se sotto questa cartella (ma fuori da Cosmic Horror) gira un node/npm/vite/vitest/tsc/playwright/esbuild, il giro si salta.
+CARTELLA_PROGETTI=/Users/builder/dev-machine/progetti

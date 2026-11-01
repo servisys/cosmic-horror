@@ -45,5 +45,10 @@ __pycache__/
 # Copyrighted reference material (local only)
 reference/literature/*.txt
 
+# Pubblicazione dal Mac mini: token dei due siti (mai nel repository), copie delle build di prova, log e stato del job
+.swa-token-*
+.pubblicati/
+.pubblicazione/
+
 # Cartella di scambio locale Cowork/Code: mai nel repository
 scambio/

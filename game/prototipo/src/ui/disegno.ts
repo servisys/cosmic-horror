@@ -1,7 +1,45 @@
 // Attrezzi di disegno con PixiJS usati dalla scena e dalle carte (nessuna regola qui).
-import { Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, Text, Texture, type FederatedPointerEvent } from 'pixi.js';
 import { texturaDi } from './immagini.js';
 import { FONT_TESTO, FONT_TITOLI } from './tipografia.js';
+
+export { sogliaTesto } from './misure.js';
+import { sogliaTesto } from './misure.js';
+
+const DURATA_PRESSIONE = 400;
+let ultimaPressione = -1e9;
+/** Una pressione lunga e' appena scattata: il rilascio che segue non deve contare come tocco. */
+export function pressioneRecente(): boolean {
+  return performance.now() - ultimaPressione < 450;
+}
+
+/**
+ * Pressione lunga (~400 ms, senza spostarsi) su una carta: chiama `apri` con una breve vibrazione. Il rilascio che segue non e' un tocco
+ * (vedi `pressioneRecente`). Al mouse apre anche il clic destro.
+ */
+export function pressioneLunga(o: Container, apri: () => void): void {
+  let timer: number | undefined;
+  let p0: { x: number; y: number } | null = null;
+  const ferma = (): void => { clearTimeout(timer); timer = undefined; p0 = null; };
+  o.eventMode = 'static';
+  o.on('pointerdown', (e: FederatedPointerEvent) => {
+    if (e.button === 2) return;
+    ferma();
+    p0 = { x: e.global.x, y: e.global.y };
+    timer = window.setTimeout(() => {
+      timer = undefined;
+      ultimaPressione = performance.now();
+      try { navigator.vibrate?.(15); } catch { /* il telefono non la supporta */ }
+      apri();
+    }, DURATA_PRESSIONE);
+  });
+  o.on('globalpointermove', (e: FederatedPointerEvent) => { if (p0 && Math.hypot(e.global.x - p0.x, e.global.y - p0.y) > 12) ferma(); });
+  o.on('pointerup', ferma);
+  o.on('pointerupoutside', ferma);
+  o.on('pointercancel', ferma);
+  o.on('pointerleave', ferma);
+  o.on('rightclick', () => { ultimaPressione = performance.now(); apri(); });
+}
 
 export interface Area {
   x: number;
@@ -61,6 +99,10 @@ export interface OpzTesto {
   peso?: string;
   ls?: number;
   alpha?: number;
+  /** Puo' stare sotto la misura minima (solo l'originale inglese della citazione). */
+  piccolo?: boolean;
+  /** Bordo scuro attorno alle lettere (cifre ad alto contrasto). */
+  bordo?: { colore: number; spessore: number };
 }
 
 export interface OpzRett {
@@ -149,7 +191,7 @@ export class Disegno {
       g.cursor = 'pointer';
       if (opz.tap) g.on('pointertap', opz.tap);
       // L'anteprima al passaggio e' solo per il mouse: sul telefono il tocco farebbe aprire l'anteprima (che resterebbe sopra il campo
-      // e intercetterebbe i tocchi) e il ridisegno farebbe perdere il tocco stesso. La scheda si apre solo con la lente o toccando.
+      // e intercetterebbe i tocchi) e il ridisegno farebbe perdere il tocco stesso. La scheda si apre toccando o tenendo premuto.
       if (opz.over) g.on('pointerover', (e) => { if (!soloTocco(e.pointerType)) opz.over!(); });
       if (opz.out) g.on('pointerout', (e) => { if (!soloTocco(e.pointerType)) opz.out!(); });
     }
@@ -183,7 +225,9 @@ export class Disegno {
     const tx = new Text({
       text: t,
       style: {
-        fontFamily: opz.titoli ? FONT_TITOLI : FONT_TESTO, fontSize: Math.round(size * this.u), fill,
+        fontFamily: opz.titoli ? FONT_TITOLI : FONT_TESTO,
+        fontSize: opz.piccolo ? Math.round(size * this.u) : Math.max(Math.round(size * this.u), Math.round(sogliaTesto(this.u))), fill,
+        stroke: opz.bordo ? { color: opz.bordo.colore, width: opz.bordo.spessore * this.u, join: 'round' } : undefined,
         fontWeight: (opz.peso ?? (opz.bold ? '700' : '400')) as '400', fontStyle: opz.corsivo ? 'italic' : 'normal',
         wordWrap: opz.w !== undefined, wordWrapWidth: opz.w !== undefined ? opz.w : 0, align: opz.align ?? 'left',
         lineHeight: opz.lh ? Math.round(opz.lh * this.u) : undefined, letterSpacing: opz.ls ? opz.ls * this.u : 0,
@@ -193,6 +237,7 @@ export class Disegno {
     tx.x = x;
     tx.y = y;
     if (opz.alpha !== undefined) tx.alpha = opz.alpha;
+    if (opz.piccolo) tx.label = 'piccolo';
     if (opz.anchorX !== undefined || opz.anchorY !== undefined) tx.anchor.set(opz.anchorX ?? 0, opz.anchorY ?? 0);
     this.s.addChild(tx);
     return tx;
@@ -257,14 +302,14 @@ export class Disegno {
     this.rett(x, y, w, h, abilitato ? colore : 0x1a1e27, {
       stroke: abilitato ? 0x8aa0c8 : 0x2c3444, id, tap: abilitato ? tap : undefined,
     });
-    this.adatta(etichetta, x + 3 * this.u, y + 2 * this.u, w - 6 * this.u, h - 4 * this.u, size, 10, abilitato ? 0xffffff : 0x667085, true, 'center', { titoli: true });
+    this.adatta(etichetta, x + 3 * this.u, y + 2 * this.u, w - 6 * this.u, h - 4 * this.u, size, 12, abilitato ? 0xffffff : 0x667085, true, 'center', { titoli: true });
     // centro verticale
     const last = this.s.children[this.s.children.length - 1] as Text;
     last.y = y + (h - last.height) / 2;
   }
 
   /** Pillola dorata (azioni possibili sulla plancia). Ritorna la larghezza. */
-  pillolaOro(id: string, etichetta: string, x: number, y: number, h: number, tap: () => void, size = 10.5, abilitata = true): number {
+  pillolaOro(id: string, etichetta: string, x: number, y: number, h: number, tap: () => void, size = 12, abilitata = true): number {
     const w = this.larghezza(etichetta, size, { titoli: true, bold: true, ls: 0.5 }) + 26 * this.u;
     if (abilitata) this.alone(x, y, w, h, COL.oroChiaro, 0.6, 12, h / (2 * this.u));
     this.rett(x, y, w, h, 0, {

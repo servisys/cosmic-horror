@@ -5,6 +5,7 @@
 // Uso: CT_CHROMIUM=<chrome> OUT=<cartella> [CSP=1] node scripts/prova-telefono.mjs <url della pagina>
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
+import { premiArea } from './pressione.mjs';
 
 const URL = process.argv[2];
 const OUT = process.env.OUT ?? 'screenshot-telefono';
@@ -97,10 +98,10 @@ await prova('tocco: carta poi territorio gioca la carta; nessuna anteprima resta
   await p.screenshot({ path: `${OUT}/tocco_dopo_carte.png` });
   const mano = await p.evaluate(() => window.__ct.ctrl.vista().mano.map((x) => x.uid));
   if (mano.length) {
-    await tap(`lente:${mano[0]}`);
+    await premiArea(p, `mano:${mano[0]}`);
     const aperta = await p.evaluate(() => !!window.__ct.aree()['grande:chiudi']);
     await p.screenshot({ path: `${OUT}/tocco_scheda_grande.png` });
-    if (!aperta) return { ok: false, dettaglio: `la lente non ha aperto la scheda (carta ${mano[0]}, area ${JSON.stringify(await p.evaluate((i) => window.__ct.aree()['lente:' + i], mano[0]))})` };
+    if (!aperta) return { ok: false, dettaglio: `la pressione lunga non ha aperto la scheda (carta ${mano[0]}, area ${JSON.stringify(await p.evaluate((i) => window.__ct.aree()['mano:' + i], mano[0]))})` };
     await tap('grande:chiudi');
     const chiusa = await p.evaluate(() => !window.__ct.aree()['grande:chiudi']);
     if (!aperta || !chiusa) return { ok: false, dettaglio: `scheda grande: aperta=${aperta} chiusa=${chiusa}` };

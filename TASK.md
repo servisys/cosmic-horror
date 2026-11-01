@@ -1,6 +1,6 @@
 ---
 id: CT-DOC-002
-fase: piano
+fase: esecuzione
 pronto: si
 branch: planning/ct-doc-002-protocollo-v04
 scritto_da: Cowork (chat Claude del progetto)
@@ -13,6 +13,13 @@ data: 2026-11-01
 - Approvazione di Matteo in chat a Cowork il 2026-11-01: proposta di Cowork «approvo la V0.3 con le regole dei punti 2 e 3», risposta di Matteo «sì». Punto 2 = `file_attesi` obbligatorio; punto 3 = fusioni e chiusure solo in un task dedicato.
 - `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md` (APPROVED), `docs/CT_COWORK_CODE_PROTOCOL_V0.3.md` (DRAFT), `docs/00_MASTER_INDEX.md` (APPROVED 0.5.0).
 - `strumenti/windows-scambio/osserva-scambio.ps1`, `LEGGIMI.md`, `prove/`.
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («sì vai»). Segui il pre-flight plan. Risposte:
+1. Sì a `tipo: deleghe`.
+2. Sì alla strada V0.4 (V0.3 e V0.2 `DEPRECATED` con `superseded_by`).
+3. Riferimenti alla V0.1 in README e Vision: task a parte più avanti, non toccarli ora.
+In questa fase PowerShell è bloccato: non tentare di lanciare le prove. Scrivi i file attesi ragionando sul codice e indica nel resoconto il comando esatto per le prove, che verranno lanciate in sessione interattiva prima della fusione.
 
 ## Obiettivo
 Rendere in vigore il protocollo che permette fusioni e chiusure tramite Cowork, aggiungendo due regole di sicurezza, e allineare lo script.

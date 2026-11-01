@@ -1,5 +1,44 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-005 - fase esecuzione - 2026-11-01 20:58 - FATTO
+
+# Resoconto CT-DEV-005
+
+**Richiesta eseguita:** tutte le rifiniture sono sulla PR #74, con un solo commit nuovo. Non ci sono PR nuove e non ho fuso né chiuso nulla.
+
+**Nuova testa della PR #74:** `ceebd6cfa0e90367f27144135372a58a3e649644`. Prima era `52c504c`.
+
+## Cosa è stato fatto
+1. **Indirizzi veri dei siti.** In `game/prototipo/siti-pubblicazione.json` ci sono ora gli indirizzi di prova e produzione che mi hai dato. La `nota` non parla più di segnaposto.
+2. **Lucchetto di Folk Lore.** In `strumenti/mac-mini/controlla-e-pubblica.sh` il pid si legge dal campo `"pid":<numero>` del JSON.
+   - Se il file è un numero nudo, si usa quello.
+   - Se il file esiste ma il pid non si legge, il giro si salta solo se il file ha meno di 120 minuti. Altrimenti il file viene ignorato.
+   - Con il vecchio codice, la data e il filtro nel JSON producevano un numero che non era un processo vivo, quindi il job sarebbe partito durante la batteria di Folk Lore.
+3. **Prova della logica.** In `prova-logica.sh` il caso con pid vivo e quello con pid morto ora usano il JSON vero. Ho aggiunto quattro casi:
+   - 13b: pid morto con data e filtro pieni di cifre, il giro procede.
+   - 13c: numero nudo con processo vivo, il giro si salta.
+   - 13d: file illeggibile e recente, il giro si salta.
+   - 13e: lucchetto tolto, pubblica la versione in attesa.
+4. **Documenti.** Ho aggiornato il commento in `pubblica.conf.esempio` e la guida V0.2 con il formato JSON. Nella guida, la voce «Produzione: segnaposto» resta come errore possibile se qualcuno rimette dei segnaposto.
+
+## Verifiche (Windows)
+- `npm run tipi`: ok.
+- `npm test`: 13 file e 208 test passati. Dentro c'è anche `prova-logica.sh` con Git Bash, con i casi nuovi: passa. `prova-pubblica.mjs` passa anch'esso.
+- `npm run build`: ok.
+
+## Branch e PR
+- Branch: `feature/ct-dev-004-pubblicazione-prova-produzione`, PR #74.
+- `git diff --stat main`: 20 file, 764 inserzioni, 192 cancellazioni. Il confronto è con il `main` locale, che è indietro di 4 commit rispetto a `origin/main`. Le righe che riguardano questo task sono nei 5 file del commit `ceebd6c`: 38 inserzioni e 16 cancellazioni.
+
+## Non verificato
+- Il lucchetto non è stato provato con un Folk Lore vero sul Mac mini. È provato solo con file finti e con la bash di Git su Windows.
+- Non ho controllato che gli indirizzi dei siti rispondano online.
+- Sono tornato su `main`.
+
+Comandi bloccati dai permessi: 2. Primi 2: `bash strumenti/mac-mini/prova-logica.sh 2>&1 | grep -E "^(KO|OK|RISULTATO|--)" | tail -50`; `git -C /c/Users/MatteoTemporini-Laye/cosmic-horror add -A`
+
+---
+
 ## CT-DEV-005 - fase piano - 2026-11-01 20:49 - FATTO
 
 Ho letto il task e controllato il codice sul branch della PR #74. Sto scrivendo il piano. Non ho modificato nulla.

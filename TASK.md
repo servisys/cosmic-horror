@@ -1,6 +1,6 @@
 ---
 id: CT-DEL-001
-fase: piano
+fase: esecuzione
 pronto: si
 tipo: deleghe
 branch: nessuno
@@ -15,6 +15,9 @@ file_attesi_70: docs/00_MASTER_INDEX.md, docs/CT_COWORK_CODE_PROTOCOL_V0.2.md, d
 ## Documenti autorevoli
 - `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` §3 (nella PR 70; in vigore alla sua fusione) e `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md`.
 - Autorizzazione di Matteo in chat a Cowork il 2026-11-01: «leggi code se ha fatto bene, poi procediamo con la fusione» (riferito alla PR 70). Cowork ha letto il resoconto di Code (prove 5/5 e 2/2 riuscite, nessuna correzione, testa `084d1d0…`) e il diff della PR su GitHub (12 file, solo quelli elencati in `file_attesi_70`).
+
+## Via di Matteo
+Matteo ha dato il via alla fase esecuzione (fusione della PR 70) in chat a Cowork il 2026-11-01 («vai»), dopo il piano con tutti i controlli positivi.
 
 ## Obiettivo
 Prima fusione eseguita dal canale automatico: la PR 70. Task dedicato: nessun lavoro nuovo.

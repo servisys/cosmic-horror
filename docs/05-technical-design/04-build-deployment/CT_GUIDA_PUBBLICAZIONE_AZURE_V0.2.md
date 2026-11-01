@@ -33,7 +33,7 @@ Si ripete due volte: una per il sito di **prova**, una per la **produzione**.
 4. In **Dettagli della distribuzione** scegli **Altro** (Other): **non collegare GitHub**.
 5. **Rivedi e crea** → **Crea**. L'indirizzo del sito (`https://….azurestaticapps.net`) è in **Panoramica**.
 6. Sempre in **Panoramica**, premi **Gestisci il token di distribuzione** e **copia** il token. È come una password: non incollarlo in chat, nei file del progetto o nelle PR. Ti serve tra poco (Parte 2), una volta per sito.
-7. **Gli indirizzi dei due siti** (non sono segreti) vanno nel file `game/prototipo/siti-pubblicazione.json` del repository, al posto dei segnaposto `SEGNAPOSTO-prova` e `SEGNAPOSTO-produzione`. Il sito di prova serve anche allo script di produzione, per controllare quale commit c'è online. Si cambia con una normale PR.
+7. **Gli indirizzi dei due siti** (non sono segreti) stanno nel file `game/prototipo/siti-pubblicazione.json` del repository (già con gli indirizzi veri; se si ricreano i siti vanno aggiornati). Il sito di prova serve anche allo script di produzione, per controllare quale commit c'è online. Si cambia con una normale PR.
 
 Il file `versione.json` (solo ambiente, commit e data) è pubblico apposta: serve per quel controllo senza fare il login. Tutto il resto del gioco richiede il ruolo `giocatore`.
 
@@ -67,8 +67,8 @@ cd /Users/builder/dev-machine/progetti/cosmic-horror/strumenti/mac-mini
 Il file `.pubblicazione/pubblica.conf` di norma è già giusto: contiene il percorso del lucchetto di Folk Lore e la cartella dei progetti (vedi sotto). Si rilegge a ogni giro, non serve riavviare nulla.
 
 ### Una build pesante alla volta
-Folk Lore non si modifica. Oggi ha solo il lucchetto della sua batteria di test, `/Users/builder/dev-machine/progetti/mandi/.coda/batteria.lock`, che contiene il pid di chi la sta eseguendo. Il job di Cosmic Horror **salta il giro** (nel log una riga «IN ATTESA», senza FALLITO) se:
-1. quel file esiste e il pid dentro è vivo;
+Folk Lore non si modifica. Oggi ha solo il lucchetto della sua batteria di test, `/Users/builder/dev-machine/progetti/mandi/.coda/batteria.lock`, che contiene una riga JSON del tipo `{"pid":12345,"filtro":"tutto","quando":"…"}` (il job legge il campo `pid`). Il job di Cosmic Horror **salta il giro** (nel log una riga «IN ATTESA», senza FALLITO) se:
+1. quel file esiste e il `pid` dentro è vivo (se il pid non si legge, il file conta come batteria in corso solo se è più recente di 120 minuti);
 2. oppure c'è un processo `node`/`npm`/`vite`/`vitest`/`tsc`/`playwright`/`esbuild` con un percorso sotto `/Users/builder/dev-machine/progetti/` ma fuori da Cosmic Horror (controllo «a occhio» sulla riga di comando dei processi: un `npm run build` di Folk Lore senza il percorso nella riga può sfuggire);
 3. oppure c'è già un giro di Cosmic Horror in corso (blocco proprio, `.pubblicazione/stato/blocco`).
 
@@ -120,10 +120,10 @@ Dopo il primo caricamento il gioco **funziona anche senza rete**. Quando esce un
 ## Se qualcosa non va
 - **Il log dice «manca il token del sito di prova»** o **«permessi …»**: crea il file `.swa-token-prova` (`./installa.sh --token prova`) o correggi con `chmod 600`. Appena a posto, il job pubblica da solo la versione in attesa.
 - **«repository non raggiungibile»**: controlla la rete del Mac mini e `git -C /Users/builder/dev-machine/progetti/cosmic-horror remote -v` (HTTPS, repository pubblico).
-- **«IN ATTESA»** nel log: c'è un'altra build in corso (Folk Lore o altro): il job riprova da solo al giro dopo. Se resta in attesa per ore, controlla che `batteria.lock` non sia rimasto con un pid vecchio (se il processo non esiste più il job lo ignora).
+- **«IN ATTESA»** nel log: c'è un'altra build in corso (Folk Lore o altro): il job riprova da solo al giro dopo. Se resta in attesa per ore, controlla che `batteria.lock` non sia rimasto con un pid vecchio (se il processo non esiste più il job lo ignora; se il file è illeggibile lo ignora dopo 120 minuti).
 - **Il job non gira**: `launchctl list | grep cosmichorror` deve mostrare `it.cosmichorror.pubblica`; se manca, rilancia `./installa.sh`.
 - **Produzione: «non risulta pubblicato in prova»**: aspetta che il job pubblichi quel commit in prova (o `npm run pubblica -- prova` a mano), poi rilancia. **«Il sito di prova risponde con il commit …»**: la prova non è ancora aggiornata a quel commit, o il clone è su un commit diverso da quello in prova.
-- **Produzione: «segnaposto»**: sostituisci gli indirizzi in `game/prototipo/siti-pubblicazione.json` (Parte 1, punto 7).
+- **Produzione: «segnaposto»** (può comparire solo se qualcuno rimette dei segnaposto nel file): rimetti gli indirizzi veri in `game/prototipo/siti-pubblicazione.json` (Parte 1, punto 7).
 - **Il gioco online non cambia**: guarda la riga «Versione» e confrontala con l'ultimo PUBBLICATO nel log; il telefono mostra la versione nuova dopo aver toccato l'avviso di aggiornamento.
 - **Token da rinnovare** (per esempio se è finito dove non doveva): su Azure, **Gestisci il token di distribuzione** → **Reimposta**, poi `./installa.sh --token prova` (o `produzione`).
 

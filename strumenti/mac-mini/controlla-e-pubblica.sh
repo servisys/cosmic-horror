@@ -10,7 +10,8 @@
 # (si riprova con un commit nuovo, oppure a mano con --riprova). Il token sta nel file .swa-token-prova del clone (permessi 600): lo legge pubblica.mjs.
 #
 # UNA BUILD PESANTE ALLA VOLTA (il Mac e' condiviso con Folk Lore): il giro si salta, senza segnare fallimento, se
-#  1. il lucchetto della batteria di test di Folk Lore esiste e contiene il pid di un processo vivo (percorso in pubblica.conf: LUCCHETTO_FOLK_LORE), oppure
+#  1. il lucchetto della batteria di test di Folk Lore esiste e contiene il pid (campo "pid" della riga JSON) di un processo vivo, oppure se il pid non si legge ma il file e' piu' recente di 120 minuti
+#     (percorso in pubblica.conf: LUCCHETTO_FOLK_LORE), oppure
 #  2. c'e' un processo node/npm/vite/vitest/tsc/playwright/esbuild con un percorso sotto la cartella dei progetti ma fuori da Cosmic Horror
 #     (CARTELLA_PROGETTI in pubblica.conf; e' un controllo «a occhio» sulla riga di comando dei processi), oppure
 #  3. c'e' il blocco proprio di Cosmic Horror (due giri insieme).
@@ -125,10 +126,18 @@ nessun_problema token
 
 # --- una build pesante alla volta: se la macchina e' occupata si salta il giro (senza segnare fallimento) ---
 pid_vivo() { [ -n "$1" ] && kill -0 "$1" 2>/dev/null; }
-# 1. lucchetto della batteria di test di Folk Lore (contiene il pid di chi la sta eseguendo)
+# 1. lucchetto della batteria di test di Folk Lore: una riga JSON {"pid":12345,"filtro":"tutto","quando":"..."}
 if [ -f "$LUCCHETTO_FOLK_LORE" ]; then
-  PID_FL=$(head -n 1 "$LUCCHETTO_FOLK_LORE" 2>/dev/null | tr -dc '0-9')
-  if pid_vivo "$PID_FL"; then attesa "batteria di test di Folk Lore in corso (pid $PID_FL, lucchetto $LUCCHETTO_FOLK_LORE)"; exit 0; fi
+  RIGA_FL=$(head -n 1 "$LUCCHETTO_FOLK_LORE" 2>/dev/null | tr -d '\r')
+  # il pid si prende dal campo "pid" (non da tutte le cifre della riga: ci sono anche la data e il filtro); ripiego: file con un numero nudo
+  PID_FL=$(echo "$RIGA_FL" | grep -oE '"pid"[[:space:]]*:[[:space:]]*[0-9]+' | head -n 1 | grep -oE '[0-9]+$')
+  [ -n "$PID_FL" ] || PID_FL=$(echo "$RIGA_FL" | grep -xE '[[:space:]]*[0-9]+[[:space:]]*' | tr -d '[:space:]')
+  if [ -n "$PID_FL" ]; then
+    if pid_vivo "$PID_FL"; then attesa "batteria di test di Folk Lore in corso (pid $PID_FL, lucchetto $LUCCHETTO_FOLK_LORE)"; exit 0; fi
+  elif [ -n "$(find "$LUCCHETTO_FOLK_LORE" -maxdepth 0 -mmin -120 2>/dev/null)" ]; then
+    # pid illeggibile: prudenza, il lucchetto recente (meno di 120 minuti, come il blocco proprio) vale come batteria in corso
+    attesa "lucchetto di Folk Lore recente ma con pid illeggibile (lucchetto $LUCCHETTO_FOLK_LORE)"; exit 0
+  fi
 fi
 # 2. altre build sotto la cartella dei progetti, fuori da Cosmic Horror
 ALTRE=$($CMD_PS 2>/dev/null | grep -F -- "$CARTELLA_PROGETTI/" | grep -v -F -- "$CLONE" | grep -E 'node|npm|vite|vitest|tsc|playwright|esbuild' | head -n 1)

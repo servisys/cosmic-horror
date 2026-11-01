@@ -58,16 +58,27 @@ bash "$S"; verifica "10. blocco senza processo: lo toglie e pubblica" "$(chiamat
 verifica "    il blocco non resta" "$([ -d "$BASE/stato/blocco" ] && echo resta || echo tolto)" tolto
 # una build alla volta: lucchetto di Folk Lore
 nuovo_commit quattro; n=$(chiamate)
-sleep 30 & PIDF=$!; echo $PIDF > "$T/mandi/.coda/batteria.lock"
+sleep 30 & PIDF=$!; echo "{\"pid\":$PIDF,\"filtro\":\"tutto\",\"quando\":\"2026-11-01T19:40:00.000Z\"}" > "$T/mandi/.coda/batteria.lock"
 bash "$S"; bash "$S"
 verifica "11. lucchetto di Folk Lore con pid vivo: salta il giro" "$(chiamate)" "$n"
 verifica "    senza segnare fallimento" "$(cat "$BASE/stato/ultimo-fallito" 2>/dev/null | wc -c | tr -d ' ')" 0
 verifica "    l'attesa e' scritta una volta sola" "$(grep -c 'IN ATTESA: batteria di test di Folk Lore' "$BASE/log/pubblica.log")" 1
 kill $PIDF 2>/dev/null; wait $PIDF 2>/dev/null
 bash "$S"; verifica "12. lucchetto con pid morto: pubblica" "$(chiamate)" "$((n+1))"
-echo "999999" > "$T/mandi/.coda/batteria.lock"
-nuovo_commit cinque; n=$(chiamate); bash "$S"; verifica "13. lucchetto di un pid che non esiste piu': pubblica" "$(chiamate)" "$((n+1))"
+echo '{"pid":999999,"filtro":"tutto","quando":"2026-11-01T19:40:00.000Z"}' > "$T/mandi/.coda/batteria.lock"
+nuovo_commit cinque; n=$(chiamate); bash "$S"; verifica "13. lucchetto JSON di un pid che non esiste piu': pubblica" "$(chiamate)" "$((n+1))"
+# le cifre della data non sono il pid: pid morto con data e filtro pieni di cifre non deve bloccare
+echo '{"pid":999999,"filtro":"123","quando":"2099-12-31T23:59:59.000Z"}' > "$T/mandi/.coda/batteria.lock"
+nuovo_commit cinque-b; n=$(chiamate); bash "$S"; verifica "13b. pid morto, data e filtro con molte cifre: pubblica" "$(chiamate)" "$((n+1))"
+# ripiego: numero nudo con processo vivo
+sleep 30 & PIDN=$!; echo "$PIDN" > "$T/mandi/.coda/batteria.lock"
+nuovo_commit cinque-c; n=$(chiamate); bash "$S"; verifica "13c. lucchetto con numero nudo e processo vivo: salta il giro" "$(chiamate)" "$n"
+kill $PIDN 2>/dev/null; wait $PIDN 2>/dev/null
+# illeggibile e recente: prudenza, salta il giro
+echo 'contenuto-non-leggibile' > "$T/mandi/.coda/batteria.lock"
+bash "$S"; verifica "13d. lucchetto illeggibile e recente: salta il giro" "$(chiamate)" "$n"
 rm -f "$T/mandi/.coda/batteria.lock"
+bash "$S"; verifica "13e. lucchetto tolto: pubblica quello in attesa" "$(chiamate)" "$((n+1))"
 # una build alla volta: altri processi pesanti sotto progetti/
 nuovo_commit sei; n=$(chiamate)
 echo "node $T/progetti/mandi/node_modules/.bin/vitest run" > "$T/ps.txt"

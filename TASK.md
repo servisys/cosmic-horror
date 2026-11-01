@@ -1,49 +1,40 @@
 ---
-id: CT-DOC-003
-fase: esecuzione
+id: CT-DEL-002
+fase: piano
 pronto: si
-branch: planning/ct-doc-003-riferimenti-protocollo
+tipo: deleghe
+branch: nessuno
 scritto_da: Cowork (chat Claude del progetto)
 data: 2026-11-01
+fusioni: 71@1a80198516d4b501e9b006c96f232acd2bf7a2b8
+file_attesi_71: README.md, docs/00-project-overview/01-vision-concept/CT_VISION_AND_PILLARS_V0.11_BOZZA.md
 ---
 
-# CT-DOC-003 — Riferimenti al protocollo vecchio in README e Vision
+# CT-DEL-002 — Fusione della PR 71 (README e Vision puntano al protocollo V0.4)
 
 ## Documenti autorevoli
-- `docs/00_MASTER_INDEX.md` (APPROVED 0.6.0) e `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` (APPROVED), §5 Regole sui file.
-- Richiesta di Matteo in chat a Cowork il 2026-11-01 («3», cioè il task per README e Vision).
-
-## Via di Matteo e risposte al pre-flight plan
-Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («vai»). Risposte:
-1. Vision: strada **B** (stesso file V0.11, solo i due riferimenti cambiati).
-2. Sì alla nota: una riga che dica che sono stati aggiornati solo i riferimenti al protocollo (V0.1 → V0.4), il 2026-11-01. Se il file ha un changelog mettila lì, altrimenti nel formato di nota che il file già usa; `version` non cambia.
-Segui il pre-flight plan.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` §3 (APPROVED).
+- Autorizzazione di Matteo in chat a Cowork il 2026-11-01: «fondi 71». Cowork ha letto il diff della PR su GitHub: 2 file, solo i riferimenti al protocollo e una riga di changelog nella Vision.
 
 ## Obiettivo
-Far puntare al protocollo in vigore (V0.4) i documenti che citano ancora la V0.1, senza cambiare nient'altro.
+Fondere la PR 71 tramite lo script. Task dedicato: nessun lavoro nuovo.
 
 ## Scope incluso
-1. `README.md` riga 10: link al protocollo da `CT_COWORK_CODE_PROTOCOL_V0.1.md` a `CT_COWORK_CODE_PROTOCOL_V0.4.md`.
-2. `docs/00-project-overview/01-vision-concept/CT_VISION_AND_PILLARS_V0.11_BOZZA.md` (DRAFT): riferimenti alla V0.1 in `related_documents` e nel testo (riga 53 circa). Il file è versionato: secondo le regole sui file proponi tu se serve una nuova versione (per esempio V0.12, con la V0.11 DEPRECATED) o se un aggiornamento di soli riferimenti nello stesso file è accettabile; spiega pro e contro in parole semplici.
-3. Cerca in tutto il repository (esclusi `scambio/`, `reference/` e i documenti DEPRECATED o storici) altri riferimenti a `CT_COWORK_CODE_PROTOCOL_V0.1`, `_V0.2` o `_V0.3` che dovrebbero puntare alla V0.4 ed elencali nel piano.
-4. PR verso `main`, descrizione in italiano.
+1. Fase `piano`: in sola lettura, controlla con `gh pr view 71` che la PR sia aperta, verso `main`, testa uguale allo sha del campo `fusioni`, fondibile, e che i file toccati siano solo quelli di `file_attesi_71`. Riporta l'esito. Non fondere.
+2. Fase `esecuzione` (solo dopo il via di Matteo): nessuna modifica al repository; ripeti i controlli in sola lettura e chiudi con esito FATTO. La fusione la esegue lo script.
 
 ## Fuori scope
-- Documenti DEPRECATED o storici (per esempio `CT_COPILOT_CLAUDE_PROTOCOL.md`, i protocolli V0.1–V0.3, i changelog, i decision log già registrati): le parti superate si segnalano, non si correggono.
-- Qualsiasi altra modifica al testo, al gioco o allo script.
-- Fusioni o chiusure di PR.
+Qualsiasi modifica, commit, branch, push o PR.
 
 ## Vincoli tecnici
-- Base `main`. Push solo con `git push -u origin HEAD`, poi `git switch main`.
+Sola lettura. Repository su `main`, pulito.
 
 ## Criteri di accettazione
-- README e Vision (o la sua nuova versione) puntano alla V0.4.
-- Diff limitato ai riferimenti (più eventuale front matter e changelog se nasce una nuova versione).
+- Piano: controlli tutti positivi.
+- Esecuzione: lo script scrive «FUSA» per la PR 71.
 
 ## Test obbligatori
-- `git diff --stat` e diff completo nel resoconto.
-- Ricerca finale: nessun riferimento alla V0.1–V0.3 rimasto fuori dai documenti storici/DEPRECATED, salvo quelli segnalati.
+Nessuno oltre ai controlli del punto 1.
 
 ## Output richiesto
-- Fase `piano`: pre-flight plan con la scelta del punto 2, l'elenco del punto 3, file toccati, domande per Matteo.
-- Fase `esecuzione` (solo dopo nuovo via): Implementation Report con commit e PR.
+Resoconto breve con l'esito dei controlli.

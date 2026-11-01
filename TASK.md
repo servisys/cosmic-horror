@@ -1,6 +1,6 @@
 ---
 id: CT-FIX-006
-fase: piano
+fase: esecuzione
 pronto: si
 branch: fix/ct-fix-006-node-per-il-job-mac
 scritto_da: Cowork (chat Claude del progetto)
@@ -43,3 +43,11 @@ Sotto launchd il PATH dello script (`/opt/homebrew/bin:/usr/local/bin:/usr/bin:.
 
 ## Fuori perimetro
 Nessuna altra modifica; niente fusioni o chiusure.
+
+## Via di Matteo per la fase esecuzione (2026-11-01, in chat a Cowork)
+Matteo ha dato il via. La guida V0.2 è su `main` (PR #74 fusa, merge commit dceca708fc59c0d3cb6c80346c356943721ecf2b): fai `git pull` prima di partire. Domande 1 e 2: va bene come proponi (override `CT_NPM` o salto del controllo con comandi finti; file condiviso `percorso-node.sh`).
+
+Due aggiunte:
+1. **Prova 17 di `prova-logica.sh` sbagliata, emersa sul Mac vero** (su Windows era saltata). Sul Mac `npm test` dentro `npm run pubblica -- prova` è fallito con `KO 17. token con permessi 644 ... (atteso: 9|1, trovato: 9|2)`. Causa: la prova conta le righe con `grep -c 'chmod 600'` nel log, ma la stringa compare anche nel messaggio del caso 16 («manca il token ... (solo il token, chmod 600)»). Conta solo il messaggio dei permessi (es. `ha permessi 644`). Il resto della batteria sul Mac era verde (34 ok).
+2. **Il job si aggiorna da solo.** Oggi `installa.sh` copia lo script in `.pubblicazione/bin` e il job usa quella copia, quindi ogni correzione al job richiede di rilanciare `installa.sh` sul Mac. Fai in modo che, dopo il checkout di un commit nuovo (e prima della build), il job ricopi da `strumenti/mac-mini/` nel `bin` lo script e il file condiviso se sono cambiati, così il giro successivo usa la versione nuova (la copia resta, per non cambiare lo script mentre gira). Se cambia il plist, scrivilo nel log come PROBLEMA («rilancia installa.sh») invece di toccare launchd da solo. Aggiungi una prova in `prova-logica.sh`.
+Nel resoconto scrivi chiaro cosa deve fare Matteo dopo la fusione: con la copia vecchia ancora installata, serve **un'ultima volta** `git pull` + `./strumenti/mac-mini/installa.sh` (+ `--riprova` se serve); da lì in poi niente.

@@ -6,7 +6,8 @@ import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { pressioneTocco, premiArea } from './pressione.mjs';
 
-const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-leggibilita';
 mkdirSync(OUT, { recursive: true });
 const VISTE = [{ nome: '956x440', w: 956, h: 440 }, { nome: '844x390', w: 844, h: 390 }, { nome: '740x340', w: 740, h: 340 }];
@@ -67,6 +68,8 @@ for (const vista of VISTE) {
     await popola(0, 4, 4);
     await popola(1, 2, 5);
     await popola(2, 1, 2);
+    await popola(3, 3, 3);
+    await popola(4, 4, 4); // R'lyeh (il pozzo al centro)
     await ferma();
     await foto('plancia_miniature');
     return controllaTesti('plancia con miniature');
@@ -119,7 +122,7 @@ for (const vista of VISTE) {
     return { ok: aperta, dettaglio: `scheda dopo un tocco di 150 ms: ${aperta ? 'aperta (e' + "'" + ' il tocco normale)' : 'chiusa'}` };
   });
 
-  for (const [n, nome, terr, nLoro, nMie] of [[2, 'due_carte', 1, 1, 1], [5, 'cinque_carte', 0, 3, 2], [8, 'otto_carte', 0, 4, 4]]) {
+  for (const [n, nome, terr, nLoro, nMie] of [[2, 'due_carte', 1, 1, 1], [5, 'cinque_carte', 0, 3, 2], [8, 'otto_carte', 0, 4, 4], [5, 'cinque_carte_dunwich', 3, 3, 2], [8, 'otto_carte_rlyeh', 4, 4, 4]]) {
     await prova(`${vista.nome}: scena di un territorio con ${n} carte`, async () => {
       await p.evaluate(() => { window.__ct.ctrl.annulla(); });
       await popola(terr, nLoro, nMie);

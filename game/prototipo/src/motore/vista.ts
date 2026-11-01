@@ -4,10 +4,10 @@ import type { FazioneId } from '../dati/tipi.js';
 import { carta } from './catalogo.js';
 import { chiDeveMuovere, finita, mosseLegali } from './motore.js';
 import {
-  altro, costoTappa, forzaPresenza, forzaTerritorio, numTappe, tappaPosabile, tappaTogliibile, type Partita,
+  altro, costoTappa, forzaPresenza, forzaTerritorio, idTerr, numTappe, tappaPosabile, tappaTogliibile, ultimaTappaSbloccata, type Partita,
 } from './queries.js';
 import { prossimiTipiEventi } from './effetti.js';
-import { REGOLE } from './regole.js';
+import { REGOLE, TERR } from './regole.js';
 import type { Mossa } from './stato.js';
 
 export interface VistaCarta {
@@ -32,6 +32,8 @@ export interface VistaPresenza {
 export interface VistaTerritorio {
   indice: number;
   nome: string;
+  /** E' il luogo dell'ultima tappa (R'lyeh, CT-DES-070): il computer non conosce ne' id ne' indici dei territori. */
+  luogoUltimaTappa: boolean;
   inst: number;
   controllo: 'io' | 'avv' | null;
   mie: VistaPresenza[];
@@ -72,6 +74,8 @@ export interface Vista {
   tappeAvv: number;
   segnaleMio: boolean;
   segnaleAvv: boolean;
+  /** Il turno di avviso e' passato: la mia ultima tappa (a R'lyeh) e' ammessa. */
+  ultimaTappaSbloccata: boolean;
   territori: VistaTerritorio[];
   /** Tipo dell'evento che si risolve a fine giro (si vede sempre; gli improvvisi mostrano "?"). */
   prossimoEvento: string;
@@ -107,6 +111,7 @@ export function creaVista(g: Partita, io: number): Vista {
     tappeAvv: numTappe(g, altro(io)),
     segnaleMio: me.segnale !== null,
     segnaleAvv: av.segnale !== null,
+    ultimaTappaSbloccata: ultimaTappaSbloccata(g, io),
     territori: s.territori.map((t, i) => {
       const vp = (pi: number) => t.presenze[pi].map((p) => ({
         uid: p.uid, id: p.carta.id, nome: carta(g.cat, p.carta.id, p.carta.trasformata).nome, trasformata: p.carta.trasformata,
@@ -115,6 +120,7 @@ export function creaVista(g: Partita, io: number): Vista {
       return {
         indice: i,
         nome: g.cat.dati.territori[i].nome,
+        luogoUltimaTappa: idTerr(g, i) === TERR.rlyeh,
         inst: t.inst,
         controllo: t.controllo === null ? null : t.controllo === io ? 'io' : 'avv',
         mie: vp(io),

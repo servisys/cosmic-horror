@@ -2,6 +2,7 @@
 // Nessuna regola qui: tutto cio' che si mostra viene dalla vista del giocatore, tutto cio' che si puo' fare viene dal controller (che chiede al motore).
 import { Container, Graphics, Rectangle, Sprite, Text, type Application } from 'pixi.js';
 import { carta } from '../motore/catalogo.js';
+import { REGOLE } from '../motore/regole.js';
 import type { Vista, VistaPresenza, VistaTerritorio } from '../motore/vista.js';
 import { altezzaCarta, cartaGrande, cartaRidotta, datiDaCarta, datiEvento, datiTerritorio, type DatiCarta, tavolozza } from './carte.js';
 import { IMG_H, IMG_W, LUCI_PLANCIA, SETTORI, coverTrasformazione, inSchermo, settoreDelTerritorio, type Settore } from './config-plancia.js';
@@ -40,6 +41,8 @@ export interface UiStato {
   scena: Settore['id'] | null;
   /** Nella scena: e' aperta la scelta della carta da giocare li'. */
   manoQui: boolean;
+  /** E' aperto il pannello delle Pietre ritte di Dunwich (scelta del territorio e del segno). */
+  pietre: boolean;
 }
 
 export interface Azioni {
@@ -62,6 +65,8 @@ export interface Azioni {
   vicino(dir: -1 | 1): void;
   manoQui(aperta: boolean): void;
   giocaQui(uid: number): void;
+  /** Apre o chiude il pannello delle Pietre ritte. */
+  pietre(aperto: boolean): void;
 }
 
 export const NOME_FAZ: Record<string, string> = { custodi: 'I Custodi', risvegliati: 'I Risvegliati' };
@@ -104,7 +109,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
       const vis = visibili.get(st.id)!;
       const reg: Area = { x: 0, y: 0, w: 28 * u, h: 18 * u }; // provvisorio: il punto libero si sceglie a fine disegno
       if (st.id === 'rlyeh') {
-        pozzo(d, st, vis, reg, az);
+        pozzo(d, c, st, i, vis, reg, az);
         continue;
       }
       const valido = i >= 0 && opz.terr.includes(i);
@@ -139,7 +144,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
     ordine.forEach(({ t, i }) => {
       const st = settoreDelTerritorio(c.cat.dati.territori[i].id);
       if (!st) return;
-      ostacoli.push(targhetta(d, c, ui, az, v, t, i, st, visibili.get(st.id)!, opz, hBar, W, H));
+      ostacoli.push(...targhetta(d, c, ui, az, v, t, i, st, visibili.get(st.id)!, opz, hBar, W, H));
     });
     d.aree['territori:tutti'] = { x: 0, y: hBar, w: W, h: H - hBar - 58 * u };
 
@@ -191,6 +196,11 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
 
   // ---------- sovrapposizioni ----------
   if (opz.cerca.length) sceltaCerca(d, c, opz.cerca, W, H, az);
+  if (opz.segni.length) sceltaSegno(d, c, opz.segni, W, H, az);
+  if (ui.pietre) {
+    if (c.puoPietre()) pannelloPietre(d, c, ui, W, H, az);
+    else ui.pietre = false; // le Pietre ritte non si possono piu' usare (usate, energia finita, controllo perso)
+  }
   const dec = c.decisione;
   if (dec) riordinoBiblioteca(d, c, dec.uids, ui, W, H, az);
   if (ui.grande && !c.evento) vistaGrande(d, c, ui.grande, W, H, az);
@@ -231,7 +241,7 @@ export function disegnaAnteprima(app: Application, c: Controller, ui: UiStato): 
   const { sopra } = livelli(app);
   for (const ch of sopra.removeChildren()) ch.destroy({ children: true });
   const opz = c.opzioni();
-  const modale = opz.cerca.length > 0 || !!c.decisione || !!c.evento || ui.regole || c.finita || !!ui.grande;
+  const modale = opz.cerca.length > 0 || opz.segni.length > 0 || ui.pietre || !!c.decisione || !!c.evento || ui.regole || c.finita || !!ui.grande;
   if (modale || (!ui.zoom && ui.zoomTerr === null)) return;
   const W = app.screen.width;
   const H = app.screen.height;
@@ -313,18 +323,43 @@ function luciPlancia(d: Disegno, W: number, H: number): void {
   anim.luce(sp, 'pulsa', { min: 0.08, max: 0.4, periodo: 3600, fase: 0 });
 }
 
-/** Il pozzo di R'lyeh: ellisse toccabile al centro; visibile ma non in gioco. */
-function pozzo(d: Disegno, st: Settore, vis: Area, reg: Area, az: Azioni): void {
+/** Il pozzo di R'lyeh: ellisse toccabile al centro. Si comporta come gli altri quadri: se la carta scelta si gioca li' la gioca, altrimenti apre la scena. */
+function pozzo(d: Disegno, c: Controller, st: Settore, i: number, vis: Area, reg: Area, az: Azioni): void {
   const g = new Graphics();
   g.ellipse(vis.x + vis.w / 2, vis.y + vis.h / 2, vis.w / 2, vis.h / 2).fill({ color: 0x000000, alpha: 0.18 });
   g.eventMode = 'static';
   g.cursor = 'pointer';
-  g.on('pointertap', () => az.settore(st.id));
+  g.on('pointertap', () => { if (i >= 0 && c.opzioni().terr.includes(i)) { c.scegliTerritorio(i); az.rerender(); } else az.settore(st.id); });
   d.s.addChild(g);
-  d.aree[`settore:${st.id}`] = reg;
+  if (i >= 0 && c.opzioni().terr.includes(i)) {
+    // il pozzo e' un bersaglio valido: contorno dorato che pulsa, come i quadri
+    const lu = new Graphics();
+    lu.ellipse(vis.x + vis.w / 2, vis.y + vis.h / 2, vis.w / 2 - 4 * d.u, vis.h / 2 - 4 * d.u).stroke({ width: 5 * d.u, color: COL.oroChiaro, alpha: 0.9 });
+    d.s.addChild(lu);
+    anim.luce(lu, 'pulsa', { min: 0.45, max: 1, periodo: 1500, fase: 0 });
+  }
+  if (i >= 0) d.aree[`terr:${i}`] = reg;
+  else d.aree[`settore:${st.id}`] = reg;
 }
 
 // ======================= targhetta di un territorio =======================
+
+/**
+ * Targhetta «ULTIMA TAPPA» sopra R'lyeh (CT-DES-070): spenta finche' nessuno dei due ha 2 tappe, accesa e pulsante da 2 tappe in su
+ * (tue o di Lui: e' il luogo dove si decide la partita). Ritorna la larghezza.
+ */
+export function ultimaTappa(d: Disegno, v: Vista, cx: number, y: number, h: number, daSinistra = false): number {
+  const accesa = v.tappe >= 2 || v.tappeAvv >= 2;
+  const et = 'ULTIMA TAPPA';
+  const w = d.larghezza(et, 12, { titoli: true, bold: true, ls: 0.5 }) + 22 * d.u;
+  const x = daSinistra ? cx : cx - w / 2;
+  cx = x + w / 2;
+  if (accesa) anim.luce(d.alone(x, y, w, h, 0xffd25a, 0.95, 14, h / (2 * d.u)), 'pulsa', { min: 0.45, max: 1, periodo: 1100, fase: 0 });
+  d.rett(x, y, w, h, accesa ? 0x4a1f6e : 0x14110c, { r: h / 2, stroke: accesa ? 0xffd25a : 0x4a4332, sw: accesa ? 1.6 : 1, alpha: accesa ? 0.97 : 0.82 });
+  d.testo(et, cx, y + h / 2, 12, accesa ? 0xfff2d0 : 0x8a8270, { titoli: true, bold: true, ls: 0.5, anchorX: 0.5, anchorY: 0.5 }).y = y + h / 2;
+  d.aree[accesa ? 'ultima-tappa:accesa' : 'ultima-tappa:spenta'] = { x, y, w, h };
+  return w;
+}
 
 function disco(d: Disegno, cx: number, cy: number, r: number, faz: string, togliibile: boolean): void {
   const col = faz === 'custodi' ? 0xb3301f : 0x2f8a4c;
@@ -338,8 +373,9 @@ function disco(d: Disegno, cx: number, cy: number, r: number, faz: string, togli
   }
 }
 
-function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista, t: VistaTerritorio, i: number, st: Settore, vis: Area, opz: ReturnType<Controller['opzioni']>, hBar: number, W: number, H: number): Area {
+function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista, t: VistaTerritorio, i: number, st: Settore, vis: Area, opz: ReturnType<Controller['opzioni']>, hBar: number, W: number, H: number): Area[] {
   const u = d.u;
+  const ing: Area[] = []; // ingombri del quadro (targhetta, badge, bottoni, fila delle miniature, righe): servono a trovare un punto libero dove toccare il quadro
   const alt = 36 * u;
   const nome = st.nome;
   const wNome = d.larghezza(nome, 14, { titoli: true, bold: true });
@@ -350,9 +386,12 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const hanMio = t.mioTappa;
   const wDischi = (hanLui ? 25 * u : 0) + (hanMio ? 25 * u : 0);
   const wp = 10 * u + wNome + 10 * u + wNum + 6 * u + wPip + 6 * u + wNum + (wDischi ? 6 * u : 0) + wDischi + 10 * u;
-  const xp = st.lato === 'sx' ? vis.x + 8 * u : vis.x + vis.w - 8 * u - wp;
+  const xp = st.lato === 'sx' ? vis.x + 8 * u : st.lato === 'dx' ? vis.x + vis.w - 8 * u - wp : vis.x + (vis.w - wp) / 2;
   const xpc = Math.max(4 * u, Math.min(W - 4 * u - wp, xp));
-  const yp = Math.max(vis.y, hBar + (v.eventiVisti.length ? 18 * u : 0)) + 5 * u;
+  // R'lyeh (al centro): sopra la targhetta c'e' la targhetta «ULTIMA TAPPA»
+  const haBadge = st.lato === 'centro';
+  const hBadge = 22 * u;
+  const yp = Math.max(vis.y, hBar + (v.eventiVisti.length ? 18 * u : 0)) + 5 * u + (haBadge ? hBadge + 2 * u : 0) - (st.rialzo ?? 0) * u;
   d.rett(xpc, yp, wp, alt, 0, {
     r: 5 * u, tex: texturaGradiente([[0, 'rgba(28,20,12,0.95)'], [1, 'rgba(14,10,6,0.95)']], true), stroke: COL.oroScuro, sw: 1,
     id: `terrnome:${i}`, tap: () => az.grande({ tipo: 'terr', i }),
@@ -380,48 +419,80 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   if (hanLui) { disco(d, x + 10 * u, cy, 8.5 * u, v.fazioneAvv, t.loroTappaTogliibile); d.punti[`disco:${i}:loro`] = { x: x + 10 * u, y: cy }; x += 25 * u; }
   if (hanMio) { disco(d, x + 10 * u, cy, 8.5 * u, v.fazione, t.mioTappaTogliibile); d.punti[`disco:${i}:mio`] = { x: x + 10 * u, y: cy }; x += 25 * u; }
   let y = yp + alt + 4 * u;
+  const yRiga = y; // dove sta la fila delle miniature se affianca i bottoni invece di stare sotto
   let xMin = xpc;
   let xMax = xpc + wp;
   misura('quadro', `targhetta:${i}`, { x: xpc, y: yp, w: wp, h: alt });
+  ing.push({ x: xpc - 3 * u, y: yp - 3 * u, w: wp + 6 * u, h: alt + 6 * u });
+  if (haBadge) {
+    const yb = yp - hBadge - 2 * u;
+    const w = ultimaTappa(d, v, xpc + wp / 2, yb, hBadge);
+    misura('quadro', `ultimatappa:${i}`, { x: xpc + wp / 2 - w / 2, y: yb, w, h: hBadge });
+    ing.push({ x: xpc + wp / 2 - w / 2 - 3 * u, y: yb - 3 * u, w: w + 6 * u, h: hBadge + 6 * u });
+    xMin = Math.min(xMin, xpc + wp / 2 - w / 2);
+    xMax = Math.max(xMax, xpc + wp / 2 + w / 2);
+  }
   const basso = st.zona.y > 0.4;
   // bottone dorato subito sotto la targhetta, in alto nel quadro: solo quando l'azione e' possibile (spento solo nel tutorial)
   const puo = c.puoTappa(i);
   const nomeBtn = v.fazione === 'custodi' ? 'PONI SIGILLO' : 'COMPLETA RITO';
   const hBtn = Math.max(34 * u, 32);
-  const bottone = (et: string, abilitata: boolean, tap: () => void, wMax: number): void => {
+  let xBtnMax = xpc; // bordo destro dei bottoni sotto la targhetta (la fila delle miniature che li affianca parte dopo)
+  const bottone = (id: string, nomeMisura: string, et: string, abilitata: boolean, tap: () => void, wMax: number): void => {
     const wb = Math.min(wMax, d.larghezza(et, 12.5, { titoli: true, bold: true, ls: 0.5 }) + 30 * u);
-    const xb = st.lato === 'sx' ? xpc : xpc + wp - wb;
-    d.pillolaOro(`btn:tappa:${i}`, et, xb, y, hBtn, tap, 12.5, abilitata);
-    misura('quadro', `bottone:${i}`, { x: xb, y, w: wb, h: hBtn });
+    const xb = st.lato === 'sx' ? xpc : st.lato === 'dx' ? xpc + wp - wb : xpc + (wp - wb) / 2;
+    d.pillolaOro(id, et, xb, y, hBtn, tap, 12.5, abilitata);
+    misura('quadro', nomeMisura, { x: xb, y, w: wb, h: hBtn });
     xMin = Math.min(xMin, xb);
     xMax = Math.max(xMax, xb + wb);
+    xBtnMax = Math.max(xBtnMax, xb + wb);
+    ing.push({ x: xb - 6 * u, y: y - 6 * u, w: wb + 12 * u, h: hBtn + 12 * u });
     y += hBtn + 4 * u;
   };
-  if (puo) bottone(`${nomeBtn} · ${t.costoTappa}`, true, () => { c.tappa(i); az.rerender(); }, wp + 60 * u);
+  if (puo) bottone(`btn:tappa:${i}`, `bottone:${i}`, `${nomeBtn} · ${t.costoTappa}`, true, () => { c.tappa(i); az.rerender(); }, wp + 60 * u);
   else if (ui.tutorial?.passo === 4) {
     const motivo = motivoTappa(v, t);
-    bottone(motivo ? `${nomeBtn}: ${motivo}` : nomeBtn, false, () => undefined, wp + 60 * u);
+    bottone(`btn:tappa:${i}`, `bottone:${i}`, motivo ? `${nomeBtn}: ${motivo}` : nomeBtn, false, () => undefined, wp + 60 * u);
+  }
+  // Dunwich: Pietre ritte (1 energia), solo se le controlli e puoi usarle: la pillola accanto alla targhetta apre il pannello con territorio e segno
+  if (st.id === 'dunwich' && c.puoPietre()) {
+    const et = `PIETRE · ${REGOLE.costoPietreRitte}`;
+    const xP = xpc + wp + 6 * u;
+    const wP = d.pillolaOro('btn:pietre', et, xP, yp, alt, () => az.pietre(true), 12.5);
+    misura('quadro', `bottonepietre:${i}`, { x: xP, y: yp, w: wP, h: alt });
+    xMax = Math.max(xMax, xP + wP);
+    ing.push({ x: xP - 6 * u, y: yp - 6 * u, w: wP + 12 * u, h: alt + 12 * u });
   }
   // miniature delle carte giocate (circa 50x70): Lui (verde) e Tu (blu) nella stessa fila, dentro il quadro; se sono tante si sovrappongono a ventaglio
-  const mw = 50 * u;
-  const mh = 70 * u;
+  const mc = st.mini ?? {};
+  const mw = 50 * u * (mc.scala ?? 1);
+  const mh = 70 * u * (mc.scala ?? 1);
   const gap = 4 * u;
   const sep = 12 * u;
   const nL = t.loro.length;
   const nT = t.mie.length;
-  const maxW = Math.max(mw, vis.w * (basso ? 0.8 : 0.66));
+  // bordo sinistro minimo della fila (pannello dell'energia, bottoni affiancati) e destro (R'lyeh): la fila sta nello spazio che resta
+  let xSinMin = mc.xDa !== undefined ? mc.xDa * u : -Infinity;
+  if (mc.affianca && xBtnMax > xpc) xSinMin = Math.max(xSinMin, xBtnMax + 6 * u);
+  const xDxMax = mc.xDa !== undefined && mc.larghezzaMax !== undefined ? (mc.xDa + mc.larghezzaMax) * u : undefined;
+  const maxW = xDxMax !== undefined ? Math.max(mw, xDxMax - xSinMin)
+    : mc.larghezzaMax !== undefined ? Math.max(mw, mc.larghezzaMax * u) : Math.max(mw, vis.w * (basso ? 0.8 : 0.66));
   // spazio per ciascun gruppo, in proporzione alle carte
   const spazio = (n: number): number => Math.max(mw, ((maxW - (nL && nT ? sep : 0)) * n) / Math.max(1, nL + nT));
   const passoDi = (n: number): number => (n > 1 ? Math.min(mw + gap, (spazio(n) - mw) / (n - 1)) : 0);
   const larghGruppo = (n: number): number => (n ? passoDi(n) * (n - 1) + mw : 0);
   const totale = larghGruppo(nL) + (nL && nT ? sep : 0) + larghGruppo(nT);
   if (nL + nT > 0) {
-    let xm = st.lato === 'sx' ? xpc : xpc + wp - totale;
+    let xm = st.lato === 'sx' ? xpc : st.lato === 'dx' ? xpc + wp - totale : xpc + (wp - totale) / 2;
+    const ym = mc.affianca ? yRiga : y;
+    // in basso a sinistra c'e' il pannello dell'energia (xDa): le carte non ci vanno sopra
+    xm = Math.max(xm, xSinMin);
     // in basso a destra c'e' il medaglione di Fine turno: le carte non ci vanno sotto
-    if (y + mh > H - 112 * u) xm = Math.min(xm, W - 104 * u - totale);
+    if (ym + mh > H - 112 * u) xm = Math.min(xm, W - 104 * u - totale);
     const xInizio = xm;
     xMin = Math.min(xMin, xm);
     xMax = Math.max(xMax, xm + totale);
+    ing.push({ x: xm - 3 * u, y: ym - 3 * u, w: totale + 6 * u, h: mh + 6 * u });
     const fila = (lista: VistaPresenza[], mio: boolean): void => {
       const n = lista.length;
       const passo = passoDi(n);
@@ -429,10 +500,10 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
         const bersaglio = opz.pres.includes(p.uid);
         const filo = mio ? 0x6aa8f0 : 0x5fb878;
         const apri = (): void => az.grande({ tipo: 'carta', id: p.id, trasformata: p.trasformata });
-        if (bersaglio) d.alone(xm, y, mw, mh, COL.selezione, 1, 12, 3);
-        d.rett(xm - 1.5 * u, y - 1.5 * u, mw + 3 * u, mh + 3 * u, 0x000000, { r: 3 * u, alpha: 0.9 });
-        if (!d.immagine(idImmagine(p.id, p.trasformata), xm, y, mw, mh, 1, 3)) d.rett(xm, y, mw, mh, colori(p.id).scuro, { r: 3 * u });
-        const g = d.rett(xm, y, mw, mh, 0xffffff, {
+        if (bersaglio) d.alone(xm, ym, mw, mh, COL.selezione, 1, 12, 3);
+        d.rett(xm - 1.5 * u, ym - 1.5 * u, mw + 3 * u, mh + 3 * u, 0x000000, { r: 3 * u, alpha: 0.9 });
+        if (!d.immagine(idImmagine(p.id, p.trasformata), xm, ym, mw, mh, 1, 3)) d.rett(xm, ym, mw, mh, colori(p.id).scuro, { r: 3 * u });
+        const g = d.rett(xm, ym, mw, mh, 0xffffff, {
           alpha: 0.001, r: 3 * u, stroke: bersaglio ? COL.selezione : filo, sw: bersaglio ? 2.8 : 1.8, id: `pres:${p.uid}`,
           tap: () => {
             if (pressioneRecente()) return;
@@ -443,22 +514,22 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
           over: () => az.zoom({ id: p.id, trasformata: p.trasformata }), out: () => az.zoom(null),
         });
         pressioneLunga(g, apri);
-        misura('quadro', `miniatura:${p.uid}`, { x: xm, y, w: mw, h: mh });
+        misura('quadro', `miniatura:${p.uid}`, { x: xm, y: ym, w: mw, h: mh });
         // il riquadro della forza sta in basso a sinistra: nel ventaglio la parte destra e' coperta dalla carta vicina
         const fw = 25 * u;
         const fh = 18 * u;
-        d.rett(xm, y + mh - fh, fw, fh, 0x000000, { alpha: 0.88, r: 3 * u });
-        d.testo(String(p.forza), xm + fw / 2, y + mh - fh / 2, 13, mio ? 0xcfe4ff : 0xbff0cc, { titoli: true, bold: true, anchorX: 0.5, anchorY: 0.5 }).y = y + mh - fh / 2;
-        if (p.trasformata) d.testo('✦', xm + mw - 3 * u, y + 1 * u, 13, 0xd08cff, { bold: true, anchorX: 1 });
+        d.rett(xm, ym + mh - fh, fw, fh, 0x000000, { alpha: 0.88, r: 3 * u });
+        d.testo(String(p.forza), xm + fw / 2, ym + mh - fh / 2, 13, mio ? 0xcfe4ff : 0xbff0cc, { titoli: true, bold: true, anchorX: 0.5, anchorY: 0.5 }).y = ym + mh - fh / 2;
+        if (p.trasformata) d.testo('✦', xm + mw - 3 * u, ym + 1 * u, 13, 0xd08cff, { bold: true, anchorX: 1 });
         // punto di tocco per i test: la parte della carta che resta scoperta
-        d.aree[`pres:${p.uid}`] = { x: xm, y: y + 4 * u, w: k < n - 1 ? Math.max(passo, 6 * u) : mw, h: mh - fh - 6 * u };
+        d.aree[`pres:${p.uid}`] = { x: xm, y: ym + 4 * u, w: k < n - 1 ? Math.max(passo, 6 * u) : mw, h: mh - fh - 6 * u };
         xm += passo;
       });
     };
     fila(t.loro, false);
     xm = xInizio + larghGruppo(nL) + (nL ? sep : 0);
     fila(t.mie, true);
-    y += mh + 4 * u;
+    y = mc.affianca ? Math.max(y, ym + mh + 4 * u) : y + mh + 4 * u;
   }
   // tappe non ancora al sicuro: in piccolo, solo se c'e' posto (nei quadri in basso la fila delle carte e il bottone arrivano gia' fin sopra la mano)
   const sigAvv = v.fazioneAvv === 'custodi' ? 'Sigillo' : 'Rito';
@@ -466,18 +537,20 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   const righe: string[] = [];
   if (hanLui && t.loroTappaTogliibile) righe.push(`${sigAvv} di Lui: al sicuro dopo il tuo turno`);
   if (hanMio && t.mioTappaTogliibile) righe.push(`${sigMio} tuo: al sicuro dopo il turno di Lui`);
-  const limite = basso ? H - 66 * u : vis.y + vis.h;
+  // in basso a sinistra (xDa) le righe non devono finire sul pannello dell'energia
+  const limite = mc.xDa !== undefined ? H - 140 * u : basso ? H - 66 * u : vis.y + vis.h;
   for (const r of righe) {
     if (y + 18 * u > limite) break;
     const wr = Math.min(wp + 40 * u, d.larghezza(r, 12, { corsivo: true }) + 14 * u);
-    const xr = st.lato === 'sx' ? xpc : xpc + wp - wr;
+    const xr = st.lato === 'sx' ? xpc : st.lato === 'dx' ? xpc + wp - wr : xpc + (wp - wr) / 2;
     xMin = Math.min(xMin, xr);
     xMax = Math.max(xMax, xr + wr);
+    ing.push({ x: xr - 3 * u, y: y - 3 * u, w: wr + 6 * u, h: 24 * u });
     d.rett(xr, y, wr, 18 * u, 0x0a0704, { alpha: 0.85, r: 9 * u });
     d.testo(r, xr + wr / 2, y + 9 * u, 12, COL.oroChiaro, { corsivo: true, anchorX: 0.5, anchorY: 0.5 }).y = y + 9 * u;
     y += 20 * u;
   }
-  return { x: xMin - 4 * u, y: yp - 4 * u, w: xMax - xMin + 8 * u, h: y - yp + 8 * u };
+  return ing;
 }
 
 // ======================= barra in alto =======================
@@ -691,7 +764,25 @@ function puntiLiberi(d: Disegno, c: Controller, visibili: Map<string, Area>, ost
     const cx = vis.x + vis.w * 0.5;
     const cy = vis.y + vis.h * 0.5;
     let meglio: { x: number; y: number } | null = null;
-    if (st.id === 'rlyeh') { meglio = { x: cx, y: cy }; } else {
+    if (st.id === 'rlyeh') {
+      // dentro l'ellisse, lontano da targhetta, bottoni e miniature di R'lyeh stesso (e dagli altri ingombri)
+      for (const mO of [8, 3, 0]) {
+        let dmin = Infinity;
+        for (let gy = 0.05; gy < 1; gy += 0.03) {
+          for (let gx = 0.05; gx < 1; gx += 0.02) {
+            const x = vis.x + gx * vis.w;
+            const y = vis.y + gy * vis.h;
+            const ex = (x - cx) / (vis.w / 2 - 6 * u);
+            const ey = (y - cy) / (vis.h / 2 - 6 * u);
+            if (ex * ex + ey * ey >= 1 || !libero(x, y, mO * u)) continue;
+            const dd = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+            if (dd < dmin) { dmin = dd; meglio = { x, y }; }
+          }
+        }
+        if (meglio) break;
+      }
+      meglio ??= { x: cx, y: cy };
+    } else {
       // prima con un bel margine, poi sempre meno
       for (const [mO, mP] of [[14, 16], [6, 8], [2, 2]] as const) {
         let dmin = Infinity;
@@ -743,6 +834,46 @@ function sceltaCerca(d: Disegno, c: Controller, ids: string[], W: number, H: num
   ids.forEach((id, k) => {
     d.bottone(`cerca:${id}`, carta(c.cat, id, false).nome, r.x + 10 * u, r.y + 34 * u + k * (bh + 4 * u), w - 20 * u, bh, true, () => { c.scegliCerca(id); az.rerender(); }, 0x2d3b55, 12);
   });
+}
+
+/** Pietra Incisa: dopo il territorio si sceglie il segno (+1 o -1 all'instabilita'). */
+function sceltaSegno(d: Disegno, c: Controller, segni: (1 | -1)[], W: number, H: number, az: Azioni): void {
+  const u = d.u;
+  const w = Math.min(380 * u, W * 0.9);
+  const h = Math.min(120 * u, H - 20 * u);
+  const r = riquadroCentrale(d, W, H, w, h);
+  const t = c.selezione.terr !== undefined ? c.vista().territori[c.selezione.terr].nome : 'il territorio';
+  d.testo(`Pietra Incisa: instabilità di ${t}`, r.x + 10 * u, r.y + 8 * u, 12.5, COL.oro, { bold: true, w: w - 20 * u });
+  const bw = (w - 40 * u) / 3;
+  const by = r.y + 44 * u;
+  d.bottone('segno:piu', 'PIÙ 1', r.x + 10 * u, by, bw, 34 * u, segni.includes(1), () => { c.scegliSegno(1); az.rerender(); }, 0x7a3b2a, 14);
+  d.bottone('segno:meno', 'MENO 1', r.x + 20 * u + bw, by, bw, 34 * u, segni.includes(-1), () => { c.scegliSegno(-1); az.rerender(); }, 0x2f5a3a, 14);
+  d.bottone('segno:annulla', 'ANNULLA', r.x + 30 * u + 2 * bw, by, bw, 34 * u, true, () => { c.annulla(); az.rerender(); }, 0x2d3b55, 13);
+}
+
+/** Pietre ritte di Dunwich: per ogni altro territorio due bottoni (+1 e -1), accesi solo se il motore ammette la mossa. */
+function pannelloPietre(d: Disegno, c: Controller, ui: UiStato, W: number, H: number, az: Azioni): void {
+  const u = d.u;
+  const v = c.vista();
+  const possibili = c.pietreRitte(); // il motore elenca solo i territori diversi da Dunwich e i segni che cambiano davvero l'instabilita'
+  const righe = v.territori.filter((t) => possibili.some((p) => p.terr === t.indice));
+  const rh = 30 * u;
+  const w = Math.min(520 * u, W * 0.95);
+  const h = Math.min(60 * u + righe.length * (rh + 4 * u) + 40 * u, H - 8 * u);
+  const r = riquadroCentrale(d, W, H, w, h);
+  d.testo('Pietre ritte: scegli il territorio e il segno (1 energia, una volta per turno)', r.x + 10 * u, r.y + 8 * u, 12.5, COL.oro, { bold: true, w: w - 20 * u });
+  let y = r.y + 34 * u;
+  const bw = 66 * u;
+  for (const t of righe) {
+    const piu = possibili.some((p) => p.terr === t.indice && p.segno === 1);
+    const meno = possibili.some((p) => p.terr === t.indice && p.segno === -1);
+    d.rett(r.x + 10 * u, y, w - 20 * u - 2 * bw - 12 * u, rh, 0x0d1118, { r: 5 * u, stroke: 0x34405a });
+    d.adatta(`${t.nome} · instabilità ${t.inst}`, r.x + 16 * u, y + 2 * u, w - 32 * u - 2 * bw - 12 * u, rh - 4 * u, 13, 12, 0xf0e6cc, false, 'left');
+    d.bottone(`pietre:${t.indice}:piu`, 'PIÙ 1', r.x + w - 10 * u - 2 * bw - 6 * u, y, bw, rh, piu, () => { c.pietre(t.indice, 1); ui.pietre = false; az.rerender(); }, 0x7a3b2a, 12.5);
+    d.bottone(`pietre:${t.indice}:meno`, 'MENO 1', r.x + w - 10 * u - bw, y, bw, rh, meno, () => { c.pietre(t.indice, -1); ui.pietre = false; az.rerender(); }, 0x2f5a3a, 12.5);
+    y += rh + 4 * u;
+  }
+  d.bottone('pietre:annulla', 'ANNULLA', r.x + 10 * u, r.y + h - 32 * u, 110 * u, 26 * u, true, () => az.pietre(false), 0x2d3b55, 12);
 }
 
 function riordinoBiblioteca(d: Disegno, c: Controller, uids: number[], ui: UiStato, W: number, H: number, az: Azioni): void {
@@ -825,8 +956,9 @@ function pannelloRegole(d: Disegno, W: number, H: number, az: Azioni): void {
     'Controlla un territorio chi vi ha più forza (parità: nessuno). Massimo 4 presenze per territorio. Controllare un territorio dà una carta della sua riserva.',
     'Le carte potenti fanno salire anche l\'esposizione (a 3, 6, 9 una carta del mazzo diventa cosmica ✦) e l\'instabilità del territorio.',
     'Instabilità 4: le presenze perdono 1 forza. Instabilità 5: scatta l\'effetto cosmico del territorio a fine giro.',
-    'Custodi: poni tre Sigilli (territorio che controlli, instabilità 3 o meno). Risvegliati: completa tre riti (una presenza, forza almeno pari, instabilità 3 o più).',
+    'Custodi: poni tre Sigilli (territorio che controlli, instabilità 3 o meno). Risvegliati: completa tre riti (una presenza, forza almeno pari, instabilità 3 o più). I primi due si fanno sui territori esterni, il terzo solo a R\'lyeh, il pozzo al centro.',
     'Con la penultima tappa scatta il SEGNALE: l\'avversario ha un turno di avviso. Le tappe si possono togliere solo fino alla fine del turno successivo dell\'avversario.',
+    'Dunwich: chi lo controlla può usare le Pietre ritte (1 energia, una volta per turno): l\'instabilità di un altro territorio sale o scende di 1. A R\'lyeh le carte potenti costano 1 esposizione in più.',
     'Fine partita: «Copia il registro» (icona in basso a destra) per mandarlo a chi analizza le partite. Tocca per chiudere.',
     'Versione del gioco: ' + VERSIONE,
   ];

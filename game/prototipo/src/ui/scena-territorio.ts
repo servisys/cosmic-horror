@@ -6,7 +6,8 @@ import { SETTORI, type Settore } from './config-plancia.js';
 import type { Controller } from './controller.js';
 import { COL, Disegno, pressioneLunga, pressioneRecente, texturaGradiente } from './disegno.js';
 import { texturaScena } from './immagini.js';
-import type { Azioni, UiStato } from './scena.js';
+import { REGOLE } from '../motore/regole.js';
+import { ultimaTappa, type Azioni, type UiStato } from './scena.js';
 import { aloneLuce, anim } from './animazioni.js';
 import { cosaManca, motivoTappa } from './suggerimento.js';
 import type { VistaPresenza } from '../motore/vista.js';
@@ -108,9 +109,16 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
     const col = s.id === 'rlyeh' ? 0xb48ae6 : 0xf3e3b6;
     d.cerchio(xDots + pitchD / 2 + k * pitchD, hBar / 2, 5.5 * u, col, { alpha: attivo ? 1 : 0.32 });
   });
-  const larghEffetto = xDots - 44 * u - (xNome + nome.width + 14 * u);
+  let xEffetto = xNome + nome.width + 14 * u;
+  if (t && st.id === 'rlyeh') {
+    // R'lyeh e' il luogo dell'ultima tappa: la targhetta accanto al nome (spenta sotto le 2 tappe, accesa e pulsante da 2 in su)
+    const hb = 22 * u;
+    const wb = ultimaTappa(d, v, xEffetto, (hBar - hb) / 2, hb, true);
+    xEffetto += wb + 14 * u;
+  }
+  const larghEffetto = xDots - 44 * u - xEffetto;
   const effetto = t ? c.cat.dati.territori[i].effetto : 'Non ancora in gioco: si può guardare la scena, ma qui non si gioca.';
-  if (larghEffetto > 80 * u) d.adatta(effetto, xNome + nome.width + 14 * u, 6 * u, larghEffetto, hBar - 10 * u, 14, 12, 0xe6dcc4, false, 'left', { corsivo: true });
+  if (larghEffetto > 80 * u) d.adatta(effetto, xEffetto, 6 * u, larghEffetto, hBar - 10 * u, 14, 12, 0xe6dcc4, false, 'left', { corsivo: true });
 
   // ---------- luogo non ancora in gioco: solo la scena ----------
   if (!t) {
@@ -232,7 +240,9 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
     const ok = qui.length > 0;
     const puo = c.puoTappa(i);
     const motivo = puo ? '' : motivoTappa(v, t);
-    const alto = 40 * u + (ok ? 0 : 20 * u) + (puo ? 34 * u : motivo ? 38 * u : 0);
+    // Dunwich: Pietre ritte (1 energia): il bottone apre il pannello con la scelta del territorio e del segno
+    const pietre = st.id === 'dunwich' && c.puoPietre();
+    const alto = 40 * u + (ok ? 0 : 20 * u) + (puo ? 34 * u : motivo ? 38 * u : 0) + (pietre ? 38 * u : 0);
     let yb = Math.max(y + 2 * u, fondo - alto);
     const et = 'GIOCA UNA CARTA QUI';
     const w1 = d.larghezza(et, 12.5, { titoli: true, bold: true, ls: 0.5 }) + 34 * u;
@@ -242,6 +252,12 @@ export function disegnaTerritorio(d: Disegno, c: Controller, ui: UiStato, az: Az
     d.testo(et, cxp, yb + 18 * u, 12.5, ok ? 0xeadcff : 0x8a8270, { titoli: true, bold: true, ls: 0.5, anchorX: 0.5, anchorY: 0.5 }).y = yb + 18 * u;
     yb += 40 * u;
     if (!ok) { d.testo(c.tuoTurno ? 'Nessuna carta si può giocare qui adesso.' : 'Turno di Lui: aspetta.', cxp, yb - 2 * u, 13, 0xe0d8c2, { anchorX: 0.5, corsivo: true, bordo: { colore: 0x000000, spessore: 3 } }); yb += 20 * u; }
+    if (pietre) {
+      const e3 = `PIETRE RITTE · ${REGOLE.costoPietreRitte}`;
+      const w3 = d.larghezza(e3, 12.5, { titoli: true, bold: true, ls: 0.5 }) + 28 * u;
+      d.pillolaOro('btn:pietre', e3, centrata(w3), yb, 32 * u, () => az.pietre(true), 12.5);
+      yb += 38 * u;
+    }
     if (puo) {
       const e2 = `${nomeBtn} · ${t.costoTappa}`;
       const w2 = d.larghezza(e2, 12.5, { titoli: true, bold: true, ls: 0.5 }) + 28 * u;

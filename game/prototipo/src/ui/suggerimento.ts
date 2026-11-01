@@ -6,10 +6,12 @@ export type TipoSuggerimento =
   | 'energia-finita'
   | 'avversario-un-passo'
   | 'puoi-tappa'
+  | 'ultima-tappa'
   | 'apertura-tappa'
   | 'tappa-non-sicura'
   | 'instabilita'
   | 'forza-mancante'
+  | 'pietre-ritte'
   | 'tocca-una-carta';
 
 export interface Suggerimento {
@@ -38,7 +40,7 @@ export function suggerimento(v: Vista): Suggerimento | null {
   if (!v.mioTurno) return null;
   const mosse = v.mosseLegali;
   if (!mosse.length || mosse.some((m) => m.t === 'riordina')) return null; // scelta in sospeso (riordino della Biblioteca): la schermata la spiega
-  const haMosseUtili = mosse.some((m) => m.t === 'gioca' || m.t === 'tappa' || m.t === 'riduci');
+  const haMosseUtili = mosse.some((m) => m.t === 'gioca' || m.t === 'tappa' || m.t === 'riduci' || m.t === 'pietre');
   if (!haMosseUtili) return { tipo: 'energia-finita', testo: 'Hai finito l\'energia: tocca «Fine turno».' };
 
   // 1 - l'avversario e' a una tappa dalla vittoria
@@ -46,8 +48,8 @@ export function suggerimento(v: Vista): Suggerimento | null {
     return {
       tipo: 'avversario-un-passo',
       testo: v.fazione === 'custodi'
-        ? 'ATTENZIONE: Lui è a una tappa dalla vittoria. Abbassa l\'instabilità dove può completare l\'ultimo rito, o gioca lì presenze per superarlo.'
-        : 'ATTENZIONE: Lui è a una tappa dalla vittoria. Alza l\'instabilità sopra 3 dove può porre l\'ultimo Sigillo, o togli un suo Sigillo.',
+        ? 'ATTENZIONE: Lui è a una tappa dalla vittoria: l\'ultimo rito lo farà a R\'lyeh. Abbassa lì l\'instabilità sotto 3, gioca lì presenze per superarlo, o togli un suo rito.'
+        : 'ATTENZIONE: Lui è a una tappa dalla vittoria: l\'ultimo Sigillo lo porrà a R\'lyeh. Alza lì l\'instabilità sopra 3, gioca lì presenze per togliergli il controllo, o togli un suo Sigillo.',
     };
   }
   // 2 - si puo' porre un Sigillo / completare un rito
@@ -58,6 +60,17 @@ export function suggerimento(v: Vista): Suggerimento | null {
       tipo: 'puoi-tappa',
       testo: `Puoi ${v.fazione === 'custodi' ? 'porre un Sigillo' : 'completare un rito'} ${aT(t.nome)}: tocca «${v.fazione === 'custodi' ? 'Poni Sigillo' : 'Completa rito'}» su quel territorio (costa ${t.costoTappa}).`,
     };
+  }
+  // 2a - con 2 tappe l'ultima si fa solo a R'lyeh (CT-DES-070): dice perche' non si puo' ancora e cosa preparare
+  if (v.tappe >= 2) {
+    const r = v.territori.find((t) => t.luogoUltimaTappa);
+    if (r && !r.mioTappa) {
+      const motivo = motivoTappa(v, r);
+      return {
+        tipo: 'ultima-tappa',
+        testo: `Hai 2 tappe: l'ultima ${v.fazione === 'custodi' ? 'si pone' : 'si completa'} solo a R'lyeh${motivo ? ` (adesso: ${motivo})` : ''}. Prepara lì le tue presenze e l'instabilità.`,
+      };
+    }
   }
   // 2b - Formula di Dho-Hna / Studio del Necronomicon (CT-DES-068): la carta permette una tappa altrimenti impossibile e c'e' l'energia per carta + tappa
   if (!v.aperturaTappa) {
@@ -109,6 +122,10 @@ export function suggerimento(v: Vista): Suggerimento | null {
     }
     return { tipo: 'forza-mancante', testo: `Gioca una presenza ${aT(t.nome)}: ti ${n === 1 ? 'manca 1 punto' : `mancano ${n} punti`} di forza per controllarlo.` };
   }
+  // 5b - Pietre ritte di Dunwich
+  if (mosse.some((m) => m.t === 'pietre')) {
+    return { tipo: 'pietre-ritte', testo: 'Controlli Dunwich: con «Pietre ritte» (1 energia) sposti di 1 l\'instabilità di un altro territorio, una volta per turno.' };
+  }
   // 6 - qualcosa da giocare
   return { tipo: 'tocca-una-carta', testo: `Hai ${v.energia} di energia: tocca una carta e poi il quadro che si illumina. Tieni premuto su una carta per leggerla.` };
 }
@@ -129,6 +146,9 @@ export function motivoTappa(v: Vista, t: VistaTerritorio): string | null {
   if (!v.mioTurno) return 'turno di Lui';
   if (t.mioTappa) return `${nomeTappa(v)} già ${v.fazione === 'custodi' ? 'posto' : 'completato'}`;
   if (v.mosseLegali.some((m) => m.t === 'tappa' && m.terr === t.indice)) return null;
+  // CT-DES-070: le prime due tappe sugli esterni, la terza solo a R'lyeh
+  if (t.luogoUltimaTappa && v.tappe < 2) return 'prima servono 2 tappe';
+  if (!t.luogoUltimaTappa && v.tappe >= 2) return 'ora solo a R\'lyeh';
   const sp = v.aperturaTappa ? 1 : 0;
   if (v.fazione === 'custodi') {
     if (t.controllo !== 'io') return 'non controlli';
@@ -166,8 +186,8 @@ export function passiTutorial(fazione: 'custodi' | 'risvegliati'): PassoTutorial
     {
       titolo: 'Lo scopo',
       testo: c
-        ? 'Vinci ponendo 3 Sigilli, uno per territorio. Su un territorio puoi porre il Sigillo se lo controlli (hai più forza di Lui) e l\'instabilità è 3 o meno.'
-        : 'Vinci completando 3 riti, uno per territorio. Su un territorio puoi completare il rito se hai una tua presenza, almeno tanta forza quanto Lui e l\'instabilità è 3 o più.',
+        ? 'Vinci ponendo 3 Sigilli: due sui territori esterni e l\'ultimo a R\'lyeh, il pozzo al centro. Il Sigillo si pone dove controlli (più forza di Lui) e l\'instabilità è 3 o meno.'
+        : 'Vinci completando 3 riti: due sui territori esterni e l\'ultimo a R\'lyeh, il pozzo al centro. Il rito si completa dove hai una presenza, almeno tanta forza quanto Lui e l\'instabilità è 3 o più.',
     },
     { area: 'pannello:energia', titolo: 'L\'energia', testo: 'Questa è l\'energia che puoi spendere in questo turno. Ogni carta costa energia (il numero nella gemma blu in alto a destra della carta). Quella non spesa si perde.' },
     { area: 'mano:tutta', titolo: 'La mano', testo: 'Tocca una carta (la mano si alza), poi il quadro che si illumina d\'oro per giocarla. Per leggere una carta ingrandita, tienila premuta.' },

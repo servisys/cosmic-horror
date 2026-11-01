@@ -81,8 +81,15 @@ export function texturaSfondo(): Texture | undefined {
   return texturaPlancia;
 }
 
+/**
+ * Segnaposto delle illustrazioni che mancano ancora (CT-FEAT-002): per i territori Dunwich e R'lyeh la loro scena 3D;
+ * per le carte della loro riserva (T4r, T5r) nessuna immagine, e le carte disegnano un riquadro con il nome.
+ * Quando arrivano i file in src/assets/illustrazioni/ vincono loro.
+ */
+const SEGNAPOSTO_SCENA: Record<string, string> = { T4: 'dunwich_v2', T5: 'rlyeh_v2' };
+
 export function texturaDi(id: string): Texture | undefined {
-  return texture.get(id);
+  return texture.get(id) ?? (SEGNAPOSTO_SCENA[id] ? texScene.get(SEGNAPOSTO_SCENA[id]) : undefined);
 }
 
 /** Quante texture sono state caricate (serve ai test automatici). */

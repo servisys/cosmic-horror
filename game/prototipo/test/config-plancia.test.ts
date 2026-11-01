@@ -4,19 +4,17 @@ import { IMG_H, IMG_W, SETTORI, coverTrasformazione, inSchermo, settoreDelTerrit
 import { cat } from './aiuti.js';
 
 describe('configurazione della plancia', () => {
-  it('cinque settori: tre in gioco (con territorio nei dati), Dunwich e R\'lyeh visibili ma non in gioco', () => {
+  it('cinque settori, tutti in gioco: ognuno e collegato a un territorio dei dati (CT-DES-069)', () => {
     expect(SETTORI.map((s) => s.id)).toEqual(['innsmouth', 'biblioteca', 'dunwich', 'landa', 'rlyeh']);
-    const attivi = SETTORI.filter((s) => s.territorioId !== null);
-    expect(attivi.map((s) => s.id)).toEqual(['innsmouth', 'biblioteca', 'landa']);
-    for (const s of attivi) expect(cat.dati.territori.some((t) => t.id === s.territorioId), s.id).toBe(true);
-    // ogni territorio dei dati ha il suo settore sulla plancia; Dunwich (T4) e R'lyeh (T5) sono nei dati dalla V0.7 (CT-DES-069),
-    // ma restano non collegati all'interfaccia finche' non arriva CT-FEAT-002 (interfaccia a 5 territori)
-    const nonAncoraCollegati = ['T4', 'T5'];
-    for (const t of cat.dati.territori) {
-      if (nonAncoraCollegati.includes(t.id)) expect(settoreDelTerritorio(t.id), t.id).toBeUndefined();
-      else expect(settoreDelTerritorio(t.id), t.id).toBeDefined();
-    }
-    expect(SETTORI.filter((s) => s.territorioId === null).map((s) => s.id)).toEqual(['dunwich', 'rlyeh']);
+    expect(SETTORI.filter((s) => s.territorioId !== null).map((s) => s.id)).toEqual(['innsmouth', 'biblioteca', 'dunwich', 'landa', 'rlyeh']);
+    expect(SETTORI.filter((s) => s.territorioId === null)).toEqual([]);
+    // ogni territorio dei dati ha il suo settore sulla plancia, e ogni settore il suo territorio
+    for (const t of cat.dati.territori) expect(settoreDelTerritorio(t.id), t.id).toBeDefined();
+    for (const s of SETTORI) expect(cat.dati.territori.some((t) => t.id === s.territorioId), s.id).toBe(true);
+    expect(settoreDelTerritorio('T4')!.id).toBe('dunwich');
+    expect(settoreDelTerritorio('T5')!.id).toBe('rlyeh');
+    // la targhetta di R'lyeh sta al centro dell'ellisse (l'ultima tappa si fa li')
+    expect(settoreDelTerritorio('T5')!.lato).toBe('centro');
   });
   it('le zone stanno dentro l\'immagine e i quadri non si sovrappongono (il pozzo, tondo, si sovrappone ai quattro)', () => {
     for (const s of SETTORI) {

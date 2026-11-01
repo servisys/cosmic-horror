@@ -19,7 +19,7 @@ const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del c
 const PAUSA_EVENTO = Number(parametri.get('pausaEvento') ?? 4500); // l'evento si chiude da solo dopo questo tempo
 
 const ctrl = new Controller(datiDelBuild());
-const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '', manoAlzata: false, scena: null, manoQui: false };
+const ui: UiStato = { zoom: null, zoomTerr: null, grande: null, regole: false, ordine: [], copiato: '', suggerimentoNascosto: false, tutorial: null, toast: '', manoAlzata: false, scena: null, manoQui: false, pietre: false };
 // Tutorial: parte alla prima partita (o se richiesto dal bottone «Come si gioca»), al primo turno del giocatore
 let tutorialPendente = false;
 let tutorialRichiesto = false;
@@ -190,19 +190,17 @@ const azioni: Azioni = {
     ridisegna();
   },
   settore(id) {
-    // un quadro (o il pozzo) toccato senza una carta da giocare: si entra nella sua scena 3D. Dunwich e R'lyeh non sono in gioco: solo da guardare.
-    const st = SETTORI.find((x) => x.id === id);
+    // un quadro (o il pozzo di R'lyeh) toccato senza una carta da giocare: si entra nella sua scena 3D
     const c0 = centroSettore(id);
     anim.entra(c0.cx, c0.cy, app.screen.width, app.screen.height);
     ui.scena = id;
     ui.manoQui = false;
     ui.zoom = null;
     ui.zoomTerr = null;
-    if (st && st.territorioId === null) {
-      ui.toast = 'Non ancora in gioco';
-      clearTimeout(timerToast);
-      timerToast = window.setTimeout(() => { ui.toast = ''; ridisegna(); }, 3000);
-    }
+    ridisegna();
+  },
+  pietre(aperto) {
+    ui.pietre = aperto;
     ridisegna();
   },
   esci() {
@@ -316,6 +314,7 @@ function iniziaPartita(fazione: FazioneId, seme: number): void {
   ui.manoAlzata = false;
   ui.scena = null;
   ui.manoQui = false;
+  ui.pietre = false;
   ui.tutorial = null;
   anim.azzera();
   tutorialPendente = parametri.get('tutorial') === '0' ? false : tutorialRichiesto || parametri.get('tutorial') === '1' || !tutorialVisto();

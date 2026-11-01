@@ -5,7 +5,8 @@ import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { premiArea } from './pressione.mjs';
 
-const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-grafica';
 mkdirSync(OUT, { recursive: true });
 const VISTE = [{ nome: '956x440', w: 956, h: 440, df: 2 }, { nome: '1280x800', w: 1280, h: 800, df: 1 }];
@@ -66,6 +67,7 @@ for (const vista of VISTE) {
       await tap(p, `mano:${m.carta}`);
       if (giocate === 0) await foto(p, 'mano_alzata_carta_selezionata');
       if (m.terr !== undefined) await tap(p, `terr:${m.terr}`);
+      if (m.segno !== undefined) { await ferma(p); if (await p.evaluate(() => !!window.__ct.aree()['segno:piu'])) await tap(p, m.segno > 0 ? 'segno:piu' : 'segno:meno'); } // Pietra Incisa
       if (m.pres !== undefined) { await ferma(p); if (await p.evaluate((i) => !!window.__ct.aree()[i], `pres:${m.pres}`)) await tap(p, `pres:${m.pres}`); }
       if (m.cerca !== undefined) await tap(p, `cerca:${m.cerca}`);
       await ferma(p);
@@ -106,7 +108,7 @@ for (const vista of VISTE) {
     // 1. tocco sui cinque quadri della plancia: si entra nella scena giusta, indietro torna alla plancia
     const quadri = await p.evaluate(() => {
       const a = window.__ct.aree();
-      return { innsmouth: 'terr:0', biblioteca: 'terr:1', landa: 'terr:2', dunwich: 'settore:dunwich', rlyeh: 'settore:rlyeh' };
+      return { innsmouth: 'terr:0', biblioteca: 'terr:1', landa: 'terr:2', dunwich: 'terr:3', rlyeh: 'terr:4' };
     });
     for (const id of ordine) {
       await tap(p, quadri[id]);
@@ -155,7 +157,7 @@ for (const vista of VISTE) {
       await turno(p);
       const m = await p.evaluate(() => window.__ct.suggerisci());
       if (m.t !== 'gioca' || m.terr === undefined) { await tap(p, 'btn:fine'); continue; }
-      const id = ['innsmouth', 'biblioteca', 'landa'][m.terr];
+      const id = ['innsmouth', 'biblioteca', 'landa', 'dunwich', 'rlyeh'][m.terr];
       await tap(p, `terr:${m.terr}`); // nessuna carta scelta: entra nella scena
       if ((await scena()) !== id) return { ok: false, dettaglio: `scena ${await scena()} invece di ${id}` };
       const n0 = await p.evaluate(() => window.__ct.ctrl.g.s.registro.length);

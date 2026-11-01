@@ -1,11 +1,15 @@
 // Il computer: mai mosse illegali, solo informazioni visibili, priorita' di fazione (Core Rules §10, CT-DES-045).
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { sceglieMossa } from '../src/computer/computer.js';
 import { applica, chiDeveMuovere, chiaveMossa, creaPartita, finita } from '../src/motore/motore.js';
 import { creaVista } from '../src/motore/vista.js';
 import { cat, energia, esposizione, inst, mano, nuova, partita, presenza } from './aiuti.js';
 
-const idCarta = (v: ReturnType<typeof creaVista>, m: ReturnType<typeof sceglieMossa>) =>
+const DUNWICH = 3;
+const RLYEH = 4;
+
+const idCarta =(v: ReturnType<typeof creaVista>, m: ReturnType<typeof sceglieMossa>) =>
   m.t === 'gioca' ? v.mano.find((c) => c.uid === m.carta)!.id : m.t;
 
 describe('il computer non fa mai mosse illegali', () => {
@@ -22,7 +26,7 @@ describe('il computer non fa mai mosse illegali', () => {
         mosse++;
       }
     }
-    expect(mosse).toBeGreaterThan(10000);
+    expect(mosse).toBeGreaterThan(5000); // con 5 territori le partite sono piu' brevi (la soglia era 10000 con 3)
   });
 });
 
@@ -78,17 +82,17 @@ describe('priorita dei Custodi', () => {
     const v = creaVista(g, 0);
     expect(idCarta(v, sceglieMossa(v, cat))).toBe('CU13');
   });
-  it('1: se l avversario e a un passo abbassa l instabilita dove sta per completare il rito', () => {
+  it("1: se l avversario ha 2 tappe abbassa l instabilita di R'lyeh, dove sta per completare il rito", () => {
     const g = partita('custodi');
     g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
     g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
-    presenza(g, 1, 2, 'RI04');
-    inst(g, 2, 4);
+    presenza(g, 1, RLYEH, 'RI04');
+    inst(g, RLYEH, 4);
     mano(g, 0, 'CU10', 'CU01');
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
     expect(idCarta(v, m)).toBe('CU10');
-    expect(m.t === 'gioca' && m.terr).toBe(2);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
   });
   it('3: rinforza il territorio piu conteso', () => {
     const g = partita('custodi');
@@ -128,17 +132,17 @@ describe('priorita dei Risvegliati', () => {
     const v = creaVista(g, 0);
     expect(idCarta(v, sceglieMossa(v, cat))).toBe('RI12');
   });
-  it('1: se i Custodi sono a un passo alza l instabilita dove stanno per porre il Sigillo', () => {
+  it("1: se i Custodi hanno 2 tappe alza l instabilita di R'lyeh, dove stanno per porre il Sigillo", () => {
     const g = partita('risvegliati');
     g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
     g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
-    inst(g, 2, 1);
-    presenza(g, 1, 2, 'CU03');
+    inst(g, RLYEH, 1);
+    presenza(g, 1, RLYEH, 'CU03');
     mano(g, 0, 'RI10', 'RI01');
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
     expect(idCarta(v, m)).toBe('RI10');
-    expect(m.t === 'gioca' && m.terr).toBe(2);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
   });
   it('3: gioca le carte potenti quando ha l energia', () => {
     const g = partita('risvegliati');
@@ -161,12 +165,12 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
     const g = partita('custodi');
     g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
     g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
-    presenza(g, 1, 2, 'RI04');
-    presenza(g, 0, 2, 'CU01');
+    presenza(g, 1, RLYEH, 'RI04');
+    presenza(g, 0, RLYEH, 'CU01');
     mano(g, 0, 'CU01', 'CU04');
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
-    expect(m.t === 'gioca' && m.terr).toBe(2);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
     expect(idCarta(v, m)).toBe('CU04'); // la presenza piu' forte
   });
   it('Risvegliati 3 (CT-DES-067): contende dove l instabilita e almeno 2, anche senza una propria presenza', () => {
@@ -215,13 +219,148 @@ describe('priorita CT-DES-065 (tabella aggiornata)', () => {
     const g = partita('risvegliati');
     g.s.giocatori[1].tappe[0] = g.s.turniCompletati - 5;
     g.s.giocatori[1].tappe[1] = g.s.turniCompletati - 5;
-    presenza(g, 1, 2, 'CU03');
-    inst(g, 2, 3);
+    presenza(g, 1, RLYEH, 'CU03');
+    inst(g, RLYEH, 3);
     mano(g, 0, 'RI10', 'RI04');
     const v = creaVista(g, 0);
     const m = sceglieMossa(v, cat);
     expect(idCarta(v, m)).toBe('RI10');
-    expect(m.t === 'gioca' && m.terr).toBe(2);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
+  });
+});
+
+// Tabella CT-DES-074 (cinque territori). Territori: 0 Innsmouth, 1 Biblioteca, 2 Landa, 3 Dunwich, 4 R'lyeh.
+const dueTappe = (g: ReturnType<typeof nuova>, pi: number) => {
+  g.s.giocatori[pi].tappe[0] = g.s.turniCompletati - 5;
+  g.s.giocatori[pi].tappe[1] = g.s.turniCompletati - 5;
+};
+const unaTappa = (g: ReturnType<typeof nuova>, pi: number) => {
+  g.s.giocatori[pi].tappe[0] = g.s.turniCompletati - 5;
+};
+
+describe('CT-DES-074: priorita del computer a 5 territori', () => {
+  it('il codice del computer non scrive id ne indici dei territori', () => {
+    const src = readFileSync(new URL('../src/computer/computer.ts', import.meta.url), 'utf8');
+    expect(src).not.toMatch(/['"]T[1-5]['"]/);
+    expect(src).not.toMatch(/TERR\.|idTerr|indiceTerr/);
+  });
+  it("Custodi 3: con 0 tappe non mette presenze a R'lyeh", () => {
+    const g = partita('custodi');
+    presenza(g, 1, RLYEH, 'RI04');
+    mano(g, 0, 'CU01');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).not.toBe(RLYEH);
+  });
+  it("Custodi 3: con 1 tappa comincia anche a mettere presenze a R'lyeh (dove e' piu' conteso)", () => {
+    const g = partita('custodi');
+    unaTappa(g, 0);
+    for (const t of [0, 1, 2, 3]) presenza(g, 0, t, 'CU03'); // esterni 4 contro 0
+    presenza(g, 0, RLYEH, 'CU01');
+    presenza(g, 1, RLYEH, 'RI04'); // R'lyeh 2 contro 4: differenza 2, il piu' conteso (gli esterni 4 contro 0)
+    mano(g, 0, 'CU01');
+    energia(g, 0, 1); // niente energia per un altro Sigillo
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
+  });
+  it("Custodi 3: con 2 tappe prepara R'lyeh con presenze fino a controllarlo", () => {
+    const g = partita('custodi');
+    dueTappe(g, 0);
+    presenza(g, 1, RLYEH, 'RI04');
+    presenza(g, 1, 0, 'RI04'); // un esterno piu' conteso non interessa piu'
+    mano(g, 0, 'CU01');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
+  });
+  it("Risvegliati 3: con 0 tappe contende solo gli esterni, non R'lyeh", () => {
+    const g = partita('risvegliati');
+    presenza(g, 1, RLYEH, 'CU03');
+    inst(g, RLYEH, 4);
+    mano(g, 0, 'RI04');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).not.toBe(RLYEH);
+  });
+  it("Risvegliati 3: con 1 tappa contende anche R'lyeh", () => {
+    const g = partita('risvegliati');
+    unaTappa(g, 0);
+    presenza(g, 1, RLYEH, 'CU03');
+    inst(g, RLYEH, 4);
+    mano(g, 0, 'RI04');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
+  });
+  it("Risvegliati 3: con 2 tappe mette presenze a R'lyeh, anche senza avversari", () => {
+    const g = partita('risvegliati');
+    dueTappe(g, 0);
+    presenza(g, 1, 0, 'CU03');
+    inst(g, 0, 3);
+    mano(g, 0, 'RI04');
+    const m = sceglieMossa(creaVista(g, 0), cat);
+    expect(m.t === 'gioca' && m.terr).toBe(RLYEH);
+  });
+  it('Custodi 1: con Pietre ritte abbassa R lyeh prima di tutto il resto', () => {
+    const g = partita('custodi');
+    dueTappe(g, 1);
+    presenza(g, 0, DUNWICH, 'CU03'); // controlla Dunwich
+    inst(g, DUNWICH, 4); // niente Sigillo li'
+    presenza(g, 1, RLYEH, 'RI04');
+    inst(g, RLYEH, 4);
+    mano(g, 0, 'CU01');
+    expect(sceglieMossa(creaVista(g, 0), cat)).toEqual({ t: 'pietre', terr: RLYEH, segno: -1 });
+  });
+  it('Risvegliati 5: con Pietre ritte tiene R lyeh a 3 o piu', () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, DUNWICH, 'RI04');
+    inst(g, RLYEH, 2);
+    mano(g, 0);
+    expect(sceglieMossa(creaVista(g, 0), cat)).toEqual({ t: 'pietre', terr: RLYEH, segno: 1 });
+  });
+  it('Risvegliati 5: con R lyeh a 3 alza dove ha presenze; a parita il territorio con indice piu basso', () => {
+    const g = partita('risvegliati');
+    presenza(g, 0, DUNWICH, 'RI04');
+    for (const t of [2, 0]) presenza(g, 0, t, 'RI04');
+    inst(g, RLYEH, 3);
+    mano(g, 0);
+    expect(sceglieMossa(creaVista(g, 0), cat)).toEqual({ t: 'pietre', terr: 0, segno: 1 });
+  });
+  it('Custodi 5: con Pietre ritte tiene R lyeh a 3 o meno anche prima dell ultima tappa', () => {
+    const g = partita('custodi');
+    presenza(g, 0, DUNWICH, 'CU03');
+    inst(g, DUNWICH, 4);
+    inst(g, RLYEH, 4);
+    mano(g, 0);
+    expect(sceglieMossa(creaVista(g, 0), cat)).toEqual({ t: 'pietre', terr: RLYEH, segno: -1 });
+  });
+  it('Pietra Incisa: i Custodi scelgono -1 su R lyeh, i Risvegliati +1', () => {
+    const c = partita('custodi');
+    dueTappe(c, 1);
+    presenza(c, 1, RLYEH, 'RI04');
+    inst(c, RLYEH, 4);
+    mano(c, 0, 'T4r');
+    const vc = creaVista(c, 0);
+    const mc = sceglieMossa(vc, cat);
+    expect(idCarta(vc, mc)).toBe('T4r');
+    expect(mc.t === 'gioca' && [mc.terr, mc.segno]).toEqual([RLYEH, -1]);
+    const r = partita('risvegliati');
+    dueTappe(r, 1);
+    presenza(r, 1, RLYEH, 'CU03');
+    inst(r, RLYEH, 2);
+    mano(r, 0, 'T4r');
+    const vr = creaVista(r, 0);
+    const mr = sceglieMossa(vr, cat);
+    expect(idCarta(vr, mr)).toBe('T4r');
+    expect(mr.t === 'gioca' && [mr.terr, mr.segno]).toEqual([RLYEH, 1]);
+  });
+  it("Idolo di Cthulhu: solo con una presenza a R'lyeh e controllo contestato", () => {
+    const g = partita('custodi');
+    presenza(g, 0, RLYEH, 'CU01');
+    mano(g, 0, 'T5r');
+    let v = creaVista(g, 0);
+    expect(idCarta(v, sceglieMossa(v, cat))).not.toBe('T5r'); // nessun avversario a R'lyeh
+    presenza(g, 1, RLYEH, 'RI04'); // 2 contro 3: contestato
+    v = creaVista(g, 0);
+    const m = sceglieMossa(v, cat);
+    expect(idCarta(v, m)).toBe('T5r');
+    expect(m.t === 'gioca' && m.pres).toBe(g.s.territori[RLYEH].presenze[0][0].uid);
   });
 });
 

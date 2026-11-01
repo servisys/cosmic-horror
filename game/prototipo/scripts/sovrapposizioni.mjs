@@ -1,11 +1,12 @@
-// Sovrapposizioni sulla plancia: per ogni quadro attivo, alle tre misure del telefono (956x440, 844x390, 740x340), con 0, 3 e 6 carte per lato
+// Sovrapposizioni sulla plancia (5 quadri: Innsmouth, Biblioteca, Dunwich, Landa e il pozzo di R'lyeh con la targhetta «ULTIMA TAPPA»): per ogni quadro attivo, alle tre misure del telefono (956x440, 844x390, 740x340), con 0, 3 e 6 carte per lato
 // e il bottone Sigillo/rito acceso (forzato solo per la prova), nessun rettangolo toccabile del quadro (targhetta, bottone, miniature) deve
 // intersecare Fine turno, icone, consiglio, energia e mano abbassata, ne' uscire dallo schermo. Screenshot della Landa col bottone acceso.
 // Uso: CT_CHROMIUM=<chrome> OUT=<cartella> node scripts/sovrapposizioni.mjs [url]
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 
-const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
+import { indirizzoDiProva } from './server-prova.mjs';
+const URL = await indirizzoDiProva(process.argv[2]);
 const OUT = process.env.OUT ?? 'screenshot-sovrapposizioni';
 mkdirSync(OUT, { recursive: true });
 const VISTE = [{ nome: '956x440', w: 956, h: 440 }, { nome: '844x390', w: 844, h: 390 }, { nome: '740x340', w: 740, h: 340 }];
@@ -28,7 +29,7 @@ for (const vista of VISTE) {
     for (let i = 0; i < 80 && !(await p.evaluate(() => window.__ct.ctrl.tuoTurno)); i++) await p.waitForTimeout(150);
     const ferma = () => p.waitForFunction(() => window.__ct.stabile(), null, { timeout: 8000 }).catch(() => undefined);
     await ferma();
-    // bottone acceso (solo per la prova) e n carte per lato in tutti e tre i territori
+    // bottone acceso (solo per la prova) e n carte per lato in tutti e cinque i territori
     const prepara = (n) => p.evaluate((n) => {
       const c = window.__ct.ctrl;
       c.puoTappa = () => true;
@@ -58,7 +59,7 @@ for (const vista of VISTE) {
         for (const f of m.fissi) if (interseca(q.r, f.r)) problemi.push(`${q.nome} interseca ${f.nome}`);
       }
       const bottoni = m.quadri.filter((q) => q.nome.startsWith('bottone:')).length;
-      if (bottoni !== 3) problemi.push(`bottoni accesi ${bottoni} invece di 3`);
+      if (bottoni !== 5) problemi.push(`bottoni accesi ${bottoni} invece di 5`);
       // i bottoni non devono essere coperti da altri quadri (targhette, miniature di un altro territorio)
       for (const b of m.quadri.filter((q) => q.nome.startsWith('bottone:'))) {
         for (const q of m.quadri) if (q !== b && !q.nome.endsWith(':' + b.nome.split(':')[1]) && interseca(b.r, q.r) && q.nome.startsWith('miniatura')) problemi.push(`${b.nome} coperto da ${q.nome}`);

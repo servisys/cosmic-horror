@@ -1,6 +1,6 @@
 ---
 id: CT-FEAT-001
-fase: piano
+fase: esecuzione
 pronto: si
 branch: feature/ct-feat-001-cinque-territori
 scritto_da: Cowork (chat Claude del progetto)
@@ -40,6 +40,17 @@ Citazioni (CT-DES-061, tradotte da Cowork dai testi in `reference/literature/gut
 - R'lyeh (T5): «La città-cadavere di R'lyeh, l'incubo costruito in eoni incommensurabili prima della storia.» — The Call of Cthulhu — "the nightmare corpse-city of R'lyeh, that was built in measureless eons behind history"
 - Pietra Incisa (T4r): «Gli strani cerchi di alte colonne di pietra che coronano quasi tutte le colline.» — The Dunwich Horror — "the queer circles of tall stone pillars with which most of them are crowned"
 - Idolo di Cthulhu (T5r): «L'idolo scolpito era il grande Cthulhu.» — The Call of Cthulhu — "The carven idol was great Cthulhu"
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («ok») con queste risposte:
+1. **Tabella delle priorità del computer a 5 territori: confermata così com'è nel pre-flight plan.** Nel Decision Log va come **CT-DES-074, Stato: REGISTRATA** (sostituisce CT-DES-065 e CT-DES-067 per il prototipo a 5 territori), con la tabella del piano. Implementazione nel secondo task.
+2. L'Orrore di Dunwich considera le presenze di entrambi i giocatori.
+3. Pietre ritte: vale per chi controlla Dunwich al momento della mossa; «altro territorio» = diverso da Dunwich; non fa salire l'esposizione.
+4. Se un giocatore con 2 tappe ne perde una, non può fare la tappa a R'lyeh finché non torna a 2.
+   (I punti 2-4 vanno come chiarimenti nelle regole V0.13, §13.)
+5. Scope del prototipo: **V0.3 APPROVED** (conseguenza della decisione registrata CT-DES-069), con modifiche minime alle sole righe sui 3 territori; V0.2 DEPRECATED con `superseded_by`.
+6. **In questo task fai solo la PR 1**: Decision Log CT-DES-069…074, regole V0.13, carte V0.7, scope V0.3, Master Index (0.7.0), motore a 5 territori con effetti legati all'id, test, prima simulazione di prova per controllare che il gioco non si blocchi. Computer, interfaccia, simulazioni complete e build saranno un task successivo (CT-FEAT-002) dopo la fusione della PR 1.
+Per la simulazione di prova, se `npm run simula` è bloccato, crea uno script npm `verifica-simula` che la lanci, e dichiaralo. Ricorda: niente `cd` prima dei comandi, niente pipe, un comando git alla volta.
 
 ## Obiettivo
 Portare il prototipo da 3 a 5 territori secondo le decisioni sopra: documenti, dati, motore, computer, interfaccia, simulazioni.

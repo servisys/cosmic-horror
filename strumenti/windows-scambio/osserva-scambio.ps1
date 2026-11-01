@@ -161,7 +161,10 @@ $RegolePiano = 'FASE PIANO: puoi solo leggere. Non modificare file, non fare com
   'Leggi i documenti autorevoli indicati nel task, verifica che siano APPROVED e produci il pre-flight plan: passi, file toccati, rischi, domande aperte e, se ci sono, i motivi per cui il task non e pronto.'
 
 $RegoleEsecuzione = 'FASE ESECUZIONE: esegui il task seguendo il pre-flight plan gia approvato. ' +
-  'Lavora solo su un branch feature/, fix/ o planning/ con il nome indicato nel task, mai su main. Puoi fare commit, push del tuo branch e aprire una PR verso main. ' +
+  'Lavora solo su un branch feature/, fix/ o planning/ con il nome indicato nel task, mai su main. Puoi fare commit e aprire una PR (verso main, o verso il branch indicato nel task). ' +
+  'Il push si fa SOLO con il comando esatto: git push -u origin HEAD (nessun altro argomento: niente HEAD:nome, niente nome del branch, niente pipe). Ogni altro push e vietato e viene bloccato. ' +
+  'A fine lavoro torna su main con git switch main (oppure git checkout main), cosi il repository di lavoro resta pulito. ' +
+  'Non usare cd (sei gia nel repository), ne pipe, ne sed: per modificare i file usa lo strumento Edit, e ogni comando git va dato da solo. ' +
   'Non fondere, non chiudere PR, non cancellare branch, niente force push. Lancia i test indicati nel task e riportane l esito.'
 
 $ToolPiano = 'Read,Glob,Grep,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch --show-current),Bash(git branch --list:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*)'
@@ -171,7 +174,7 @@ $ToolPiano = 'Read,Glob,Grep,Bash(git status:*),Bash(git log:*),Bash(git diff:*)
 $ToolEsecuzione = 'Read,Edit,Write,Glob,Grep,' +
   'Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git branch --show-current),Bash(git branch --list:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(git add:*),Bash(git commit:*),' +
   'Bash(git checkout -b feature/*),Bash(git checkout -b fix/*),Bash(git checkout -b planning/*),Bash(git switch -c feature/*),Bash(git switch -c fix/*),Bash(git switch -c planning/*),' +
-  'Bash(git switch feature/*),Bash(git switch fix/*),Bash(git switch planning/*),Bash(git switch main),Bash(git checkout main),' +
+  'Bash(git switch feature/*),Bash(git switch fix/*),Bash(git switch planning/*),Bash(git switch main),Bash(git checkout main),Bash(git switch -q main),Bash(git checkout -q main),Bash(git switch --quiet main),Bash(git checkout --quiet main),' +
   'Bash(git push -u origin HEAD),Bash(git push origin HEAD),' +
   'Bash(npm ci:*),Bash(npm test:*),Bash(npm run build:*),Bash(npm run verifica*),' +
   'Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr diff:*),Bash(gh pr comment:*)'

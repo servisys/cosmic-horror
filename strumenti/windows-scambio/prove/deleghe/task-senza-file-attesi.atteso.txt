@@ -1,0 +1,2 @@
+- Errore di formato nel task: fusione della PR 69 senza file_attesi_69
+- Nessuna fusione o chiusura eseguita (un errore di formato ferma tutto).

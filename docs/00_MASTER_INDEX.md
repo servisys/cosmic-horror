@@ -1,7 +1,7 @@
 ---
 title: Cosmic Horror — Master Index
 status: APPROVED
-version: 0.5.0
+version: 0.6.0
 owner: Team Cosmic Horror
 last_reviewed: 2026-11-01
 repository_scope: GitHub
@@ -21,7 +21,7 @@ Questo documento è il punto di ingresso della documentazione di **Cosmic Horror
 Prima di qualsiasi review o implementazione:
 
 1. leggere questo Master Index;
-2. leggere `CT_COWORK_CODE_PROTOCOL_V0.2.md`;
+2. leggere `CT_COWORK_CODE_PROTOCOL_V0.4.md`;
 3. identificare i documenti autorevoli elencati nel task;
 4. verificarne lo stato;
 5. ignorare come requisiti i documenti `IDEA`, `DRAFT`, `REVIEW` e il materiale in `reference/`, salvo istruzioni esplicite di sola analisi;
@@ -58,7 +58,7 @@ Una divergenza deve essere risolta esplicitamente, non nascosta adattando uno de
 
 ### Governance
 
-- [`CT_COWORK_CODE_PROTOCOL_V0.2.md`](CT_COWORK_CODE_PROTOCOL_V0.2.md) — protocollo operativo tra Matteo, Cowork e Claude Code.
+- [`CT_COWORK_CODE_PROTOCOL_V0.4.md`](CT_COWORK_CODE_PROTOCOL_V0.4.md) — protocollo operativo tra Matteo, Cowork e Claude Code.
 - [`CT_COPILOT_CLAUDE_PROTOCOL.md`](CT_COPILOT_CLAUDE_PROTOCOL.md) — `DEPRECATED`: vecchio protocollo con Copilot, non più usato.
 
 ### 00 — Project Overview
@@ -293,3 +293,4 @@ Claude deve produrre prima un pre-flight plan e, al termine, un Implementation R
 | 0.3.0 | DRAFT | Preparata da Cowork. Copilot sostituito da Cowork nel principio operativo; protocollo di riferimento ora `CT_COWORK_CODE_PROTOCOL_V0.1.md`; vecchio protocollo Copilot-Claude segnato `DEPRECATED`. Nessun'altra modifica. |
 | 0.4.0 | DRAFT | Preparata da Cowork. §6: Vision e Core Rules indicate con il nome reale dei file versionati e la loro cartella. Nessun'altra modifica. |
 | 0.5.0 | APPROVED | Approvato da Matteo il 2026-11-01. Riferimenti al protocollo aggiornati a `CT_COWORK_CODE_PROTOCOL_V0.2.md`. Nessun'altra modifica. |
+| 0.6.0 | APPROVED | Approvato da Matteo il 2026-11-01. Riferimenti al protocollo aggiornati a `CT_COWORK_CODE_PROTOCOL_V0.4.md`. Nessun'altra modifica. |

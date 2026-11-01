@@ -74,11 +74,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\disinstalla.ps1 -AncheCart
 
 ## Fusioni e chiusure autorizzate (campi facoltativi del task)
 
-La chat li scrive nel front matter di `TASK.md` solo dopo un sì esplicito di Matteo che nomina la PR. Senza questi campi non cambia nulla: fusioni e chiusure restano bloccate.
+La chat li scrive nel front matter di `TASK.md` solo dopo un sì esplicito di Matteo che nomina la PR, e solo in un **task dedicato** (il cui unico scopo è fondere o chiudere PR già aperte e già controllate), mai insieme a un lavoro nuovo. Il task lo dichiara con `tipo: deleghe`. Senza questi campi non cambia nulla: fusioni e chiusure restano bloccate.
 
 ```yaml
+tipo: deleghe                                # obbligatorio se ci sono fusioni o chiusure
 fusioni: 69@<sha completo di 40 caratteri minuscoli>, 71@<sha>
-file_attesi_69: docs/a.md, docs/cartella/    # facoltativo; una cartella finisce con /
+file_attesi_69: docs/a.md, docs/cartella/    # obbligatorio per ogni fusione; una cartella finisce con /
+file_attesi_71: docs/b.md
 chiusure: 70, 72
 motivo_70: testo del commento                # obbligatorio per ogni chiusura
 motivo_72: testo del commento
@@ -86,9 +88,9 @@ motivo_72: testo del commento
 
 Cosa fa lo script (e non Code), solo in fase `esecuzione`, solo dopo che Code ha finito con esito FATTO:
 
-- **Fusione** (`gh pr merge <n> --merge --match-head-commit <sha>`, mai `--squash`, `--rebase`, `--delete-branch`, `--admin`, `--auto`), solo se: PR aperta, base `main`, non da fork, non in bozza, testa uguale allo sha del task, fondibile senza conflitti, file toccati tutti dentro `file_attesi` (se c'è).
+- **Fusione** (`gh pr merge <n> --merge --match-head-commit <sha>`, mai `--squash`, `--rebase`, `--delete-branch`, `--admin`, `--auto`), solo se: PR aperta, base `main`, non da fork, non in bozza, testa uguale allo sha del task, fondibile senza conflitti, file toccati tutti dentro `file_attesi_<numero>`.
 - **Chiusura** (`gh pr close <n> --comment <motivo>`, mai `--delete-branch`), solo se la PR è aperta.
-- Un errore di formato (sha corto, PR doppia, chiusura senza motivo) ferma tutto. Una PR non elencata non viene mai toccata.
+- Un errore di formato (sha corto, PR doppia, chiusura senza motivo, fusione senza `file_attesi_<numero>`, fusioni o chiusure in un task senza `tipo: deleghe`) ferma tutto, e il resoconto dice il motivo. Una PR non elencata non viene mai toccata.
 - Il task usato è quello letto prima dell'avvio di Code: Code non può cambiarlo mentre lavora.
 - Il resoconto su `REPORT.md` ha in fondo una riga per PR: FUSA, CHIUSA o FERMATA e perché.
 - Se Code non finisce con FATTO (errore o tempo scaduto), non si fonde e non si chiude nulla.

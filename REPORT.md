@@ -1,5 +1,59 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DOC-001 - fase esecuzione - 2026-11-01 12:44 - FATTO
+
+# Resoconto CT-DOC-001
+
+**Il task è fatto a metà.** Le modifiche e il commit ci sono, ma non sono riuscito a fare push, a aprire la PR né a tornare su `main`.
+
+## Cosa non ha funzionato
+- `git push` è stato bloccato: la sessione automatica non ha avuto il permesso di eseguirlo.
+- `git checkout main` è stato bloccato allo stesso modo. Il repo di lavoro è ancora sul branch `planning/ct-doc-001-approvazioni`, con l'albero pulito.
+- La PR non esiste. Senza il push non si poteva aprire.
+
+## Cosa è stato fatto
+- Ho creato il branch `planning/ct-doc-001-approvazioni` da `origin/feature/ct-scambio-automatico` e ci ho fatto un commit, solo in locale. Il commit è «CT-DOC-001: approvati Master Index 0.5.0 e protocollo Cowork-Code V0.2; V0.1 deprecata».
+- `docs/00_MASTER_INDEX.md`:
+  - `status: APPROVED`, versione 0.5.0, `last_reviewed: 2026-11-01`.
+  - I due riferimenti al protocollo (§1 punto 2 e indice Governance) ora puntano alla V0.2.
+  - Aggiunta la riga 0.5.0 nel changelog.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md`:
+  - `status: APPROVED`.
+  - Tolta la riga «PROPOSTA ... DA CONFERMARE DA MATTEO».
+  - Aggiunta la riga di changelog.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.1.md`:
+  - `status: DEPRECATED`.
+  - Aggiunto `superseded_by: CT_COWORK_CODE_PROTOCOL_V0.2.md`.
+  - `last_reviewed` non toccato.
+  - Aggiunta la riga di changelog.
+
+## Verifiche
+- `git diff --stat`: 3 file, 11 inserimenti e 9 cancellazioni, tutti in `docs/`.
+- Il diff completo l'ho riletto e corrisponde all'elenco qui sopra. L'ho solo visto a terminale, non l'ho incollato in questo resoconto.
+- Nessun file fuori da `docs/` risulta modificato.
+
+## Da sapere
+- Insieme alla riga «PROPOSTA ...» ho tolto anche la frase che segue nella stessa riga («Rispetto alla V0.1 aggiunge il canale automatico... Il canale manuale della V0.1 resta valido»). Il task chiedeva di togliere la riga intera. Se quella frase va conservata, va rimessa a mano.
+- Nel changelog ho aggiunto una riga nuova per ogni stato, senza sovrascrivere quelle esistenti: 0.2.0 compare due volte (DRAFT e APPROVED), e lo stesso vale per la 0.1.0.
+
+## Riferimenti alla V0.1 non toccati (come da task)
+- `README.md`.
+- `docs/00-project-overview/01-vision-concept/CT_VISION_AND_PILLARS_V0.11_BOZZA.md`.
+- `docs/CT_COPILOT_CLAUDE_PROTOCOL.md`.
+- Molti file in `scambio/` (storico locale, non tracciato).
+- Non ho controllato se la V0.2 contiene riferimenti alla V0.1: si cita da sola, quindi probabilmente sì.
+
+## Cosa serve da Matteo
+Da una sessione interattiva:
+1. `git push -u origin planning/ct-doc-001-approvazioni`
+2. Aprire la PR con base `feature/ct-scambio-automatico`. La descrizione deve dire di fonderla dopo la PR del canale automatico.
+3. Tornare su `main` nel repo di lavoro.
+
+## Cosa non ho verificato
+- Non ho verificato la PR (non esiste) e non ho lanciato test di codice (il task toccava solo documenti).
+
+---
+
 ## CT-DOC-001 - fase piano - 2026-11-01 12:35 - FATTO
 
 # Pre-flight plan CT-DOC-001 (fase piano, solo lettura)

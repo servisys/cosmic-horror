@@ -4,7 +4,7 @@ export const REGOLE = {
   energiaPrimoTurno: 2,
   energiaMax: 8,
   energiaPrimoTurnoPartita: [1, 3] as const, // [chi gioca per primo, chi gioca per secondo] (CT-DES-057)
-  extraTerritori: { minimo: 2, energia: 1 },
+  extraTerritori: { minimo: 3, energia: 1 }, // CT-DES-072
   esposizioneMax: 10,
   sogliaTrasformazione: [3, 6, 9] as readonly number[],
   costoRiduzione: 2,
@@ -16,9 +16,16 @@ export const REGOLE = {
   sogliaSigillo: 3, // inst massima per porre un Sigillo / minima per un rito
   costoTappa: 2, // CT-DES-055
   tappeVittoria: 3,
+  costoPietreRitte: 1, // CT-DES-071: una volta per turno, chi controlla Dunwich
+  espExtraRlyeh: 1, // CT-DES-073: La citta' dormiente
+  espCosmicoRlyeh: 1, // CT-DES-073: Cthulhu si agita (a entrambi, a instabilita' 5)
   giriFase: { I: 3, II: 6 }, // fase I giri 1-3, II 4-6, III dal 7
   maxGiriPredefinito: 30, // NON e' una regola: limite tecnico per le simulazioni (CT-DES-009 lascia la scelta ai playtest)
 };
+
+/** Id dei territori nei file dati (CT-DES-069): gli effetti legati a un territorio si agganciano all'id, mai all'indice. */
+export const TERR = { innsmouth: 'T1', biblioteca: 'T2', landa: 'T3', dunwich: 'T4', rlyeh: 'T5' } as const;
+export type TerrId = (typeof TERR)[keyof typeof TERR];
 
 export function faseDelGiro(giro: number): 'fase_I' | 'fase_II' | 'fase_III' {
   return giro <= REGOLE.giriFase.I ? 'fase_I' : giro <= REGOLE.giriFase.II ? 'fase_II' : 'fase_III';

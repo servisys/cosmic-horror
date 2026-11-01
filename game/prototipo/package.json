@@ -9,6 +9,7 @@
     "test": "vitest run",
     "tipi": "tsc --noEmit",
     "simula": "tsx src/simulazione/simula.ts",
+    "verifica-simula": "tsx src/simulazione/simula.ts 1000 0 --json",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

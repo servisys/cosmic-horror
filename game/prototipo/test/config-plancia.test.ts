@@ -9,8 +9,13 @@ describe('configurazione della plancia', () => {
     const attivi = SETTORI.filter((s) => s.territorioId !== null);
     expect(attivi.map((s) => s.id)).toEqual(['innsmouth', 'biblioteca', 'landa']);
     for (const s of attivi) expect(cat.dati.territori.some((t) => t.id === s.territorioId), s.id).toBe(true);
-    // ogni territorio dei dati ha il suo settore sulla plancia
-    for (const t of cat.dati.territori) expect(settoreDelTerritorio(t.id), t.id).toBeDefined();
+    // ogni territorio dei dati ha il suo settore sulla plancia; Dunwich (T4) e R'lyeh (T5) sono nei dati dalla V0.7 (CT-DES-069),
+    // ma restano non collegati all'interfaccia finche' non arriva CT-FEAT-002 (interfaccia a 5 territori)
+    const nonAncoraCollegati = ['T4', 'T5'];
+    for (const t of cat.dati.territori) {
+      if (nonAncoraCollegati.includes(t.id)) expect(settoreDelTerritorio(t.id), t.id).toBeUndefined();
+      else expect(settoreDelTerritorio(t.id), t.id).toBeDefined();
+    }
     expect(SETTORI.filter((s) => s.territorioId === null).map((s) => s.id)).toEqual(['dunwich', 'rlyeh']);
   });
   it('le zone stanno dentro l\'immagine e i quadri non si sovrappongono (il pozzo, tondo, si sovrappone ai quattro)', () => {

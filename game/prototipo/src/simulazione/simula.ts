@@ -32,7 +32,12 @@ for (let i = 0; i < N; i++) {
   giri.push(Math.min(s.giro, s.maxGiri));
   const k = `${s.giocatori[0].fazione} -> ${vince}`;
   inizia[k] = (inizia[k] ?? 0) + 1;
-  aggiungi('inst fine (media dei 3 territori)', s.territori.reduce((a, t) => a + t.inst, 0) / 3);
+  aggiungi(`inst fine (media dei ${s.territori.length} territori)`, s.territori.reduce((a, t) => a + t.inst, 0) / s.territori.length);
+  aggiungi('Pietre ritte usate (totale)', s.cronaca.filter((l) => /usa le Pietre ritte/.test(l)).length);
+  aggiungi('Pietra Incisa giocata (totale)', s.cronaca.filter((l) => / gioca Pietra Incisa$/.test(l)).length);
+  aggiungi('Idolo di Cthulhu giocato (totale)', s.cronaca.filter((l) => / gioca Idolo di Cthulhu$/.test(l)).length);
+  aggiungi('Cthulhu si agita (volte)', s.cronaca.filter((l) => /^Cthulhu si agita/.test(l)).length);
+  aggiungi("L'Orrore di Dunwich (presenze eliminate)", s.cronaca.filter((l) => /eliminata: L'Orrore di Dunwich \(instabilita' 5\)/.test(l)).length);
   for (const p of s.giocatori) {
     const f = p.fazione;
     const conta = (re: RegExp) => s.cronaca.filter((l) => re.test(l)).length;

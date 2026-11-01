@@ -3,6 +3,7 @@
 // Uso: CT_CHROMIUM=<chrome> OUT=<cartella> node scripts/grafica-finale.mjs [url]
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
+import { premiArea } from './pressione.mjs';
 
 const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
 const OUT = process.env.OUT ?? 'screenshot-grafica';
@@ -75,7 +76,7 @@ for (const vista of VISTE) {
     }
     await foto(p, 'plancia_con_miniature');
     const uid = await p.evaluate(() => window.__ct.ctrl.vista().mano[0].uid);
-    await tap(p, `lente:${uid}`);
+    await premiArea(p, `mano:${uid}`);
     await foto(p, 'scheda_carta_custodi');
     await tap(p, 'grande:chiudi');
     const loro = await p.evaluate(() => window.__ct.ctrl.vista().territori.flatMap((t) => t.loro.map((x) => x.uid))[0] ?? null);

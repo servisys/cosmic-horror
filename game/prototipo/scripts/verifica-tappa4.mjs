@@ -2,6 +2,7 @@
 // Uso: CT_CHROMIUM=<percorso chrome> OUT=<cartella screenshot> node scripts/verifica-tappa4.mjs [url]
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
+import { pressioneMouse } from './pressione.mjs';
 
 const URL = process.argv[2] ?? 'http://127.0.0.1:5183/';
 const OUT = process.env.OUT ?? 'screenshot-tappa4';
@@ -62,8 +63,11 @@ for (const vista of VISTE) {
       await page.waitForTimeout(250);
       if (await page.evaluate(() => window.__ct.zoomAttivo())) problemi.push('l\'ingrandimento al passaggio e\' rimasto dopo aver spostato il mouse');
       await foto('1_mano_campo');
-      // carta ingrandita: una carta dei Custodi dalla mano (lente)
-      await clic(`lente:${s.mano[0].uid}`);
+      // carta ingrandita: una carta dei Custodi dalla mano (clic destro; la pressione lunga e' provata a parte)
+      await esiste(`mano:${s.mano[0].uid}`);
+      const am = await page.evaluate((i) => window.__ct.aree()[i], `mano:${s.mano[0].uid}`);
+      await pressioneMouse(page, am.x + am.w / 2, am.y + am.h / 2, 60, 'right');
+      await page.waitForTimeout(200);
       await foto('2_zoom_custode');
       await chiudiGrande();
       // carta dei Risvegliati in campo (tocco)

@@ -1,10 +1,11 @@
 // Cornici delle carte («collezionabili»): bordo sfumato nel colore della fazione, barra del nome con gemma del costo, illustrazione,
 // barra del tipo, riquadro chiaro con effetto, citazione e fonte, riquadro della forza. Tre misure: scheda grande, media (scena del territorio),
 // ridotta (mano). Nessuna regola: si disegnano solo i dati ricevuti.
-import { Container, Graphics } from 'pixi.js';
+import type { Container } from 'pixi.js';
 import { carta } from '../motore/catalogo.js';
 import type { Controller, EventoMostrato } from './controller.js';
 import { COL, type Disegno, texturaGradiente } from './disegno.js';
+import { anim } from './animazioni.js';
 import { idImmagine } from './immagini.js';
 
 export type Schema = 'custodi' | 'risvegliati' | 'evento' | 'riserva';
@@ -106,7 +107,7 @@ export function cartaGrande(d: Disegno, x: number, y: number, w: number, dati: D
   const h = altezzaCarta(w);
   const u = d.u;
   const s = w / 236;
-  const fz = (n: number, min = 10): number => Math.max(min, n * s) / u;
+  const fz = (n: number, min = 12): number => Math.max(min, n * s) / u;
   const pad = 9 * s;
   const r = 14 * s;
   if (opz.alone || opz.evidenzia) d.alone(x, y, w, h, opz.evidenzia ? COL.selezione : tv.alone, opz.evidenzia ? 0.9 : 0.5, 22, r / u);
@@ -123,7 +124,12 @@ export function cartaGrande(d: Disegno, x: number, y: number, w: number, dati: D
   d.rett(ix, iy, iw, hb, 0, { r: 6 * s, tex: barra });
   const spazioGemma = dati.costo !== null ? hb * 0.9 : 0;
   const dn = d.clip(ix, iy, iw - spazioGemma, hb);
-  dn.testo(dati.nome, ix + 8 * s, iy + hb / 2, fz(14, 10), 0x17110a, { titoli: true, bold: true, anchorY: 0.5 }).y = iy + hb / 2;
+  if (opz.completa) dn.testo(dati.nome, ix + 8 * s, iy + hb / 2, fz(14, 12), 0x17110a, { titoli: true, bold: true, anchorY: 0.5 }).y = iy + hb / 2;
+  else {
+    // carta media: il nome in un carattere piu' stretto, su una riga, tagliato con «…» se non sta
+    const tn = d.adatta(dati.nome, ix + 7 * s, iy + 1, iw - spazioGemma - 10 * s, hb - 2, fz(14, 12), 12, 0x17110a, true, 'left');
+    tn.y = iy + (hb - tn.height) / 2;
+  }
   if (dati.costo !== null) gemma(d, ix + iw - hb * 0.5, iy + hb / 2, hb * 0.38, String(dati.costo));
   // illustrazione
   const ay = iy + hb + 1.5 * s;
@@ -141,34 +147,34 @@ export function cartaGrande(d: Disegno, x: number, y: number, w: number, dati: D
   // riquadro chiaro con effetto (e citazione)
   const hres = iy + ih - yy;
   d.rett(ix, yy, iw, hres, 0xf1e8d0, { r: 0 });
-  const fh = dati.forza !== null ? 28 * s : 0;
+  const fh = dati.forza !== null ? Math.max(28 * s, 26 * u) : 0;
   const dt = d.clip(ix, yy, iw, hres - (opz.completa ? 0 : fh));
   let ty = yy + 6 * s;
   const largT = iw - 16 * s;
-  const eff = dt.adatta(dati.effetto || '(nessun effetto)', ix + 8 * s, ty, largT, opz.completa ? hres * 0.42 : hres - fh - 8 * s, fz(opz.completa ? 13.5 : 10.5, 10), 10, 0x17110a, false, 'left');
+  const eff = dt.adatta(dati.effetto || '(nessun effetto)', ix + 8 * s, ty, largT, opz.completa ? hres * 0.42 : hres - fh - 8 * s, fz(opz.completa ? 13.5 : 12.5, 12), 12, 0x17110a, false, 'left');
   ty += eff.height + 4 * s;
   if (opz.completa && dati.citazione) {
     dt.rett(ix + 8 * s, ty, largT, 1, 0xb9a77a, { r: 0 });
     ty += 5 * s;
-    const ci = dt.testo('«' + dati.citazione.testo + '»', ix + 8 * s, ty, fz(12, 10), 0x4a3d26, { w: largT, corsivo: true });
+    const ci = dt.testo('«' + dati.citazione.testo + '»', ix + 8 * s, ty, fz(12, 12), 0x4a3d26, { w: largT, corsivo: true });
     ty += ci.height + 2 * s;
-    const fo = dt.testo('— ' + dati.citazione.fonte, ix + iw - 8 * s, ty, fz(10.5, 10), 0x6a5a3a, { anchorX: 1 });
+    const fo = dt.testo('— ' + dati.citazione.fonte, ix + iw - 8 * s, ty, fz(10.5, 12), 0x6a5a3a, { anchorX: 1 });
     ty += fo.height + 2 * s;
     if (dati.citazione.originale && ty + 14 * s < yy + hres - fh) {
       // l'originale inglese puo' stare sotto i 10 px (richiesta)
-      dt.testo(dati.citazione.originale, ix + 8 * s, ty, Math.max(9, 9.5 * s) / u, 0x7a6a4a, { w: largT, corsivo: true });
+      dt.testo(dati.citazione.originale, ix + 8 * s, ty, Math.max(9, 9.5 * s) / u, 0x7a6a4a, { w: largT, corsivo: true, piccolo: true });
     }
   }
   // riquadro della forza (presenze)
   if (dati.forza !== null) {
-    const fw = Math.max(34 * s, 24 * u);
-    const fhh = Math.max(24 * s, 20 * u);
+    const fw = Math.max(34 * s, opz.completa ? 24 * u : 34 * u);
+    const fhh = Math.max(24 * s, opz.completa ? 20 * u : 28 * u);
     const fx = ix + iw - fw - 4 * s;
     const fy = iy + ih - fhh - 3 * s;
     d.rett(fx, fy, fw, fhh, 0, { r: 6 * s, tex: barra, stroke: 0x3a2e18, sw: 1.2 });
-    d.testo(String(dati.forza), fx + fw / 2, fy + fhh / 2, fz(17, 13), 0x17110a, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = fy + fhh / 2;
+    d.testo(String(dati.forza), fx + fw / 2, fy + fhh / 2, fz(opz.completa ? 17 : 20, opz.completa ? 17 : 20), 0x17110a, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5 }).y = fy + fhh / 2;
   }
-  if (dati.cosmica) d.testo('✦', ix + iw - 6 * s, ay + 4 * s, fz(14, 12), 0xd08cff, { anchorX: 1, bold: true });
+  if (dati.cosmica) d.testo('✦', ix + iw - 6 * s, ay + 4 * s, fz(14, 14), 0xd08cff, { anchorX: 1, bold: true });
 }
 
 export interface OpzMano {
@@ -178,42 +184,39 @@ export interface OpzMano {
 
 /**
  * Carta ridotta della mano: nome, costo e illustrazione (w x h), disegnata nel contenitore con origine in alto a sinistra.
- * Ritorna le aree della lente (in coordinate locali).
+ * Giocabile: bordo dorato luminoso con un leggero bagliore che pulsa piano e piena luminosita'. Non giocabile: sbiadita, senza bagliore.
+ * Selezionata: bordo e bagliore piu' forti (e la carta e' piu' alta, lo decide la mano).
  */
-export function cartaRidotta(cont: Container, dd: Disegno, w: number, h: number, dati: DatiCarta, opz: OpzMano): { lente: { x: number; y: number; w: number; h: number } } {
+export function cartaRidotta(cont: Container, dd: Disegno, w: number, h: number, dati: DatiCarta, opz: OpzMano): void {
   const d = dd.dentro(cont);
   const u = d.u;
   const tv = TAV[dati.schema];
   const r = 7 * u;
-  if (opz.selezionata) d.alone(0, 0, w, h, COL.selezione, 1, 18, 7);
+  const spenta = !opz.giocabile && !opz.selezionata;
+  if (opz.selezionata) d.alone(0, 0, w, h, COL.selezione, 1, 22, 7);
+  else if (opz.giocabile) anim.luce(d.alone(0, 0, w, h, COL.oroChiaro, 0.75, 14, 7), 'pulsa', { min: 0.45, max: 1, periodo: 1700, fase: 0 });
   d.rett(-1, -1, w + 2, h + 2, 0x0a0a0a, { r: r + 1 });
-  d.rett(0, 0, w, h, 0, { r, tex: texturaGradiente(tv.cornice), stroke: opz.selezionata ? COL.selezione : undefined, sw: 2 });
+  d.rett(0, 0, w, h, 0, {
+    r, tex: texturaGradiente(tv.cornice), stroke: opz.selezionata ? COL.selezione : opz.giocabile ? 0xffd25a : undefined, sw: opz.selezionata ? 3.2 : 2.6,
+  });
   const p = 3 * u;
   d.rett(p, p, w - 2 * p, h - 2 * p, 0x120f0b, { r: 5 * u });
-  const hb = 20 * u;
+  const hb = 22 * u;
   d.rett(p, p, w - 2 * p, hb, 0, { r: 4 * u, tex: texturaGradiente(tv.barra, true) });
-  const costoW = dati.costo !== null ? 17 * u : 0;
-  d.riga(dati.nome, p + 4 * u, p + hb / 2 - 6 * u, w - 2 * p - costoW - 6 * u, 10, 0x17110a, { titoli: true, bold: true });
-  if (dati.costo !== null) gemma(d, w - p - 9 * u, p + hb / 2, 7.5 * u, String(dati.costo));
+  const costoW = dati.costo !== null ? 19 * u : 0;
+  d.riga(dati.nome, p + 4 * u, p + hb / 2 - 7 * u, w - 2 * p - costoW - 6 * u, 12.5, 0x17110a, { bold: true });
+  if (dati.costo !== null) gemma(d, w - p - 10 * u, p + hb / 2, 8.5 * u, String(dati.costo));
   const ay = p + hb + 1 * u;
   const ah = 62 * u;
-  if (!d.immagine(dati.idImg, p, ay, w - 2 * p, ah, opz.giocabile ? 1 : 0.55, 0)) d.rett(p, ay, w - 2 * p, ah, 0x222222, { r: 0 });
+  if (!d.immagine(dati.idImg, p, ay, w - 2 * p, ah, 1, 0)) d.rett(p, ay, w - 2 * p, ah, 0x222222, { r: 0 });
   d.rett(p, ay + ah, w - 2 * p, 1.5 * u, 0x3a2e18, { r: 0 });
   const yb = ay + ah + 1.5 * u;
   d.rett(p, yb, w - 2 * p, h - p - yb, 0xefe6cf, { r: 3 * u });
   const piede = dati.tipo.split(' ')[0];
-  d.testo(piede, p + 5 * u, yb + 4 * u, 10, 0x4a3d26, { titoli: true });
-  if (dati.forza !== null) d.testo(String(dati.forza), w - p - 5 * u, h - p - 5 * u, 16, 0x17110a, { titoli: true, bold: true, peso: '900', anchorX: 1, anchorY: 1 });
-  if (dati.cosmica) d.testo('✦', p + 4 * u, ay + 3 * u, 12, 0xd08cff, { bold: true });
+  d.testo(piede, p + 5 * u, yb + 4 * u, 12, 0x4a3d26, { titoli: true });
+  if (dati.forza !== null) d.testo(String(dati.forza), w - p - 5 * u, h - p - 5 * u, 20, 0x17110a, { titoli: true, bold: true, peso: '900', anchorX: 1, anchorY: 1 });
+  if (dati.cosmica) d.testo('✦', p + 4 * u, ay + 3 * u, 14, 0xd08cff, { bold: true });
+  // non giocabile: sbiadita
+  if (spenta) d.rett(0, 0, w, h, 0x0a0a12, { r, alpha: 0.5 });
   void tv;
-  // lente in alto a destra dell'illustrazione
-  const lr = 8 * u;
-  const lx = w - p - lr - 3 * u;
-  const ly = ay + lr + 3 * u;
-  d.cerchio(lx, ly, lr, 0x0d1015, { stroke: 0xcfd8ea, sw: 1.1, alpha: 0.85 });
-  const g = new Graphics();
-  g.circle(lx - 1 * u, ly - 1 * u, 3.2 * u).stroke({ width: 1.3, color: 0xcfd8ea });
-  g.moveTo(lx + 1.3 * u, ly + 1.3 * u).lineTo(lx + 4.2 * u, ly + 4.2 * u).stroke({ width: 1.5, color: 0xcfd8ea });
-  cont.addChild(g);
-  return { lente: { x: lx - lr, y: ly - lr, w: 2 * lr, h: 2 * lr } };
 }

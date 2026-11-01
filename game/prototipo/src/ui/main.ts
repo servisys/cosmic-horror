@@ -10,7 +10,7 @@ import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { anim, type FotoStato } from './animazioni.js';
 import { SETTORI, inSchermo } from './config-plancia.js';
 import { motivoCartaNonGiocabile, suggerimento } from './suggerimento.js';
-import { disegnaAnteprima, disegnaScena, puntiUltimoDisegno, testiFuoriSchermo, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
+import { disegnaAnteprima, disegnaScena, puntiUltimoDisegno, testiFuoriSchermo, testiPiccoli, type Area, type Azioni, type UiStato, type ZoomInfo } from './scena.js';
 
 const parametri = new URLSearchParams(location.search);
 const PAUSA = Number(parametri.get('pausa') ?? 650); // pausa fra le mosse del computer (ms)
@@ -328,6 +328,13 @@ async function avvia(): Promise<void> {
     resolution: Math.max(1, window.devicePixelRatio || 1), autoDensity: true,
   });
   document.getElementById('gioco')!.appendChild(app.canvas);
+  // tenere premuto su una carta la apre in grande: niente menu del browser, selezione del testo o scorrimento della pagina
+  app.canvas.style.touchAction = 'none';
+  app.canvas.style.userSelect = 'none';
+  app.canvas.style.setProperty('-webkit-user-select', 'none');
+  app.canvas.style.setProperty('-webkit-touch-callout', 'none');
+  app.canvas.style.setProperty('-webkit-tap-highlight-color', 'transparent');
+  app.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   await caricaFont();
   await Promise.all([caricaImmagini(), caricaSfondo()]);
   window.addEventListener('resize', ridisegna);
@@ -363,6 +370,7 @@ async function avvia(): Promise<void> {
     ctrl,
     mosseComputer: () => mosseComputer,
     fuori: () => testiFuoriSchermo(),
+    piccoli: () => testiPiccoli(),
     zoomAttivo: () => !!ui.zoom || ui.zoomTerr !== null,
     immagini: () => numeroTexture(),
     suggerimento: () => suggerimento(ctrl.vista()),

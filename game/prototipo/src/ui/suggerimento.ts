@@ -94,7 +94,7 @@ export function suggerimento(v: Vista): Suggerimento | null {
     return { tipo: 'forza-mancante', testo: `Gioca una presenza ${aT(t.nome)}: ti ${n === 1 ? 'manca 1 punto' : `mancano ${n} punti`} di forza per controllarlo.` };
   }
   // 6 - qualcosa da giocare
-  return { tipo: 'tocca-una-carta', testo: `Hai ${v.energia} di energia: tocca una carta della mano e poi un territorio evidenziato per giocarla.` };
+  return { tipo: 'tocca-una-carta', testo: `Hai ${v.energia} di energia: tocca una carta e poi il quadro che si illumina. Tieni premuto su una carta per leggerla.` };
 }
 
 /** Nella scena del territorio: le tue presenze e cosa ti manca per prenderlo (solo numeri gia' visibili nella vista). */
@@ -153,7 +153,7 @@ export function passiTutorial(fazione: 'custodi' | 'risvegliati'): PassoTutorial
         : 'Vinci completando 3 riti, uno per territorio. Su un territorio puoi completare il rito se hai una tua presenza, almeno tanta forza quanto Lui e l\'instabilità è 3 o più.',
     },
     { area: 'pannello:energia', titolo: 'L\'energia', testo: 'Questa è l\'energia che puoi spendere in questo turno. Ogni carta costa energia (il numero nella gemma blu in alto a destra della carta). Quella non spesa si perde.' },
-    { area: 'mano:tutta', titolo: 'La mano', testo: 'Tocca una carta (la mano si alza), poi il quadro che si illumina d\'oro per giocarla. La lente serve solo a leggere la carta ingrandita.' },
+    { area: 'mano:tutta', titolo: 'La mano', testo: 'Tocca una carta (la mano si alza), poi il quadro che si illumina d\'oro per giocarla. Per leggere una carta ingrandita, tienila premuta.' },
     { area: 'territori:tutti', titolo: 'I territori', testo: 'Ogni targhetta mostra la forza di Lui (verde) e la tua (blu): controlla chi ne ha di più. I pallini sono l\'instabilità: a 3 cambia chi può fare cosa, a 4 le presenze perdono forza, a 5 scatta un effetto cosmico.' },
     {
       area: 'btn:tappa:1',

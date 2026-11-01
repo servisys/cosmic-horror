@@ -1,56 +1,50 @@
 ---
-id: CT-DOC-001
-fase: esecuzione
+id: CT-DEV-001
+fase: piano
 pronto: si
-branch: planning/ct-doc-001-approvazioni
+branch: fix/ct-dev-001-log-comandi
 scritto_da: Cowork (chat Claude del progetto)
 data: 2026-11-01
 ---
 
-# CT-DOC-001 — Approvazione del Master Index e del protocollo Cowork-Code
+# CT-DEV-001 — Registro completo delle esecuzioni del canale automatico
 
 ## Documenti autorevoli
-- Approvazione di Matteo, data in chat a Cowork il 2026-11-01: «ok approvo Master Index e protocollo».
-- `docs/00_MASTER_INDEX.md` (oggi `status: DRAFT`, v0.4.0) — §3 Stati documentali, §5 Regole sui file del protocollo.
-- `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md` (oggi `status: DRAFT`, solo sul branch `feature/ct-scambio-automatico`, PR aperta non fusa).
-- `docs/CT_COWORK_CODE_PROTOCOL_V0.1.md` (su `main`, `status: DRAFT`).
-
-## Via di Matteo e risposte al pre-flight plan
-Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («procedi»), con queste risposte alle domande del piano:
-1. Sì: branch `planning/ct-doc-001-approvazioni` creato da `origin/feature/ct-scambio-automatico`, PR con base `feature/ct-scambio-automatico`.
-2. Master Index alla versione **0.5.0**, file non rinominato.
-3. Sì: nella V0.1 aggiungi `superseded_by: CT_COWORK_CODE_PROTOCOL_V0.2.md` nel front matter.
-4. No: `last_reviewed` della V0.1 resta com'è.
-5. Riferimenti alla V0.1 in README, Vision e protocollo Copilot: non toccarli ora, saranno un task a parte. Elencali nel resoconto.
+- `docs/00_MASTER_INDEX.md` (APPROVED 0.5.0, se la PR delle approvazioni è fusa; altrimenti sul branch della PR).
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md` (APPROVED, stessa nota) — §2.1 canale automatico.
+- `strumenti/windows-scambio/LEGGIMI.md` e `osserva-scambio.ps1`.
+- Richiesta di Matteo in chat a Cowork il 2026-11-01: «facciamo anche il 2» (proposta di Code nel resoconto del 2026-11-01: salvare il flusso json di Code).
 
 ## Obiettivo
-Portare il Master Index e il protocollo Cowork-Code V0.2 allo stato `APPROVED`, così i task del canale automatico hanno documenti di governance approvati. Primo task reale del canale: serve anche a provare dal vivo la fase `esecuzione`.
+Oggi il log di un'esecuzione contiene solo il testo finale di Code: quando un comando viene bloccato non si vede quale. Lo script deve salvare il flusso completo dell'esecuzione, così si capisce subito cosa è successo.
 
 ## Scope incluso
-1. Master Index: `status: APPROVED`, versione aumentata secondo le regole del progetto (il file non ha la versione nel nome: proponi tu come gestirlo, senza rinominarlo se non è necessario), `last_reviewed: 2026-11-01`, riga nel changelog «approvato da Matteo il 2026-11-01». Nessun'altra modifica al testo.
-2. Protocollo: la V0.2 diventa `APPROVED` (tolta la riga «PROPOSTA ... DA CONFERMARE DA MATTEO» in testa, riga nel changelog); la V0.1 diventa `DEPRECATED` senza altre modifiche al testo. Il Master Index, se cita il protocollo, deve puntare alla V0.2.
-3. Problema da risolvere nel piano: la V0.2 esiste solo sul branch `feature/ct-scambio-automatico`, la cui PR non è fusa. Proponi la strada più pulita (per esempio: branch `planning/ct-doc-001-approvazioni` creato da `feature/ct-scambio-automatico`, così la PR di questo task si appoggia a quella; oppure solo il Master Index ora e il protocollo dopo la fusione) e spiega pro e contro in parole semplici.
-4. Una PR con base `feature/ct-scambio-automatico`, descrizione in italiano che dica che va fusa dopo la PR del canale automatico.
+1. In `osserva-scambio.ps1` lancia Code con `--output-format stream-json --verbose` e salva il flusso grezzo in `esecuzioni\<data>-<id>-<fase>\flusso.jsonl`.
+2. Ricava dal flusso il testo finale del resoconto (quello che oggi va in `REPORT.md`), senza cambiare cosa finisce su GitHub.
+3. Ricava dal flusso un file `comandi.txt` leggibile: ogni comando che Code ha provato, con esito (eseguito / bloccato dai permessi / errore). In fondo al resoconto pubblicato aggiungi solo una riga con il numero di comandi bloccati e i primi 5 (testo del comando), così Cowork li vede da GitHub.
+4. Il flusso e `comandi.txt` restano solo sul PC (nessun segreto su GitHub: se nel testo dei comandi compaiono token o chiavi, coprili).
+5. Aggiorna il LEGGIMI (dove trovare i due file).
+6. PR con base `main`, descrizione in italiano.
 
 ## Fuori scope
-- Fusioni, chiusure di PR, cancellazione di branch: le decide Matteo direttamente.
-- Qualsiasi altro documento, codice del gioco, regole, carte.
-- Cambiare lo stato di altri documenti DRAFT.
+- Fusioni, chiusure di PR, cancellazione di branch (le decide Matteo direttamente).
+- Cambiare i permessi delle due fasi o il formato di `TASK.md`, `REPORT.md`, `STATO.md` (salvo la riga del punto 3).
+- Reinstallare lo script: dopo la fusione lo farà Matteo o Code in sessione interattiva.
 
 ## Vincoli tecnici
-- Lavora solo sul branch `planning/ct-doc-001-approvazioni`; nessun push su `main`.
-- Regole sui file del protocollo: niente sovrascritture di contenuto storico, nome del file e `version` coerenti, niente segreti.
-- Lascia il repository di lavoro pulito e torna su `main` alla fine.
+- Base: `main` dopo la fusione della PR del canale automatico. Se nel piano risulta non ancora fusa, dillo e proponi la base giusta.
+- Windows PowerShell 5.1, solo ASCII nei file .ps1 (come oggi), nessuna nuova dipendenza.
+- Push solo con `git push -u origin HEAD`; a fine lavoro torna su `main`.
 
 ## Criteri di accettazione
-- Master Index e protocollo V0.2 con `status: APPROVED`, protocollo V0.1 con `status: DEPRECATED`.
-- Diff limitato al front matter, alla riga in testa della V0.2 e alle righe di changelog (più l'eventuale riferimento alla V0.2 nel Master Index).
-- PR aperta, non fusa.
+- Con un flusso json di esempio (salvato nel repository come file di prova sotto `strumenti/windows-scambio/prove/`) la funzione che ricava resoconto e `comandi.txt` dà il risultato atteso, compreso un comando bloccato.
+- Il testo pubblicato in `REPORT.md` resta uguale a oggi più la riga dei comandi bloccati.
+- Nessun file fuori da `strumenti/windows-scambio/` cambiato.
 
 ## Test obbligatori
-- `git diff --stat` e diff completo nel resoconto.
-- Controllo che nessun file fuori da `docs/` sia cambiato.
+- Prova della funzione di estrazione sul flusso di esempio (descrivi come l'hai verificata se in fase esecuzione non puoi lanciare PowerShell: in quel caso scrivilo chiaramente fra le cose non verificate).
+- `git diff --stat` nel resoconto.
 
 ## Output richiesto
-- Fase `piano`: pre-flight plan con la scelta del punto 3, file toccati, rischi, domande per Matteo.
-- Fase `esecuzione` (solo dopo nuovo via): Implementation Report con commit, PR, cosa non è stato verificato.
+- Fase `piano`: pre-flight plan (passi, file toccati, come si prova con i permessi della fase esecuzione, rischi, domande per Matteo).
+- Fase `esecuzione` (solo dopo nuovo via): Implementation Report con commit, PR e cosa non è stato verificato.

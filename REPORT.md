@@ -1,5 +1,51 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEV-004 - fase esecuzione - 2026-11-01 20:45 - FATTO
+
+Le modifiche sono su disco perché sono tornato su `main`: mostrano lo stato di `main`, non c'è nessun problema. Il lavoro è nel branch pushato.
+
+## Resoconto CT-DEV-004
+
+**Richiesta eseguita:** pubblicazione del Mac mini allineata a Folk Lore. Il sito di prova si aggiorna da solo, la produzione solo a mano. Ho seguito il via di Matteo, comprese le correzioni sul clone esistente, sull'assenza di deploy key e sul controllo `git fetch`.
+
+**Branch e PR:** `feature/ct-dev-004-pubblicazione-prova-produzione`, PR #74 verso `main`. Non ho fuso né chiuso nulla. Sono tornato su `main`.
+
+**Cosa è stato fatto**
+- **`pubblica.mjs`:**
+  - L'ambiente `prova` o `produzione` è obbligatorio e non c'è un valore predefinito.
+  - Ogni sito ha il suo token, da variabile oppure da file `.swa-token-<ambiente>` con permessi 600, ignorato da git. Il vecchio `SWA_CLI_DEPLOYMENT_TOKEN` non si legge più.
+  - In prova salva la copia della build in `.pubblicati/<commit>` e tiene le ultime 10.
+  - In produzione non ricostruisce. Si ferma se il commit non è stato pubblicato in prova o se il sito di prova risponde con un altro commit.
+  - La modalità `versioni` è tolta.
+- **Job del Mac:**
+  - Lavora nel clone esistente, con log e stato in `.pubblicazione/`. Pubblica solo in prova e legge il token dal file, senza Portachiavi.
+  - Salta il giro, senza segnare fallimento, se `batteria.lock` di Folk Lore ha un pid vivo. Lo salta anche se `ps` mostra una build sotto `progetti/` fuori da Cosmic Horror, o se c'è il blocco proprio.
+  - `installa.sh` prova `git fetch` senza credenziali e si ferma con un messaggio chiaro se non va. `disinstalla.sh` e `prova-logica.sh` sono aggiornati.
+- **Gioco:** la scritta della versione mostra anche l'ambiente, letto da `versione.json`. Ho reso pubblica solo questa route in `staticwebapp.config.json`, perché la produzione deve poter leggere il commit online senza login. Contiene solo ambiente, commit e data.
+- **Indirizzi dei siti:** sono in `siti-pubblicazione.json`, con segnaposto da sostituire.
+- **Guida:** nuova V0.2, la V0.1 è DEPRECATED. Ho anche aggiornato il rimando in `CT_TECHNICAL_ARCHITECTURE_V0.1.md`.
+
+**Verifiche (su Windows)**
+- `npm run tipi`, `npm run build` e `npm test` sono verdi: 208 test.
+- Dentro `npm test` girano `scripts/prova-pubblica.mjs` e `prova-logica.sh`. Provano ambiente mancante o sconosciuto, token per sito, il vecchio token ignorato, i rifiuti della produzione, la potatura a 10 copie, il blocco di Folk Lore e le build di altri progetti.
+- Ho aggiunto `test/pubblica.test.ts` che le lancia. Questo test ha bisogno di una bash: se non c'è, la parte del job Mac viene saltata.
+
+**`git diff --stat main`:** 20 file cambiati, 740 inserimenti, 190 cancellazioni.
+
+**Non verificato**
+- Il Mac mini vero: launchd, `installa.sh`, `git fetch` reale, deploy reale con la CLI di Azure e la lettura di `versione.json` online.
+- `npm run pubblica -- prova --prova`: la sessione non mi ha dato il permesso di lanciarlo. Tipi, test e build li ho eseguiti a parte.
+- Il controllo dei permessi 600 sul file del token. Sul disco usato per le prove `chmod` non vale, quindi la prova 17 è saltata e un controllo l'ho aggirato con `CT_SALTA_PERMESSI`, che serve solo ai test.
+- Il controllo delle build di altri progetti: guarda il percorso nella riga di comando di `ps`, e un `npm run build` di Folk Lore senza percorso può sfuggire.
+
+**Da dire a Matteo**
+- Controllare sulla sua guida dell'ambiente di build che `batteria.lock` e `/Users/builder/dev-machine/progetti` siano i percorsi giusti.
+- Se `builder` non ha una sessione grafica, `installa.sh` usa `user/<uid>` al posto di `gui/<uid>`, ma non l'ho potuto provare.
+
+Comandi bloccati dai permessi: 7. Primi 5: `npm run prova-pubblica --prefix game/prototipo`; `node game/prototipo/scripts/prova-pubblica.mjs`; `npm run prova-pubblica --prefix game/prototipo`; `node -e " const fs=require('fs');const p='game/prototipo/scripts/prova-pubblica.mjs';let s=fs.readFileSync(p,'utf8'); s=...`; `npm run pubblica --prefix game/prototipo -- prova --prova`
+
+---
+
 ## CT-DEV-004 - fase piano - 2026-11-01 20:18 - FATTO
 
 Sto leggendo i file e ho quasi finito. Ecco il pre-flight plan, nessun file modificato.

@@ -1,6 +1,6 @@
 ---
 id: CT-FEAT-002
-fase: piano
+fase: esecuzione
 pronto: si
 branch: feature/ct-feat-001-cinque-territori
 scritto_da: Cowork (chat Claude del progetto)
@@ -13,6 +13,15 @@ data: 2026-11-01
 - Sul branch `feature/ct-feat-001-cinque-territori` (PR 72, aperta, non fusa): `CT_CORE_RULES_V0.13.md` (APPROVED; Matteo ha confermato in chat il 2026-11-01 le interpretazioni 26-28 del §13), `CT_CARTE_PROTOTIPO_V0.7.yaml`, `CT_PROTOTYPE_SCOPE_V0.3.md` (APPROVED), Decision Log `CT_DECISION_LOG_CT_DES_069_073_V0.1.md` (CT-DES-069…074 REGISTRATA; CT-DES-074 = priorità del computer a 5 territori).
 - `docs/00_MASTER_INDEX.md`, `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md` (APPROVED).
 - Decisione di Matteo in chat a Cowork il 2026-11-01: la PR 72 non si fonde da sola; questo lavoro si fa sopra di lei e poi si fonde tutto insieme, così `main` resta sempre giocabile.
+
+## Via di Matteo e risposte al pre-flight plan
+Matteo ha dato il via all'esecuzione in chat a Cowork il 2026-11-01 («sì») con queste risposte:
+1. Opzione A: stesso branch `feature/ct-feat-001-cinque-territori`, PR 72 unica.
+2. Decision Log: `status: DRAFT` in testa con voci REGISTRATA va bene (convenzione del progetto).
+3. Targhetta «ULTIMA TAPPA» sempre visibile: spenta sotto le 2 tappe, accesa e pulsante da 2 in su.
+4. Segnaposto: per i territori T4 e T5 usa le loro scene 3D (`dunwich_v2`, `rlyeh_v2`); per le carte T4r e T5r un segnaposto generico con il nome della carta.
+5. Pietre ritte del computer: a parità, il territorio con indice più basso, sempre dopo le priorità della tabella CT-DES-074.
+Segui il pre-flight plan; ogni interpretazione della tabella CT-DES-074 va elencata nel resoconto.
 
 ## Obiettivo
 Completare il gioco a 5 territori: computer secondo CT-DES-074, interfaccia con 5 quadri giocabili, simulazioni complete, controlli verdi, build.

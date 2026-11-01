@@ -1,0 +1,54 @@
+=== RESOCONTO ===
+git fetch ESEGUITO
+
+Read `a.txt`: righe `uno`, `due`.
+
+Resoconto:
+- ESEGUITO: `git status`, `git log -1`, `git branch --show-current`, `git branch --list`, `git fetch`.
+- BLOCCATO: `git branch nuovo-ramo`, `git branch -D feature/ct-zz`, `git branch -m altro`, `git checkout -b x`, `git commit --allow-empty -m x`, `git push origin feature/ct-zz`, `touch nuovo.txt`.
+
+Il sistema lascia passare i comandi di sola lettura e `git fetch`. Blocca o chiede approvazione per tutto cio' che modifica rami, commit, remoto o file. `git branch -D` e' stato negato in modo esplicito. Gli altri chiedevano approvazione, che in modalita' non interattiva non c'era.
+=== COMANDI.TXT ===
+Comandi provati da Claude Code: 13 (bloccati: 7)
+
+1. [eseguito]
+git status
+
+2. [eseguito]
+git log -1
+
+3. [eseguito]
+git branch --show-current
+
+4. [eseguito]
+git branch --list
+
+5. [BLOCCATO dai permessi]
+git branch nuovo-ramo
+
+6. [BLOCCATO dai permessi]
+git branch -D feature/ct-zz
+
+7. [BLOCCATO dai permessi]
+git branch -m altro
+
+8. [BLOCCATO dai permessi]
+git checkout -b x
+
+9. [BLOCCATO dai permessi]
+git commit --allow-empty -m x
+
+10. [BLOCCATO dai permessi]
+git push origin feature/ct-zz
+
+11. [BLOCCATO dai permessi]
+touch nuovo.txt
+
+12. [eseguito]
+git fetch
+
+13. [eseguito]
+[Read] C:\Users\utente\prova\w\a.txt
+
+=== RIGA PUBBLICATA ===
+Comandi bloccati dai permessi: 7. Primi 5: `git branch nuovo-ramo`; `git branch -D feature/ct-zz`; `git branch -m altro`; `git checkout -b x`; `git commit --allow-empty -m x`

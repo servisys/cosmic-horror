@@ -35,12 +35,12 @@ $Branch = 'scambio'
 $StatoDir = Join-Path $Base 'stato'
 $LogDir = Join-Path $Base 'log'
 $RunDir = Join-Path $Base 'esecuzioni'
-New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null
+if (-not $Prova) { New-Item -ItemType Directory -Force -Path $StatoDir, $LogDir, $RunDir | Out-Null }   # -Prova non crea nulla
 $Log = Join-Path $LogDir 'scambio.log'
 $Blocco = Join-Path $StatoDir 'blocco'
 $Fatti = Join-Path $StatoDir 'task-eseguiti.txt'
 $Vuoto = Join-Path $StatoDir 'vuoto.txt'
-if (-not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
+if (-not $Prova -and -not (Test-Path $Vuoto)) { [IO.File]::WriteAllText($Vuoto, '', $Utf8) }
 
 # ---------------------------------------------------------------- utilita'
 
@@ -199,7 +199,8 @@ function Estrai-Flusso([string]$file) {
           $c = ''
           if ($b.content -is [string]) { $c = $b.content }
           else { $c = (@($b.content) | ForEach-Object { $_.text }) -join ' ' }
-          if ($c -match "(?i)permission|haven't granted|not allowed|was denied") { $uso.Esito = 'BLOCCATO dai permessi' }
+          # messaggi reali visti: 'This command requires approval', 'Permission to use Bash with command ... has been denied.', '... needs approval', '... contains multiple operations'; il segnale piu' sicuro e' comunque permission_denials dell'evento finale
+          if ($c -match "(?i)permission|haven't granted|not allowed|was denied|has been denied|requires? approval|needs approval|require approval|multiple operations") { $uso.Esito = 'BLOCCATO dai permessi' }
           else { $uso.Esito = 'ERRORE' }
         } else { $uso.Esito = 'eseguito' }
       }

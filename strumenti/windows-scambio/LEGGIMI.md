@@ -54,7 +54,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\CosmicHorr
   - `flusso.jsonl`: il flusso completo di Code (stream-json), un evento per riga;
   - `comandi.txt`: ogni comando che Code ha provato, con esito (eseguito / BLOCCATO dai permessi / ERRORE). Token e chiavi sono coperti con `[COPERTO]`.
 - In fondo a ogni resoconto pubblicato su `REPORT.md` c'è una riga con il numero di comandi bloccati e i primi 5.
-- Prova dell'estrazione senza lanciare Code: `osserva-scambio.ps1 -Prova prove\flusso-esempio.jsonl` (stampa resoconto, `comandi.txt` e riga dei bloccati).
+- Prova dell'estrazione senza lanciare Code: `osserva-scambio.ps1 -Prova prove\flusso-esempio.jsonl` (stampa resoconto, `comandi.txt` e riga dei bloccati; non crea nessuna cartella).
+- `prove\flusso-reale.jsonl` è un flusso vero di `claude -p --output-format stream-json --verbose` (comandi eseguiti e bloccati, ripulito da percorsi e identificativi); `prove\flusso-esempio.jsonl` è scritto a mano. Per ognuno c'è il risultato atteso (`*.atteso.txt`). Controllo automatico: `powershell -NoProfile -ExecutionPolicy Bypass -File prove\controlla-prove.ps1` (con `-Scrivi` riscrive i file attesi dopo un cambio voluto).
+- Nel flusso reale i comandi bloccati si riconoscono dalla lista `permission_denials` dell'evento finale e dai messaggi «requires approval» / «has been denied»; se il formato di Claude Code cambia, rilanciare il controllo.
 - I vecchi flussi non vengono cancellati in automatico.
 
 ## Quando non parte

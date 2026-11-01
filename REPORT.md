@@ -1,5 +1,99 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DOC-002 - fase piano - 2026-11-01 14:27 - FATTO
+
+# Pre-flight plan CT-DOC-002 (fase piano, nessun file modificato)
+
+**Richiesta eseguita:** letto `TASK.md` e i documenti autorevoli. Fase piano, sola lettura.
+
+## Verifiche sui documenti
+- Approvazione di Matteo: è solo una citazione dentro `TASK.md`. Non ho modo di verificarla, la prendo come scritta da Cowork.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.2.md`: APPROVED. Non ha il campo `superseded_by`.
+- `docs/CT_COWORK_CODE_PROTOCOL_V0.3.md`: DRAFT, come dice il task.
+- `docs/00_MASTER_INDEX.md`: APPROVED 0.5.0. I riferimenti alla V0.2 sono alle righe 24, 61 e 295.
+- Task `pronto: si`. Non vedo motivi per cui non sia pronto.
+
+## Strada per le versioni (la mia proposta)
+Creo **`CT_COWORK_CODE_PROTOCOL_V0.4.md`, APPROVED, version 0.4.0**, copia della V0.3 con le due regole.
+- **V0.4:** `supersedes: CT_COWORK_CODE_PROTOCOL_V0.3.md`. Tolgo il riquadro «PROPOSTA DI COWORK». Aggiungo righe di changelog: 0.3.0 resta come storico, poi 0.4.0 APPROVED con la data.
+- **V0.3:** solo front matter, `status: DEPRECATED` e `superseded_by: V0.4`. Il testo non cambia. Il riquadro «proposta» resta, ma la V0.3 non è mai stata approvata e non entra in vigore.
+- **V0.2:** solo front matter, `DEPRECATED` e `superseded_by`. Il changelog della V0.2 non ha righe da aggiungere, perché il testo non si tocca. Il passaggio a DEPRECATED lo registra la V0.4.
+- **V0.1:** già DEPRECATED con `superseded_by: V0.2`. Non la tocco. La catena V0.1 → V0.2 → V0.3 → V0.4 si segue.
+- **Perché la V0.4:** è la strada più pulita e rispetta «non si sovrascrive mai un file». Cambiare la V0.3 sul posto non va bene. Saltare da V0.2 alla V0.3 approvata cambiando il testo non va bene neanche quello.
+
+## Nome del campo «deleghe»
+Propongo **`tipo: deleghe`**.
+- Va nel front matter di `TASK.md`, vicino a `fase`.
+- Valori ammessi: `deleghe`. Se il campo manca o ha un altro valore, il task è un lavoro normale.
+- Se un task ha `fusioni` o `chiusure` senza `tipo: deleghe`, lo script le ferma e scrive il motivo nel resoconto. Non ne esegue nessuna.
+- Nel task di deleghe non ci sono lavori nuovi. Nelle prove lo script controlla solo i campi. Che il corpo del task sia vuoto di lavoro nuovo è una regola per Cowork nel protocollo, non un controllo che lo script può fare.
+
+## Modifiche al protocollo (§2.1, §3, §8)
+- **§2.1:** la tabella di `TASK.md` nomina `tipo: deleghe`. Il passo 6 dice che lo script esegue le deleghe solo con `tipo: deleghe`.
+- **§3:**
+  - `file_attesi_<numero>` diventa obbligatorio per ogni fusione, compilato da Cowork dopo aver letto il diff della PR su GitHub.
+  - Nuova regola: fusioni e chiusure solo in un task dedicato, il cui unico scopo è fondere o chiudere PR già aperte e già controllate da Cowork. Mai nello stesso task di un lavoro nuovo.
+  - Cambio la frase sui controlli dello script: «file toccati dentro `file_attesi`», senza «se presente».
+- **§8:**
+  - Aggiorno il punto sulla protezione di `main`: esiste un ruleset con PR obbligatoria, niente force push né cancellazione. Il punto va dal «da fare» al «fatto».
+  - Aggiungo una nota che la protezione non copre il caso di un account con diritto di bypass. Non ne so niente, quindi lo segnalo come non verificato.
+  - Il punto sul «solo il campo fusioni/chiusure è l'unica delega» resta e cita anche `tipo`.
+
+## Master Index → 0.6.0
+- Aggiorno le righe 24 e 61 alla V0.4.
+- `version: 0.6.0`. Aggiungo una riga di changelog che dice solo «riferimenti al protocollo aggiornati alla V0.4, nessun'altra modifica».
+- La riga 295 dello storico, che nomina la V0.2, resta com'è.
+
+## Script `osserva-scambio.ps1`
+- `Leggi-Deleghe` (riga 257): legge anche `tipo`.
+  - `file_attesi_<n>` mancante o vuoto per una fusione produce un errore di formato, e quindi ferma tutto (la regola esistente: un errore di formato ferma tutto).
+  - Fusioni o chiusure senza `tipo: deleghe` producono un errore che ferma tutto.
+- Commenti in testa (righe 248-255) e `file_attesi` non più facoltativo. La riga 292 resta valida.
+- Il controllo dei file (riga 349 circa): togliere la condizione «se presente», perché non può più mancare.
+- Task senza deleghe: comportamento invariato (`$presente` falso).
+- Prompt di Code (riga 389 circa): ritocco della frase sulle fusioni. Prima di toccarlo mi serve rileggere il testo intero.
+- Il blocco alla riga 579: resto invariato, salvo il motivo del blocco se manca `tipo`.
+
+## Prove in `prove/deleghe/`
+- Nuovo `task-senza-file-attesi.md` + `.atteso.txt`: fusione senza `file_attesi_<n>`.
+- Nuovo `task-senza-tipo.md` + `.atteso.txt`: `fusioni`/`chiusure` ma niente `tipo: deleghe`.
+- Aggiungo `tipo: deleghe` a `task-ok.md` e `task-errori.md`.
+  - `task-ok.md` oggi ha fusioni senza `file_attesi` (71, 72, 73, 75, 76) e va riscritto con `file_attesi`.
+  - Il suo `.atteso.txt` cambia di conseguenza. Rigenero con `controlla-deleghe.ps1 -Scrivi` e leggo il risultato invece di fidarmene.
+- `task-senza-campi.md` non cambia.
+
+Comando per le prove (nella fase esecuzione):
+`powershell -NoProfile -ExecutionPolicy Bypass -File .\strumenti\windows-scambio\prove\controlla-deleghe.ps1`
+poi anche `controlla-prove.ps1`. Verifico che passino prima di aprire la PR.
+
+## `LEGGIMI.md`
+Righe 22 e 75-89: aggiungere `tipo: deleghe`, dire che `file_attesi_<n>` è obbligatorio per le fusioni, e che fusioni e chiusure vanno in un task dedicato.
+
+## File toccati
+- Nuovo: `docs/CT_COWORK_CODE_PROTOCOL_V0.4.md`.
+- Modificati: V0.3 (front matter), V0.2 (front matter), `docs/00_MASTER_INDEX.md`, `osserva-scambio.ps1`, `LEGGIMI.md`.
+- Prove: due nuovi task con i file attesi, più `task-ok.md`, `task-errori.md` e i loro attesi.
+
+## Rischi
+- **Riferimenti alla V0.1 che restano vecchi:** `README.md` (riga 10) e il documento Vision `CT_VISION_AND_PILLARS_V0.11_BOZZA.md` (righe 13 e 53) puntano ancora alla V0.1 DEPRECATED. Il task dice «cambiare altri documenti» fuori scope e il diff va limitato a `docs/` (protocollo e Master Index) e allo script. Il README sta fuori da `docs/`, e il Vision è un documento che non è il protocollo. **Non li tocco**: sono segnalati, da sistemare in un task a parte.
+- **Task già scritti:** se Cowork ha un task con `fusioni` senza `tipo: deleghe` o senza `file_attesi`, dopo questa modifica viene fermato. È voluto.
+- **Script installato:** il task dice di non reinstallare lo script. Se l'installazione sul PC usa una copia, le modifiche al repo non valgono finché Matteo non aggiorna quella copia. Non so dove viva la copia, quindi non l'ho verificato.
+- **La PR di questo task** ha i file del protocollo e dello script insieme. La V0.4 deve entrare insieme allo script, altrimenti c'è un periodo in cui protocollo e script non coincidono.
+- **ASCII e PowerShell 5.1:** i messaggi nuovi nello script devono restare ASCII (niente accenti, uso `e'` come nel resto del file).
+
+## Domande per Matteo
+1. Ti va bene `tipo: deleghe` come nome del campo?
+2. Ti va bene la strada V0.4 (V0.3 e V0.2 DEPRECATED con `superseded_by`)?
+3. Vuoi un task a parte per i riferimenti vecchi alla V0.1 in `README.md` e nel documento Vision?
+
+**Cosa non ho verificato:** l'approvazione di Matteo in chat, il ruleset di `main` su GitHub, dove vive la copia installata dello script, e il testo completo del prompt di Code nello script (righe 385-410, letto solo in parte).
+
+**Branch e PR:** nessuno creato in questa fase. Il branch previsto è `planning/ct-doc-002-protocollo-v04`.
+
+Comandi bloccati dai permessi: 1. Primi 1: `head -12 docs/CT_COWORK_CODE_PROTOCOL_V0.1.md; sed -n 18,28p docs/00_MASTER_INDEX.md; sed -n 286,300p docs/00_MASTER_IND...`
+
+---
+
 ## CT-DEV-002 - fase esecuzione - 2026-11-01 13:55 - FATTO
 
 # Resoconto CT-DEV-002

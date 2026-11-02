@@ -1,5 +1,44 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-DEL-006 - fase piano - 2026-11-02 05:55 - FATTO
+
+**Resoconto CT-DEL-006, fase piano**
+
+**Richiesta eseguita:** controlli in sola lettura sulla PR 76. Non ho modificato nulla.
+
+**Verifiche (tutte positive):**
+- Il protocollo V0.4 è APPROVED (`status: APPROVED` nell'intestazione, §3 presente).
+- La PR 76 è aperta e non è bozza. Il titolo è «CT-FIX-007: barra di stato in basso, safe area iPhone, ritorno dal background».
+- La base è `main`.
+- La testa è `51133b47b4fd643b5306b70ffa30e4b478ca51c7`, uguale allo sha di `fusioni`.
+- GitHub la dà `MERGEABLE` e `CLEAN`.
+- Gli 8 file sono tutti dentro `file_attesi_76`:
+  - `game/prototipo/index.html`
+  - `game/prototipo/package.json`
+  - `game/prototipo/scripts/verifica-schermo.mjs`
+  - `game/prototipo/src/ui/config-plancia.ts`
+  - `game/prototipo/src/ui/main.ts`
+  - `game/prototipo/src/ui/pwa.ts`
+  - `game/prototipo/src/ui/scena.ts`
+  - `game/prototipo/src/ui/schermo.ts`
+
+**Cosa è stato fatto:** niente. Nessun file, commit, branch, push o PR.
+
+**Pronto per l'esecuzione:** sì. La fusione la esegue lo script.
+
+**Non verificato:**
+- Non ho letto il diff. Il task dice che l'ha già letto Cowork.
+- Non ho controllato i check di CI. `CLEAN` indica che non ci sono blocchi.
+- Non ho confermato di persona la frase di Matteo «fondi 76». Mi baso su quanto scritto nel task.
+
+Comandi bloccati dai permessi: 0
+
+**Fusioni e chiusure (eseguite dallo script, non da Code):**
+
+- Campi fusioni/chiusure ignorati: la fase e' piano, non esecuzione.
+
+---
+
 ## CT-FIX-007 - fase esecuzione - 2026-11-02 01:26 - FATTO
 
 CT-FIX-007 è fatto e la PR è aperta, ma non l'ho potuto provare su un iPhone vero. Il ritorno dal background l'ho simulato con eventi su Chromium a 852×393.

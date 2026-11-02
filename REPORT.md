@@ -1,5 +1,40 @@
 # Resoconti di Claude Code (il piu' recente in alto)
 
+## CT-FIX-007 - fase esecuzione - 2026-11-02 01:26 - FATTO
+
+CT-FIX-007 è fatto e la PR è aperta, ma non l'ho potuto provare su un iPhone vero. Il ritorno dal background l'ho simulato con eventi su Chromium a 852×393.
+
+**Branch e PR**
+- Branch `fix/ct-fix-007-schermo-pieno-e-barra-di-stato`, creato da `origin/main` dopo `git fetch`.
+- PR #76 verso `main`: https://github.com/servisys/cosmic-horror/pull/76. Non l'ho fusa.
+- Sono tornato su `main`. Il `main` locale è indietro di 9 commit rispetto a `origin/main`.
+
+**Cosa ho fatto**
+- **Barra di stato in basso:** al posto del riquadro ENERGIA c'è una barra su una riga, con energia, Sigilli/Riti x/3, Esposizione x/10, Mazzo e RIDUCI. Dunwich resta libero. L'avversario resta nella barra in alto.
+- **Barra non a tutta larghezza:** a destra restano il medaglione FINE TURNO e le icone, dove erano. Con la barra a tutta larghezza le miniature della Landa finivano sopra mano e icone a 740×340. Era un compromesso che non ho potuto chiedere a Matteo.
+- **Mano e Dunwich:** la mano ora sporge 34u sopra la barra (prima 58u). Per questo ho alzato di 24u la targhetta di Dunwich (`rialzo`), altrimenti le miniature toccavano il consiglio.
+- **Safe area iPhone:** il contenitore del gioco sta dentro `env(safe-area-inset-*)`, quindi niente tacca di lato né barra dei gesti sotto. Ho aggiunto `touch-action: manipulation` su `html` e `body`.
+- **Ritorno dal background:** il nuovo `src/ui/schermo.ts` ridimensiona il canvas e ridisegna su `resize`, `orientationchange`, `pageshow`, `visibilitychange`, `fullscreenchange` e `visualViewport.resize`. Lo fa subito e ancora dopo 150, 500 e 1200 ms. Blocca i gesti di pizzico (`gesturestart`/`gesturechange`/`gestureend`) e, se `visualViewport.scale` non è 1, riporta la scala a 1 (best effort).
+- **Tutto schermo su Android:** la richiesta in `pwa.ts` si riarma a ogni ritorno dal background e non è più `{ once: true }`. Su iPhone l'API non c'è e il codice esce subito, senza errori.
+- **Fascia vuota in basso:** non ho trovato la causa in locale e non ho potuto confermarla su iPhone. L'unica correzione che la riguarda è la safe area. Resta da verificare sul telefono.
+
+**Verifiche**
+- `npm run tipi`: ok.
+- `npm test`: 267 test passati, lanciati prima di spostare i controlli dell'ultima modifica.
+- `npm run sovrapposizioni`, `npm run leggibilita` e `npm run verifica-cinque-territori`: tutte le prove sono OK. Resta un solo "problema" in ognuna: un errore 404 in console, presente anche con la build vecchia. Credo sia `versione.json`, che in locale non c'è, ma non l'ho verificato.
+- Le verifiche grafiche leggono `dist`, quindi serve prima `npm run build`. La mia prima corsa girava su una build vecchia e l'ho rifatta.
+- Nuova `npm run verifica-schermo` (`scripts/verifica-schermo.mjs`): 8 prove OK. Controlla la barra sul fondo, il canvas uguale al contenitore dopo il ritorno anche senza `resize`, il cambio di misura e l'assenza di errori.
+- Non l'ho confrontata con il codice vecchio, quindi non prova da sola che il bug fosse questo.
+
+**Non verificato**
+- `npm run grafica-finale` non l'ho eseguito: il comando mi è stato bloccato, quindi va rilanciato.
+- Non ho ridotto la ricerca dei test alla sola verifica dei tipi dopo l'ultimo ritocco: i test unitari non sono stati rilanciati dopo le ultime modifiche a `scena.ts` e `config-plancia.ts`.
+- Su iPhone da verificare: la safe area in orizzontale, il ritorno dal background (zoom e tagli), la fascia vuota in basso, la leggibilità della barra e se la mano che sporge di 34u si tocca bene. La scala a 1 su iOS è solo un tentativo.
+
+Comandi bloccati dai permessi: 5. Primi 5: `git stash -u -q && (npm run sovrapposizioni 2>&1 | tail -4); git stash pop -q && git status --short`; `git stash -u`; `node -e "import('playwright').then(async({chromium})=>{const{indirizzoDiProva}=await import('./scripts/server-prova.mjs'...`; `npm run grafica-finale 2>&1 | grep -v "^OK" | cut -c1-260`; `npm run grafica-finale`
+
+---
+
 ## CT-FIX-007 - fase piano - 2026-11-02 00:36 - FATTO
 
 # Pre-flight plan CT-FIX-007 (fase piano, nessuna modifica fatta)

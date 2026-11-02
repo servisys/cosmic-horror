@@ -13,8 +13,9 @@
 <meta name="apple-mobile-web-app-title" content="Cosmic Horror">
 <title>Cosmic Horror - prototipo</title>
 <style>
-  html, body { margin: 0; height: 100%; background: #0d1015; overflow: hidden; font-family: system-ui, 'Segoe UI', Arial, sans-serif; color: #e8e6e0; }
-  #gioco { position: fixed; inset: 0; }
+  html, body { margin: 0; height: 100%; background: #0d1015; overflow: hidden; font-family: system-ui, 'Segoe UI', Arial, sans-serif; color: #e8e6e0; touch-action: manipulation; }
+  /* il gioco sta dentro la safe area (tacca di lato, barra dei gesti in basso su iPhone); il resto e' lo sfondo scuro della pagina */
+  #gioco { position: fixed; top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px); bottom: env(safe-area-inset-bottom, 0px); left: env(safe-area-inset-left, 0px); }
   #gioco canvas { display: block; }
   #inizio { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d1015; z-index: 5; }
   #inizio .scatola { max-width: 640px; padding: 12px 20px; text-align: center; }

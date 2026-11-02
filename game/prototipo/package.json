@@ -19,6 +19,7 @@
     "verifica-aiuti": "node scripts/verifica-aiuti.mjs",
     "verifica-cinque-territori": "node scripts/verifica-cinque-territori.mjs",
     "grafica-finale": "node scripts/grafica-finale.mjs",
+    "verifica-schermo": "node scripts/verifica-schermo.mjs",
     "verifica-animazioni": "node scripts/verifica-animazioni.mjs",
     "leggibilita": "node scripts/leggibilita.mjs",
     "sovrapposizioni": "node scripts/sovrapposizioni.mjs",

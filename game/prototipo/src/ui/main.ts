@@ -8,6 +8,7 @@ import { alCaricarsiDiUnaScena, caricaImmagini, caricaScene, caricaSfondo, numer
 import { caricaFont } from './tipografia.js';
 import { VERSIONE, caricaAmbiente, etichettaVersione } from './versione.js';
 import { registraServiceWorker, tuttoSchermoAlPrimoTocco } from './pwa.js';
+import { sorvegliaSchermo } from './schermo.js';
 import { segnaTutorialVisto, tutorialVisto } from './memoria.js';
 import { anim, type FotoStato } from './animazioni.js';
 import { SETTORI, inSchermo } from './config-plancia.js';
@@ -339,6 +340,7 @@ async function avvia(): Promise<void> {
   await caricaFont();
   await Promise.all([caricaImmagini(), caricaSfondo()]);
   window.addEventListener('resize', ridisegna);
+  sorvegliaSchermo(app, ridisegna);
   // scene 3D dei luoghi: si caricano in background dopo la partenza (poche centinaia di KB), la scena si ridisegna quando arrivano
   alCaricarsiDiUnaScena(() => { if (ui.scena) ridisegna(); });
   void caricaScene(SETTORI.map((x) => x.scena));

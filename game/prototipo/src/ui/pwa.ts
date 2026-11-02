@@ -58,12 +58,15 @@ export function tuttoSchermoAlPrimoTocco(): void {
     || (navigator as unknown as { standalone?: boolean }).standalone === true;
   // solo sul telefono (puntatore «grosso»): sul computer non serve e darebbe fastidio
   if (installata || !document.documentElement.requestFullscreen || !window.matchMedia('(pointer: coarse)').matches) return;
+  // armato all'avvio e a ogni ritorno dal background (Android esce dal tutto schermo): si richiede al primo tocco successivo
+  let armato = true;
   const chiedi = (): void => {
-    window.removeEventListener('pointerup', chiedi);
-    if (document.fullscreenElement) return;
+    if (!armato || document.fullscreenElement) return;
+    armato = false;
     try {
       void document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => undefined);
     } catch { /* il browser non lo permette */ }
   };
-  window.addEventListener('pointerup', chiedi, { once: true });
+  window.addEventListener('pointerup', chiedi);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') armato = true; });
 }

@@ -146,7 +146,7 @@ export function disegnaScena(app: Application, c: Controller, ui: UiStato, az: A
       if (!st) return;
       ostacoli.push(...targhetta(d, c, ui, az, v, t, i, st, visibili.get(st.id)!, opz, hBar, W, H));
     });
-    d.aree['territori:tutti'] = { x: 0, y: hBar, w: W, h: H - hBar - 58 * u };
+    d.aree['territori:tutti'] = { x: 0, y: hBar, w: W, h: H - hBar - (58 + H_BARRA) * u };
 
     // ---------- barra in alto: avversario, messaggio, giro ----------
     barraAlto(d, c, v, W, hBar, cAvv.chiaro);
@@ -538,7 +538,7 @@ function targhetta(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista,
   if (hanLui && t.loroTappaTogliibile) righe.push(`${sigAvv} di Lui: al sicuro dopo il tuo turno`);
   if (hanMio && t.mioTappaTogliibile) righe.push(`${sigMio} tuo: al sicuro dopo il turno di Lui`);
   // in basso a sinistra (xDa) le righe non devono finire sul pannello dell'energia
-  const limite = mc.xDa !== undefined ? H - 140 * u : basso ? H - 66 * u : vis.y + vis.h;
+  const limite = mc.xDa !== undefined ? H - (110 + H_BARRA) * u : basso ? H - (66 + H_BARRA) * u : vis.y + vis.h;
   for (const r of righe) {
     if (y + 18 * u > limite) break;
     const wr = Math.min(wp + 40 * u, d.larghezza(r, 12, { corsivo: true }) + 14 * u);
@@ -593,6 +593,8 @@ interface RisMano {
 
 /** Larghezza del pannello dell'energia (serve anche alla mano, che gli lascia lo spazio). */
 const LARGH_ENERGIA = 178;
+/** Altezza (a scala 1) della barra di stato in basso: energia, Sigilli/Riti, Esposizione, Mazzo, RIDUCI. La mano e i bottoni stanno sopra. */
+const H_BARRA = 30;
 
 function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista, sel: Controller['selezione'], W: number, H: number): RisMano {
   const u = d.u;
@@ -600,7 +602,7 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
   const cw = 90 * u;
   const ch = 126 * u;
   const alzata = ui.manoAlzata || sel.carta !== undefined;
-  const yAlto = alzata ? H - ch - 12 * u : H - 58 * u;
+  const yAlto = alzata ? H - H_BARRA * u - ch - 8 * u : H - (H_BARRA + 34) * u;
   const zonaX0 = (LARGH_ENERGIA + 30) * u;
   const zonaW = W - 2 * zonaX0;
   const passo = n > 1 ? Math.min(cw * 0.9, (zonaW - cw) / (n - 1)) : 0;
@@ -659,37 +661,43 @@ function disegnaMano(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vist
 function controlli(d: Disegno, c: Controller, ui: UiStato, az: Azioni, v: Vista, sel: Controller['selezione'], opz: ReturnType<Controller['opzioni']>, W: number, H: number): Area[] {
   const u = d.u;
   const ingombri: Area[] = [];
-  // --- energia (in basso a sinistra): gemma grande col numero ad alto contrasto, poi Sigilli/riti e una riga sola di informazioni ---
-  const pw = LARGH_ENERGIA * u;
-  const ph = 126 * u;
-  const px = 10 * u;
-  const py = H - ph - 10 * u;
-  d.rett(px, py, pw, ph, 0x070503, { alpha: 0.9, stroke: COL.oroScuro, sw: 1.2, r: 8 * u });
-  d.aree['pannello:energia'] = { x: px, y: py, w: pw, h: 66 * u };
-  misura('fisso', 'energia', { x: px, y: py, w: pw, h: ph });
-  ingombri.push({ x: px, y: py, w: pw, h: ph });
-  const gx = px + 38 * u;
-  const gy = py + 37 * u;
-  const lato = 38 * u; // lato del quadrato ruotato: la diagonale e' circa 54 px
+  // --- barra di stato (in basso, a tutta larghezza): energia, Sigilli/Riti, Esposizione, Mazzo e RIDUCI, in una riga sola ---
+  const hb = H_BARRA * u;
+  const yb = H - hb;
+  const cyb = yb + hb / 2;
+  // a destra della barra restano il medaglione e le icone (come prima, nell'angolo): la barra arriva fin dove cominciano le icone
+  const wBarra = W - 272 * u;
+  d.rett(0, yb, wBarra, hb, 0x070503, { alpha: 0.94, r: 0 });
+  d.rett(0, yb, wBarra, 1.2 * u, COL.oroScuro, { r: 0 });
+  d.aree['pannello:energia'] = { x: 0, y: yb, w: wBarra, h: hb };
+  misura('fisso', 'energia', { x: 0, y: yb, w: wBarra, h: hb });
+  ingombri.push({ x: 0, y: yb, w: wBarra, h: hb });
+  let xb = 14 * u;
+  const gx = xb + 12 * u;
+  const lato = 17 * u; // lato del quadrato ruotato: la diagonale e' circa 24 px
   const gem = new Graphics();
-  gem.roundRect(gx - lato / 2, gy - lato / 2, lato, lato, 7 * u).fill(0x2a5ea8).stroke({ width: 2.5, color: 0xdbe6f4 });
-  gem.roundRect(gx - lato * 0.34, gy - lato * 0.44, lato * 0.44, lato * 0.44, 4 * u).fill({ color: 0xe8f4ff, alpha: 0.55 });
+  gem.roundRect(gx - lato / 2, cyb - lato / 2, lato, lato, 3 * u).fill(0x2a5ea8).stroke({ width: 1.8, color: 0xdbe6f4 });
   gem.rotation = Math.PI / 4;
-  gem.pivot.set(gx, gy);
-  gem.position.set(gx, gy);
+  gem.pivot.set(gx, cyb);
+  gem.position.set(gx, cyb);
   d.s.addChild(gem);
-  const tEn = d.testo(String(v.energia), gx, gy, 28, 0xffffff, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5, bordo: { colore: 0x0a1626, spessore: 5 } });
-  tEn.y = gy;
+  const tEn = d.testo(String(v.energia), gx, cyb, 15, 0xffffff, { titoli: true, bold: true, peso: '900', anchorX: 0.5, anchorY: 0.5, bordo: { colore: 0x0a1626, spessore: 3 } });
+  tEn.y = cyb;
   anim.numero('energia', v.energia, tEn);
-  d.testo('ENERGIA', px + 74 * u, py + 11 * u, 13, 0xa9d0ff, { titoli: true, bold: true, ls: 0.5 });
-  const tappeEt = v.fazione === 'custodi' ? 'Sigilli' : 'Riti';
-  d.testo(`${tappeEt} ${v.tappe}/3`, px + 74 * u, py + 32 * u, 14.5, 0xf2ead6, { bold: true });
-  // una riga sola: esposizione e mazzo
+  xb = gx + 18 * u;
+  const voce = (testo: string, colore: number, bold = false): void => {
+    const t = d.testo(testo, xb, cyb, 13, colore, { bold, anchorY: 0.5 });
+    t.y = cyb;
+    xb += t.width + 18 * u;
+  };
+  voce('ENERGIA', 0xa9d0ff, true);
+  voce(`${v.fazione === 'custodi' ? 'Sigilli' : 'Riti'} ${v.tappe}/3`, 0xf2ead6, true);
   const allarme = v.esposizione >= 6;
-  const tEsp = d.testo(`Esposizione ${v.esposizione}/10`, px + 9 * u, py + 69 * u, 13, allarme ? COL.pericolo : 0xf2ead6, { bold: allarme });
-  d.testo(`· Mazzo ${v.nMazzo}`, px + 9 * u + tEsp.width + 5 * u, py + 69 * u, 13, 0xd8d0ba);
+  voce(`Esposizione ${v.esposizione}/10`, allarme ? COL.pericolo : 0xf2ead6, allarme);
+  voce(`Mazzo ${v.nMazzo}`, 0xd8d0ba);
   const riduci = c.puoRidurre();
-  d.pillolaOro('btn:riduci', 'RIDUCI · 2', px + 9 * u, py + ph - 33 * u, 26 * u, () => { c.riduci(); az.rerender(); }, 12, riduci);
+  const hPill = 22 * u;
+  d.pillolaOro('btn:riduci', 'RIDUCI · 2', xb, cyb - hPill / 2, hPill, () => { c.riduci(); az.rerender(); }, 12, riduci);
 
   // --- fine turno / gioca (in basso a destra) ---
   const r = 41 * u;
